@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post — Emir Esparza</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+
+  <header class="header header--light">
+    <div class="header__inner">
+      <a href="index.html" class="logo">EEF.</a>
+      <nav class="nav">
+        <a href="index.html#about"    class="nav__link">About</a>
+        <a href="projects.html"       class="nav__link">Proyectos</a>
+        <a href="blog.html"           class="nav__link">Blog</a>
+        <a href="index.html#proceso"  class="nav__link">Proceso</a>
+        <a href="index.html#contacto" class="nav__link">Contacto</a>
+      </nav>
+      <a href="mailto:emiresparza@gmail.com" class="btn-cta" id="headerCta">
+        <svg width="14" height="11" viewBox="0 0 14 11" fill="none" aria-hidden="true">
+          <rect x=".7" y=".7" width="12.6" height="9.6" rx="1.2" stroke="currentColor" stroke-width="1.1"/>
+          <polyline points="1,1 7,6.5 13,1" stroke="currentColor" stroke-width="1.1" fill="none"/>
+        </svg>
+        Hablemos
+      </a>
+    </div>
+  </header>
+
+  <!-- Cabecera del post -->
+  <div class="post-top">
+    <a href="blog.html" class="post-back reveal" style="transition-delay:.05s">
+      <svg width="16" height="10" viewBox="0 0 16 10" fill="none" aria-hidden="true">
+        <path d="M15 5H1M1 5L5 1M1 5L5 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Blog
+    </a>
+    <div class="post-top__meta reveal" style="transition-delay:.1s">
+      <span class="post-top__cat" id="postCat"></span>
+      <span class="post-top__sep">·</span>
+      <span class="post-top__date" id="postDate"></span>
+      <span class="post-top__sep">·</span>
+      <span class="post-top__read" id="postRead"></span>
+    </div>
+    <h1 class="post-top__title reveal" style="transition-delay:.18s" id="postTitle">—</h1>
+  </div>
+
+  <!-- Imagen hero -->
+  <div class="post-hero-img reveal" style="transition-delay:.26s" id="postHeroWrap">
+    <img id="postHeroImg" src="" alt="">
+  </div>
+
+  <!-- Cuerpo del post -->
+  <article class="post-body" id="postBody"></article>
+
+  <!-- CTA + FOOTER -->
+  <div class="dark-card">
+    <section class="cta">
+      <div class="container cta__inner">
+        <h2 class="cta__title">Creemos un espacio<br>que sea tuyo.</h2>
+        <a href="mailto:emiresparza@gmail.com" class="btn-cta btn-cta--light">
+          <svg width="14" height="11" viewBox="0 0 14 11" fill="none" aria-hidden="true"><rect x=".7" y=".7" width="12.6" height="9.6" rx="1.2" stroke="currentColor" stroke-width="1.1"/><polyline points="1,1 7,6.5 13,1" stroke="currentColor" stroke-width="1.1" fill="none"/></svg>
+          Hablemos
+        </a>
+      </div>
+    </section>
+    <footer class="footer">
+      <div class="container footer__grid">
+        <div class="footer__brand">
+          <p class="footer__logo">EEF.</p>
+          <p class="footer__addr">Temuco, Chile<br>(+569) 87 28 31 54</p>
+        </div>
+        <div class="footer__col">
+          <span class="footer__col-label">Sitemap</span>
+          <ul>
+            <li><a href="index.html#about">About</a></li>
+            <li><a href="projects.html">Proyectos</a></li>
+            <li><a href="index.html#servicios">Servicios</a></li>
+            <li><a href="index.html#proceso">Proceso</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <span class="footer__col-label">Social</span>
+          <ul>
+            <li><a href="#">Instagram</a></li>
+            <li><a href="#">LinkedIn</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <span class="footer__col-label">Contacto</span>
+          <a class="footer__email" href="mailto:emiresparza@gmail.com">emiresparza@gmail.com</a>
+        </div>
+      </div>
+      <div class="container footer__bottom">
+        <p>2026, Todos los derechos reservados</p>
+        <a href="#">Política de privacidad</a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="blog-data.js"></script>
+  <script src="main.js"></script>
+  <script>
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var id     = params.get('id');
+    var post   = (posts || []).find(function (p) { return p.id === id; });
+
+    if (!post) {
+      document.getElementById('postTitle').textContent = 'Post no encontrado';
+      return;
+    }
+
+    document.title = post.title + ' — Emir Esparza';
+    document.getElementById('postTitle').textContent = post.title;
+    document.getElementById('postCat').textContent   = post.category;
+    document.getElementById('postDate').textContent  = post.dateLabel;
+    document.getElementById('postRead').textContent  = post.readTime + ' de lectura';
+
+    var heroImg = document.getElementById('postHeroImg');
+    heroImg.src = post.thumbnail;
+    heroImg.alt = post.title;
+
+    // Cuerpo
+    var body = document.getElementById('postBody');
+    post.body.forEach(function (block, i) {
+      var el;
+      if (block.type === 'h2') {
+        el = document.createElement('h2');
+      } else {
+        el = document.createElement('p');
+      }
+      el.textContent    = block.text;
+      el.className      = 'reveal';
+      el.style.transitionDelay = (i * 0.07) + 's';
+      body.appendChild(el);
+    });
+
+    // Reveal en scroll — incluye cabecera y cuerpo
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('is-visible');
+        obs.unobserve(e.target);
+      });
+    }, { threshold: 0.05, rootMargin: '0px 0px -3% 0px' });
+
+    document.querySelectorAll('.post-top .reveal, .post-hero-img, .post-body .reveal').forEach(function (el) {
+      obs.observe(el);
+    });
+  })();
+  </script>
+
+</body>
+</html>

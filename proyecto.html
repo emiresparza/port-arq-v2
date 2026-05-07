@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proyecto — Emir Esparza</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+
+  <header class="header header--light">
+    <div class="header__inner">
+      <a href="index.html" class="logo">EEF.</a>
+      <nav class="nav">
+        <a href="index.html#about"    class="nav__link">About</a>
+        <a href="projects.html"       class="nav__link">Proyectos</a>
+        <a href="blog.html"           class="nav__link">Blog</a>
+        <a href="index.html#proceso"  class="nav__link">Proceso</a>
+        <a href="index.html#contacto" class="nav__link">Contacto</a>
+      </nav>
+      <a href="mailto:emiresparza@gmail.com" class="btn-cta" id="headerCta">
+        <svg width="14" height="11" viewBox="0 0 14 11" fill="none" aria-hidden="true">
+          <rect x=".7" y=".7" width="12.6" height="9.6" rx="1.2" stroke="currentColor" stroke-width="1.1"/>
+          <polyline points="1,1 7,6.5 13,1" stroke="currentColor" stroke-width="1.1" fill="none"/>
+        </svg>
+        Hablemos
+      </a>
+    </div>
+  </header>
+
+  <!-- Cabecera del proyecto -->
+  <div class="proj-top">
+    <a href="projects.html" class="proj-back reveal" style="transition-delay:.05s">
+      <svg width="16" height="10" viewBox="0 0 16 10" fill="none" aria-hidden="true">
+        <path d="M15 5H1M1 5L5 1M1 5L5 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Proyectos
+    </a>
+    <p class="proj-cat reveal" style="transition-delay:.12s" id="projCat"></p>
+    <h1 class="proj-title reveal" style="transition-delay:.2s" id="projTitle">—</h1>
+  </div>
+
+  <!-- Galería de imágenes -->
+  <div class="proj-gallery" id="projGallery"></div>
+
+  <!-- CTA + FOOTER -->
+  <div class="dark-card">
+    <section class="cta">
+      <div class="container cta__inner">
+        <h2 class="cta__title">Creemos un espacio<br>que sea tuyo.</h2>
+        <a href="mailto:emiresparza@gmail.com" class="btn-cta btn-cta--light">
+          <svg width="14" height="11" viewBox="0 0 14 11" fill="none" aria-hidden="true"><rect x=".7" y=".7" width="12.6" height="9.6" rx="1.2" stroke="currentColor" stroke-width="1.1"/><polyline points="1,1 7,6.5 13,1" stroke="currentColor" stroke-width="1.1" fill="none"/></svg>
+          Hablemos
+        </a>
+      </div>
+    </section>
+    <footer class="footer">
+      <div class="container footer__grid">
+        <div class="footer__brand">
+          <p class="footer__logo">EEF.</p>
+          <p class="footer__addr">Temuco, Chile<br>(+569) 87 28 31 54</p>
+        </div>
+        <div class="footer__col">
+          <span class="footer__col-label">Sitemap</span>
+          <ul>
+            <li><a href="index.html#about">About</a></li>
+            <li><a href="projects.html">Proyectos</a></li>
+            <li><a href="index.html#servicios">Servicios</a></li>
+            <li><a href="index.html#proceso">Proceso</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <span class="footer__col-label">Social</span>
+          <ul>
+            <li><a href="#">Instagram</a></li>
+            <li><a href="#">LinkedIn</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <span class="footer__col-label">Contacto</span>
+          <a class="footer__email" href="mailto:emiresparza@gmail.com">emiresparza@gmail.com</a>
+        </div>
+      </div>
+      <div class="container footer__bottom">
+        <p>2026, Todos los derechos reservados</p>
+        <a href="#">Política de privacidad</a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="main.js"></script>
+  <script>
+  (function () {
+    var params  = new URLSearchParams(window.location.search);
+    var id      = params.get('id');
+    var project = (projects || []).find(function (p) { return p.id === id; });
+
+    if (!project || !project.hasDetails) {
+      document.getElementById('projTitle').textContent = 'Proyecto no encontrado';
+      return;
+    }
+
+    document.title = project.title + ' — Emir Esparza';
+    document.getElementById('projTitle').textContent = project.title;
+    document.getElementById('projCat').textContent   = project.category;
+
+    // ── Galería ──────────────────────────────────────────────────────
+    var gallery  = document.getElementById('projGallery');
+    var imgs     = project.images;
+    var toReveal = [];
+    var i        = 0;
+
+    while (i < imgs.length) {
+      var remaining = imgs.length - i;
+
+      if (i === 0 || remaining === 1) {
+        var img = document.createElement('img');
+        img.src       = 'assets/img/project-details/' + id + '/' + imgs[i];
+        img.alt       = project.title;
+        img.loading   = 'lazy';
+        img.className = 'proj-gallery__img reveal reveal--img';
+        gallery.appendChild(img);
+        toReveal.push({ el: img, delay: 0 });
+        i++;
+      } else {
+        var pair = document.createElement('div');
+        pair.className = 'proj-gallery__pair reveal reveal--img';
+        for (var j = 0; j < 2 && i < imgs.length; j++, i++) {
+          var img = document.createElement('img');
+          img.src       = 'assets/img/project-details/' + id + '/' + imgs[i];
+          img.alt       = project.title;
+          img.loading   = 'lazy';
+          img.className = 'proj-gallery__img';
+          pair.appendChild(img);
+        }
+        gallery.appendChild(pair);
+        toReveal.push({ el: pair, delay: 0 });
+      }
+    }
+
+    // ── Reveal al hacer scroll ────────────────────────────────────────
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('is-visible');
+        obs.unobserve(e.target);
+      });
+    }, { threshold: 0.06, rootMargin: '0px 0px -5% 0px' });
+
+    // Encabezado (ya en viewport al cargar)
+    document.querySelectorAll('.proj-top .reveal').forEach(function (el) {
+      obs.observe(el);
+    });
+
+    // Galería — stagger suave entre bloques
+    toReveal.forEach(function (item, idx) {
+      item.el.style.transitionDelay = (idx * 0.1) + 's';
+      obs.observe(item.el);
+    });
+
+  })();
+  </script>
+
+</body>
+</html>

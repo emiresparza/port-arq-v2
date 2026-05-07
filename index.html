@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emir Esparza — Arquitectura & Diseño</title>
+  <meta name="description" content="Arquitecto independiente con base en Temuco. Proyectos residenciales, interiorismo, BIM y comunicación visual.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header__inner">
+      <a href="#" class="logo">EEF.</a>
+      <nav class="nav">
+        <a href="#about"       class="nav__link">About</a>
+        <a href="projects.html" class="nav__link">Proyectos</a>
+        <a href="#proceso"     class="nav__link">Proceso</a>
+        <a href="#contacto"    class="nav__link">Contacto</a>
+      </nav>
+      <a href="mailto:emiresparza@gmail.com" class="btn-cta" id="headerCta">
+        <svg width="14" height="11" viewBox="0 0 14 11" fill="none" aria-hidden="true">
+          <rect x=".7" y=".7" width="12.6" height="9.6" rx="1.2" stroke="currentColor" stroke-width="1.1"/>
+          <polyline points="1,1 7,6.5 13,1" stroke="currentColor" stroke-width="1.1" fill="none"/>
+        </svg>
+        Hablemos
+      </a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero__bg">
+      <img src="assets/img/projects/antu.png"
+           alt="" class="hero__img" id="heroImg">
+      <div class="hero__overlay"></div>
+    </div>
+    <div class="hero__words" id="heroWords" aria-hidden="true">
+      <span data-depth="0.3">Diseñamos</span>
+      <span data-depth="0.6">Espacios</span>
+      <span data-depth="0.4">Para</span>
+      <span data-depth="0.7">Vivir</span>
+    </div>
+    <div class="hero__bottom">
+      <h1 class="hero__title">Espacios que<br>construyen<br>quiénes somos</h1>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="container">
+      <span class="label">Arquitecto &amp; Consultor BIM — Temuco, Chile</span>
+      <p class="about__text">
+        Arquitectura, interiorismo y consultoría BIM integrados en proyectos
+        que unifican lógica técnica, identidad espacial y comunicación visual.
+        Docente universitario y consultor independiente con base en Temuco.
+      </p>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="projects" id="proyectos">
+    <div class="container projects__header">
+      <span class="label">Proyectos Seleccionados</span>
+    </div>
+
+    <article class="project project--right">
+      <a href="#" class="project__link">
+        <div class="project__img-wrap">
+          <img src="assets/img/projects/antu.png"
+               alt="Antü" class="project__img">
+        </div>
+        <div class="project__info">
+          <h3 class="project__title">Antü</h3>
+          <div class="project__tags">
+            <span>Institucional</span><span class="sep">•</span>
+            <span>Arquitectura</span><span class="sep">•</span>
+            <span>Branding</span>
+          </div>
+        </div>
+      </a>
+    </article>
+
+    <article class="project project--left">
+      <a href="#" class="project__link">
+        <div class="project__img-wrap">
+          <img src="assets/img/projects/casa-bv.png"
+               alt="Casa BV" class="project__img">
+        </div>
+        <div class="project__info">
+          <h3 class="project__title">Casa BV</h3>
+          <div class="project__tags">
+            <span>Residencial</span><span class="sep">•</span>
+            <span>BIM</span><span class="sep">•</span>
+            <span>Interiorismo</span>
+          </div>
+        </div>
+      </a>
+    </article>
+
+    <article class="project project--full">
+      <a href="#" class="project__link">
+        <div class="project__img-wrap">
+          <img src="assets/img/projects/belmonte.jpg"
+               alt="Belmonte" class="project__img">
+        </div>
+        <div class="project__info">
+          <h3 class="project__title">Belmonte</h3>
+          <div class="project__tags">
+            <span>Residencial</span><span class="sep">•</span>
+            <span>Arquitectura</span>
+          </div>
+        </div>
+      </a>
+    </article>
+
+    <div class="projects__more">
+      <a href="#" class="btn-outline">Ver todos los proyectos</a>
+    </div>
+
+    <div class="ticker">
+      <div class="ticker__track">
+        <span>Arquitectura</span><span class="sep">—</span>
+        <span>BIM · Revit · Archicad</span><span class="sep">—</span>
+        <span>Interiorismo</span><span class="sep">—</span>
+        <span>Branding</span><span class="sep">—</span>
+        <span>Archviz</span><span class="sep">—</span>
+        <span>Temuco · Chile</span><span class="sep">—</span>
+        <span>Arquitectura</span><span class="sep">—</span>
+        <span>BIM · Revit · Archicad</span><span class="sep">—</span>
+        <span>Interiorismo</span><span class="sep">—</span>
+        <span>Branding</span><span class="sep">—</span>
+        <span>Archviz</span><span class="sep">—</span>
+        <span>Temuco · Chile</span><span class="sep">—</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="services" id="servicios">
+    <div class="container services__header">
+      <span class="label">Servicios</span>
+      <p class="services__intro">
+        Entrego arquitectura, BIM e interiorismo integrados en una propuesta cohesiva
+        que transforma el encargo en espacios construidos sobre lógica material y visión propia.
+      </p>
+    </div>
+
+    <div class="service" style="--svc-bg: url('assets/img/projects/antu.png')">
+      <div class="service__bg-clip"><div class="service__bg"></div></div>
+      <div class="service__left">
+        <span class="service__num">01</span>
+        <ul class="service__index">
+          <li class="is-active">(01) Arquitectura</li>
+          <li>(02) BIM &amp; Modelado</li>
+          <li>(03) Interiorismo</li>
+          <li>(04) Comunicación Visual</li>
+        </ul>
+        <div class="service__includes">
+          <span class="service__inc-label">Incluye</span>
+          <ul>
+            <li>Diseño y anteproyecto</li>
+            <li>Documentación técnica</li>
+            <li>Permisos municipales</li>
+            <li>Coordinación de especialidades</li>
+          </ul>
+        </div>
+        <p class="service__name">Arquitectura</p>
+      </div>
+      <div class="service__images">
+        <div class="service__card">
+          <img src="assets/img/projects/antu.png" alt="Antü">
+        </div>
+      </div>
+    </div>
+
+    <div class="service" style="--svc-bg: url('assets/img/projects/bim-panoramica.jpg')">
+      <div class="service__bg-clip"><div class="service__bg"></div></div>
+      <div class="service__left">
+        <span class="service__num">02</span>
+        <ul class="service__index">
+          <li>(01) Arquitectura</li>
+          <li class="is-active">(02) BIM &amp; Modelado</li>
+          <li>(03) Interiorismo</li>
+          <li>(04) Comunicación Visual</li>
+        </ul>
+        <div class="service__includes">
+          <span class="service__inc-label">Incluye</span>
+          <ul>
+            <li>Modelado Revit / Archicad</li>
+            <li>Estándares BIM</li>
+            <li>Coordinación de modelos</li>
+            <li>Documentación inteligente</li>
+          </ul>
+        </div>
+        <p class="service__name">BIM &amp; Modelado</p>
+      </div>
+      <div class="service__images">
+        <div class="service__card">
+          <img src="assets/img/projects/bim-panoramica.jpg" alt="BIM Panorámica">
+        </div>
+      </div>
+    </div>
+
+    <div class="service" style="--svc-bg: url('assets/img/projects/clinica-o2.png')">
+      <div class="service__bg-clip"><div class="service__bg"></div></div>
+      <div class="service__left">
+        <span class="service__num">03</span>
+        <ul class="service__index">
+          <li>(01) Arquitectura</li>
+          <li>(02) BIM &amp; Modelado</li>
+          <li class="is-active">(03) Interiorismo</li>
+          <li>(04) Comunicación Visual</li>
+        </ul>
+        <div class="service__includes">
+          <span class="service__inc-label">Incluye</span>
+          <ul>
+            <li>Diseño de interiores</li>
+            <li>Especificación de materiales</li>
+            <li>Diseño de mobiliario</li>
+            <li>Renders e infografías</li>
+          </ul>
+        </div>
+        <p class="service__name">Interiorismo</p>
+      </div>
+      <div class="service__images">
+        <div class="service__card">
+          <img src="assets/img/projects/clinica-o2.png" alt="Clínica O2">
+        </div>
+      </div>
+    </div>
+
+    <div class="service" style="--svc-bg: url('assets/img/projects/branding-bosquesur.jpg')">
+      <div class="service__bg-clip"><div class="service__bg"></div></div>
+      <div class="service__left">
+        <span class="service__num">04</span>
+        <ul class="service__index">
+          <li>(01) Arquitectura</li>
+          <li>(02) BIM &amp; Modelado</li>
+          <li>(03) Interiorismo</li>
+          <li class="is-active">(04) Comunicación Visual</li>
+        </ul>
+        <div class="service__includes">
+          <span class="service__inc-label">Incluye</span>
+          <ul>
+            <li>Branding de proyecto</li>
+            <li>Archviz &amp; renders</li>
+            <li>Identidad corporativa</li>
+            <li>Marketing digital</li>
+          </ul>
+        </div>
+        <p class="service__name">Comunicación Visual</p>
+      </div>
+      <div class="service__images">
+        <div class="service__card">
+          <img src="assets/img/projects/branding-bosquesur.jpg" alt="Branding Bosquesur">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECONOCIMIENTOS -->
+  <section class="awards" id="reconocimientos">
+    <div class="container">
+      <span class="label">Reconocimientos</span>
+      <p class="awards__intro">
+        Trabajo reconocido en plataformas de diseño y arquitectura por unir claridad,
+        proporción y un lenguaje arquitectónico que produce espacios que perduran.
+      </p>
+      <div class="awards__table">
+        <div class="awards__row">
+          <span class="awards__pub">Bienal de Arquitectura</span>
+          <div class="awards__items">
+            <span>Selección oficial 2015</span>
+            <span>Proyecto residencial destacado</span>
+          </div>
+        </div>
+        <div class="awards__row">
+          <span class="awards__pub">Universidad Mayor</span>
+          <div class="awards__items">
+            <span>Material docente publicado</span>
+            <span>Distinción académica</span>
+          </div>
+        </div>
+        <div class="awards__row">
+          <span class="awards__pub">Plataforma Arquitectura</span>
+          <div class="awards__items">
+            <span>Proyecto Casa BV publicado</span>
+            <span>Arquitectura residencial</span>
+          </div>
+        </div>
+        <div class="awards__row">
+          <span class="awards__pub">Notable™ — Diseño Digital</span>
+          <div class="awards__items">
+            <span>Dirección creativa y comunicación</span>
+            <span>Documentación de proyectos</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESO -->
+  <section class="process" id="proceso">
+    <div class="container process__grid">
+      <div class="process__left">
+        <span class="label">Proceso</span>
+        <h2 class="process__heading">Diseñado para<br>hacer realidad<br>tu visión</h2>
+        <p class="process__sub">Un flujo claro y estructurado que transforma el encargo en un resultado preciso y visualmente coherente.</p>
+        <a href="mailto:emiresparza@gmail.com" class="btn-cta">
+          <svg width="14" height="11" viewBox="0 0 14 11" fill="none" aria-hidden="true"><rect x=".7" y=".7" width="12.6" height="9.6" rx="1.2" stroke="currentColor" stroke-width="1.1"/><polyline points="1,1 7,6.5 13,1" stroke="currentColor" stroke-width="1.1" fill="none"/></svg>
+          Hablemos
+        </a>
+      </div>
+      <div class="process__steps">
+        <div class="process__step">
+          <div class="process__step-head">
+            <span class="process__badge">1</span>
+            <h3 class="process__step-title">Briefing</h3>
+          </div>
+          <p class="process__step-sub">Entiendo el contexto</p>
+          <p class="process__step-text">Escucho el programa, el terreno, el presupuesto y los plazos. Cada proyecto parte de escuchar bien.</p>
+        </div>
+        <div class="process__step">
+          <div class="process__step-head">
+            <span class="process__badge">2</span>
+            <h3 class="process__step-title">Concepto</h3>
+          </div>
+          <p class="process__step-sub">Construyo la visión</p>
+          <p class="process__step-text">Desarrollo una propuesta espacial con identidad propia. Esquemas, volumetrías y referencias visuales.</p>
+        </div>
+        <div class="process__step">
+          <div class="process__step-head">
+            <span class="process__badge">3</span>
+            <h3 class="process__step-title">Diseño</h3>
+          </div>
+          <p class="process__step-sub">Desarrollando los detalles</p>
+          <p class="process__step-text">Layouts detallados y mood boards donde cada material, textura y elemento del espacio es cuidadosamente definido.</p>
+        </div>
+        <div class="process__step">
+          <div class="process__step-head">
+            <span class="process__badge">4</span>
+            <h3 class="process__step-title">Desarrollo</h3>
+          </div>
+          <p class="process__step-sub">Documentación y coordinación</p>
+          <p class="process__step-text">Documentación técnica BIM, coordinación de especialidades y gestión de permisos municipales.</p>
+        </div>
+        <div class="process__step">
+          <div class="process__step-head">
+            <span class="process__badge">5</span>
+            <h3 class="process__step-title">Entrega</h3>
+          </div>
+          <p class="process__step-sub">El proyecto hecho realidad</p>
+          <p class="process__step-text">Renders ejecutivos, planos, especificaciones y acompañamiento durante la obra hasta el resultado final.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA + FOOTER — contenedor oscuro redondeado -->
+  <div class="dark-card">
+
+    <section class="cta" id="contacto">
+      <div class="container cta__inner">
+        <h2 class="cta__title">Creemos un espacio<br>que sea tuyo.</h2>
+        <a href="mailto:emiresparza@gmail.com" class="btn-cta btn-cta--light">
+          <svg width="14" height="11" viewBox="0 0 14 11" fill="none" aria-hidden="true"><rect x=".7" y=".7" width="12.6" height="9.6" rx="1.2" stroke="currentColor" stroke-width="1.1"/><polyline points="1,1 7,6.5 13,1" stroke="currentColor" stroke-width="1.1" fill="none"/></svg>
+          Hablemos
+        </a>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container footer__grid">
+        <div class="footer__brand">
+          <p class="footer__logo">EEF.</p>
+          <p class="footer__addr">Temuco, Chile<br>(+569) 87 28 31 54</p>
+        </div>
+        <div class="footer__col">
+          <span class="footer__col-label">Sitemap</span>
+          <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#proyectos">Proyectos</a></li>
+            <li><a href="#servicios">Servicios</a></li>
+            <li><a href="#proceso">Proceso</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <span class="footer__col-label">Social</span>
+          <ul>
+            <li><a href="#">Instagram</a></li>
+            <li><a href="#">LinkedIn</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <span class="footer__col-label">Contacto</span>
+          <a class="footer__email" href="mailto:emiresparza@gmail.com">emiresparza@gmail.com</a>
+        </div>
+      </div>
+      <div class="container footer__bottom">
+        <p>2026, Todos los derechos reservados</p>
+        <a href="#">Política de privacidad</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

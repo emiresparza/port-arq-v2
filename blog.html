@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — Emir Esparza Arquitectura</title>
+  <meta name="description" content="Reflexiones sobre arquitectura, BIM, diseño y proceso creativo.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+
+  <header class="header header--light">
+    <div class="header__inner">
+      <a href="index.html" class="logo">EEF.</a>
+      <nav class="nav">
+        <a href="index.html#about"    class="nav__link">About</a>
+        <a href="projects.html"       class="nav__link">Proyectos</a>
+        <a href="blog.html"           class="nav__link">Blog</a>
+        <a href="index.html#proceso"  class="nav__link">Proceso</a>
+        <a href="index.html#contacto" class="nav__link">Contacto</a>
+      </nav>
+      <a href="mailto:emiresparza@gmail.com" class="btn-cta" id="headerCta">
+        <svg width="14" height="11" viewBox="0 0 14 11" fill="none" aria-hidden="true">
+          <rect x=".7" y=".7" width="12.6" height="9.6" rx="1.2" stroke="currentColor" stroke-width="1.1"/>
+          <polyline points="1,1 7,6.5 13,1" stroke="currentColor" stroke-width="1.1" fill="none"/>
+        </svg>
+        Hablemos
+      </a>
+    </div>
+  </header>
+
+  <!-- PAGE HERO -->
+  <div class="page-hero">
+    <div>
+      <span class="page-hero__date">Reflexiones sobre arquitectura y diseño</span>
+      <h1 class="page-hero__title">Blog</h1>
+    </div>
+  </div>
+
+  <!-- POST LIST -->
+  <div class="blog-list" id="blogList"></div>
+
+  <!-- CTA + FOOTER -->
+  <div class="dark-card">
+    <section class="cta">
+      <div class="container cta__inner">
+        <h2 class="cta__title">Creemos un espacio<br>que sea tuyo.</h2>
+        <a href="mailto:emiresparza@gmail.com" class="btn-cta btn-cta--light">
+          <svg width="14" height="11" viewBox="0 0 14 11" fill="none" aria-hidden="true"><rect x=".7" y=".7" width="12.6" height="9.6" rx="1.2" stroke="currentColor" stroke-width="1.1"/><polyline points="1,1 7,6.5 13,1" stroke="currentColor" stroke-width="1.1" fill="none"/></svg>
+          Hablemos
+        </a>
+      </div>
+    </section>
+    <footer class="footer">
+      <div class="container footer__grid">
+        <div class="footer__brand">
+          <p class="footer__logo">EEF.</p>
+          <p class="footer__addr">Temuco, Chile<br>(+569) 87 28 31 54</p>
+        </div>
+        <div class="footer__col">
+          <span class="footer__col-label">Sitemap</span>
+          <ul>
+            <li><a href="index.html#about">About</a></li>
+            <li><a href="projects.html">Proyectos</a></li>
+            <li><a href="index.html#servicios">Servicios</a></li>
+            <li><a href="index.html#proceso">Proceso</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <span class="footer__col-label">Social</span>
+          <ul>
+            <li><a href="#">Instagram</a></li>
+            <li><a href="#">LinkedIn</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <span class="footer__col-label">Contacto</span>
+          <a class="footer__email" href="mailto:emiresparza@gmail.com">emiresparza@gmail.com</a>
+        </div>
+      </div>
+      <div class="container footer__bottom">
+        <p>2026, Todos los derechos reservados</p>
+        <a href="#">Política de privacidad</a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="blog-data.js"></script>
+  <script src="main.js"></script>
+  <script>
+  (function () {
+    var list = document.getElementById('blogList');
+
+    posts.forEach(function (post) {
+      var a = document.createElement('a');
+      a.href      = 'post.html?id=' + post.id;
+      a.className = 'blog-post-row reveal';
+
+      a.innerHTML =
+        '<div class="blog-post-row__left">' +
+          '<span class="blog-post-row__date">' + post.dateLabel + '</span>' +
+          '<p class="blog-post-row__title">' + post.title + '</p>' +
+          '<p class="blog-post-row__excerpt">' + post.excerpt + '</p>' +
+          '<div class="blog-post-row__meta">' +
+            '<span class="blog-post-row__cat">' + post.category + '</span>' +
+            '<span class="blog-post-row__sep">·</span>' +
+            '<span class="blog-post-row__read">' + post.readTime + '</span>' +
+            '<span class="blog-post-row__arrow">→</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="blog-post-row__img">' +
+          '<img src="' + post.thumbnail + '" alt="' + post.title + '" loading="lazy">' +
+        '</div>';
+
+      list.appendChild(a);
+    });
+
+    // Reveal al scroll con stagger
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('is-visible');
+        obs.unobserve(e.target);
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+
+    document.querySelectorAll('.blog-post-row').forEach(function (el, i) {
+      el.style.transitionDelay = (i * 0.08) + 's';
+      obs.observe(el);
+    });
+  })();
+  </script>
+
+</body>
+</html>
