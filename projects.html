@@ -41,34 +41,94 @@
       <span class="page-hero__date">2016 – 2026</span>
       <h1 class="page-hero__title">Proyectos</h1>
     </div>
-    <div class="grid-toggle" role="group" aria-label="Vista de grilla">
-      <button class="grid-toggle__btn is-active" data-cols="5" aria-label="5 columnas" title="Vista compacta">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-          <rect x="0"  y="0"  width="3" height="3" rx=".5" fill="currentColor"/>
-          <rect x="4"  y="0"  width="3" height="3" rx=".5" fill="currentColor"/>
-          <rect x="8"  y="0"  width="3" height="3" rx=".5" fill="currentColor"/>
-          <rect x="12" y="0"  width="3" height="3" rx=".5" fill="currentColor"/>
-          <rect x="16" y="0"  width="2" height="3" rx=".5" fill="currentColor"/>
-          <rect x="0"  y="5"  width="3" height="3" rx=".5" fill="currentColor"/>
-          <rect x="4"  y="5"  width="3" height="3" rx=".5" fill="currentColor"/>
-          <rect x="8"  y="5"  width="3" height="3" rx=".5" fill="currentColor"/>
-          <rect x="12" y="5"  width="3" height="3" rx=".5" fill="currentColor"/>
-          <rect x="16" y="5"  width="2" height="3" rx=".5" fill="currentColor"/>
-          <rect x="0"  y="10" width="3" height="3" rx=".5" fill="currentColor"/>
-          <rect x="4"  y="10" width="3" height="3" rx=".5" fill="currentColor"/>
-          <rect x="8"  y="10" width="3" height="3" rx=".5" fill="currentColor"/>
-          <rect x="12" y="10" width="3" height="3" rx=".5" fill="currentColor"/>
-          <rect x="16" y="10" width="2" height="3" rx=".5" fill="currentColor"/>
-        </svg>
-      </button>
-      <button class="grid-toggle__btn" data-cols="2" aria-label="2 columnas" title="Vista amplia">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-          <rect x="0"  y="0"  width="8" height="8" rx=".5" fill="currentColor"/>
-          <rect x="10" y="0"  width="8" height="8" rx=".5" fill="currentColor"/>
-          <rect x="0"  y="10" width="8" height="8" rx=".5" fill="currentColor"/>
-          <rect x="10" y="10" width="8" height="8" rx=".5" fill="currentColor"/>
-        </svg>
-      </button>
+    <div class="projects-controls">
+      <details class="project-filter" id="projectFilter">
+        <summary class="project-filter__summary">
+          <span class="project-filter__caret" aria-hidden="true"></span>
+          <span class="project-filter__title">Tipos</span>
+          <span class="project-filter__count" id="projectFilterCount">Todos</span>
+        </summary>
+        <div class="project-filter__panel">
+          <label class="project-filter__option">
+            <input type="checkbox" value="all" checked>
+            <span>Todos</span>
+          </label>
+          <label class="project-filter__option">
+            <input type="checkbox" value="Arquitectura">
+            <span>Arquitectura</span>
+          </label>
+          <label class="project-filter__option">
+            <input type="checkbox" value="Branding">
+            <span>Branding</span>
+          </label>
+          <label class="project-filter__option">
+            <input type="checkbox" value="Comercial">
+            <span>Comercial</span>
+          </label>
+          <label class="project-filter__option">
+            <input type="checkbox" value="Comunicación">
+            <span>Comunicación</span>
+          </label>
+          <label class="project-filter__option">
+            <input type="checkbox" value="Docencia">
+            <span>Docencia</span>
+          </label>
+          <label class="project-filter__option">
+            <input type="checkbox" value="Industrial">
+            <span>Industrial</span>
+          </label>
+          <label class="project-filter__option">
+            <input type="checkbox" value="Institucional">
+            <span>Institucional</span>
+          </label>
+          <label class="project-filter__option">
+            <input type="checkbox" value="Paisajismo">
+            <span>Paisajismo</span>
+          </label>
+          <label class="project-filter__option">
+            <input type="checkbox" value="Residencial">
+            <span>Residencial</span>
+          </label>
+          <label class="project-filter__option">
+            <input type="checkbox" value="Salud">
+            <span>Salud</span>
+          </label>
+          <label class="project-filter__option">
+            <input type="checkbox" value="Visualización">
+            <span>Visualización</span>
+          </label>
+        </div>
+      </details>
+
+      <div class="grid-toggle" role="group" aria-label="Vista de grilla">
+        <button class="grid-toggle__btn is-active" data-cols="5" aria-label="5 columnas" title="Vista compacta">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <rect x="0"  y="0"  width="3" height="3" rx=".5" fill="currentColor"/>
+            <rect x="4"  y="0"  width="3" height="3" rx=".5" fill="currentColor"/>
+            <rect x="8"  y="0"  width="3" height="3" rx=".5" fill="currentColor"/>
+            <rect x="12" y="0"  width="3" height="3" rx=".5" fill="currentColor"/>
+            <rect x="16" y="0"  width="2" height="3" rx=".5" fill="currentColor"/>
+            <rect x="0"  y="5"  width="3" height="3" rx=".5" fill="currentColor"/>
+            <rect x="4"  y="5"  width="3" height="3" rx=".5" fill="currentColor"/>
+            <rect x="8"  y="5"  width="3" height="3" rx=".5" fill="currentColor"/>
+            <rect x="12" y="5"  width="3" height="3" rx=".5" fill="currentColor"/>
+            <rect x="16" y="5"  width="2" height="3" rx=".5" fill="currentColor"/>
+            <rect x="0"  y="10" width="3" height="3" rx=".5" fill="currentColor"/>
+            <rect x="4"  y="10" width="3" height="3" rx=".5" fill="currentColor"/>
+            <rect x="8"  y="10" width="3" height="3" rx=".5" fill="currentColor"/>
+            <rect x="12" y="10" width="3" height="3" rx=".5" fill="currentColor"/>
+            <rect x="16" y="10" width="2" height="3" rx=".5" fill="currentColor"/>
+          </svg>
+        </button>
+        <button class="grid-toggle__btn" data-cols="2" aria-label="2 columnas" title="Vista amplia">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <rect x="0"  y="0"  width="8" height="8" rx=".5" fill="currentColor"/>
+            <rect x="10" y="0"  width="8" height="8" rx=".5" fill="currentColor"/>
+            <rect x="0"  y="10" width="8" height="8" rx=".5" fill="currentColor"/>
+            <rect x="10" y="10" width="8" height="8" rx=".5" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -440,13 +500,60 @@
     var btns = document.querySelectorAll('.grid-toggle__btn');
     if (!grid || !btns.length) return;
 
+    // Filtro por tipo de proyecto
+    var filter      = document.getElementById('projectFilter');
+    var count       = document.getElementById('projectFilterCount');
+    var filterBoxes = filter ? Array.from(filter.querySelectorAll('input[type="checkbox"]')) : [];
+    var allBox      = filterBoxes.find(function (box) { return box.value === 'all'; });
+
+    function syncProjectFilter(changedBox) {
+      if (!filterBoxes.length) return;
+
+      if (changedBox === allBox && allBox.checked) {
+        filterBoxes.forEach(function (box) {
+          if (box !== allBox) box.checked = false;
+        });
+      } else if (changedBox && changedBox !== allBox && changedBox.checked && allBox) {
+        allBox.checked = false;
+      }
+
+      var active = filterBoxes
+        .filter(function (box) { return box.checked && box.value !== 'all'; })
+        .map(function (box) { return box.value; });
+
+      if (!active.length && allBox) allBox.checked = true;
+
+      grid.querySelectorAll('.pg-item').forEach(function (item) {
+        var cat = item.querySelector('.pg-item__cat');
+        var category = cat ? cat.textContent.trim() : '';
+        var show = !active.length || active.indexOf(category) !== -1;
+        item.classList.toggle('is-filtered', !show);
+      });
+
+      if (count) {
+        count.textContent = active.length === 1 ? '1 activo' : (active.length ? active.length + ' activos' : 'Todos');
+      }
+    }
+
+    filterBoxes.forEach(function (box) {
+      box.addEventListener('change', function () {
+        syncProjectFilter(box);
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      if (filter && filter.open && !filter.contains(e.target)) {
+        filter.open = false;
+      }
+    });
+
     btns.forEach(function (btn) {
       btn.addEventListener('click', function () {
         var cols     = btn.dataset.cols;
         var newClass = 'projects-full' + (cols === '2' ? ' cols-2' : '');
         if (grid.className === newClass) return;
 
-        var items  = Array.from(grid.querySelectorAll('.pg-item'));
+        var items  = Array.from(grid.querySelectorAll('.pg-item:not(.is-filtered)'));
         var firsts = items.map(function (el) { return el.getBoundingClientRect(); });
 
         grid.className = newClass;

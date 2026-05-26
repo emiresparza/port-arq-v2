@@ -1,25 +1,15 @@
-// Custom cursor con lag
+// Custom cursor
 (function () {
   const cursor = document.getElementById('cursor');
   if (!cursor) return;
 
-  let mx = 0, my = 0, cx = 0, cy = 0;
-
   document.addEventListener('mousemove', function (e) {
-    mx = e.clientX;
-    my = e.clientY;
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
   });
 
-  (function loop() {
-    cx += (mx - cx) * 0.1;
-    cy += (my - cy) * 0.1;
-    cursor.style.left = cx + 'px';
-    cursor.style.top  = cy + 'px';
-    requestAnimationFrame(loop);
-  })();
-
   // Expandir sobre interactivos
-  document.querySelectorAll('a, button').forEach(function (el) {
+  document.querySelectorAll('a, button, summary, label, input').forEach(function (el) {
     el.addEventListener('mouseenter', function () { cursor.classList.add('cursor--expanded'); });
     el.addEventListener('mouseleave', function () { cursor.classList.remove('cursor--expanded'); });
   });
