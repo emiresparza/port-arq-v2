@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://emiresparza.github.io/port-arq-v2/sitemap.xml

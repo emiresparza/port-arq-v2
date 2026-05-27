@@ -1,17 +1,19 @@
+// Edita la reseña visible de cada página de proyecto con la propiedad "review".
+// Si un proyecto no tiene "review", la plantilla oculta la reseña en vez de repetir un texto genérico.
 const projects = [
   {
     "id": "antu",
     "title": "ANTÜ",
     "category": "Institucional",
+    "review": "",
     "thumbnail": "assets/img/projects/antu.png",
     "hasDetails": true,
     "images": [
-      "img-0.jpg",
-      "img-1.jpg",
-      "img-2.jpg",
-      "img-3.jpg",
-      "img-4.jpg",
-      "img-5.jpg"
+      "img-0.webp",
+      "img-1.webp",
+      "img-2.webp",
+      "img-3.webp",
+      "img-4.webp"
     ],
     "folderName": "antu"
   },
@@ -19,6 +21,7 @@ const projects = [
     "id": "belmonte",
     "title": "BELMONTE",
     "category": "Residencial",
+    "review": "Belmonte consistió en el diseño y habilitación de una sala de ventas y un departamento piloto para un edificio de la inmobiliaria Martabid. El encargo exigía resolver dos espacios comerciales en un plazo reducido, con capacidad para recibir clientes, comunicar valor inmobiliario y acelerar decisiones de compra.\n\nLa sala de ventas se desarrolló a partir del manual de marca de la inmobiliaria, incorporando su paleta, requerimientos operativos y criterios de presentación. Para el departamento piloto se trabajó una propuesta de interiorismo con renders, listas de compra y validaciones sucesivas, permitiendo ordenar diseño, compras y montaje.\n\nEl resultado fue una habilitación eficiente: el departamento piloto se vendió amoblado rápidamente y la sala de ventas continúa operativa.",
     "thumbnail": "assets/img/projects/belmonte.jpg",
     "hasDetails": false,
     "images": []

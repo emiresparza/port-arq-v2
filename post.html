@@ -3,7 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Post — Emir Esparza</title>
+  <title>Artículo de Arquitectura, BIM y Diseño — Emir Esparza</title>
+  <meta id="metaDescription" name="description" content="Artículo de Emir Esparza sobre arquitectura, BIM, diseño, docencia y proceso creativo.">
+  <meta name="author" content="Emir Esparza">
+  <meta id="robotsMeta" name="robots" content="index, follow">
+  <meta name="theme-color" content="#d9d9d9">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link id="canonicalLink" rel="canonical" href="https://emiresparza.github.io/port-arq-v2/post.html">
+  <meta property="og:locale" content="es_CL">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Emir Esparza Arquitectura">
+  <meta id="ogTitle" property="og:title" content="Artículo de Arquitectura, BIM y Diseño — Emir Esparza">
+  <meta id="ogDescription" property="og:description" content="Reflexiones sobre arquitectura, BIM, diseño y proceso creativo.">
+  <meta id="ogImage" property="og:image" content="https://emiresparza.github.io/port-arq-v2/assets/img/projects/bim-panoramica.jpg">
+  <meta id="ogUrl" property="og:url" content="https://emiresparza.github.io/port-arq-v2/post.html">
+  <meta id="articlePublishedTime" property="article:published_time" content="">
+  <meta id="articleSection" property="article:section" content="">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta id="twitterTitle" name="twitter:title" content="Artículo de Arquitectura, BIM y Diseño — Emir Esparza">
+  <meta id="twitterDescription" name="twitter:description" content="Reflexiones sobre arquitectura, BIM, diseño y proceso creativo.">
+  <meta id="twitterImage" name="twitter:image" content="https://emiresparza.github.io/port-arq-v2/assets/img/projects/bim-panoramica.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,11 +31,14 @@
 <body>
 
   <div class="cursor" id="cursor"></div>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
   <header class="header header--light">
     <div class="header__inner">
-      <a href="index.html" class="logo">EEF.</a>
-      <nav class="nav">
+      <a href="index.html" class="logo" aria-label="Inicio">
+        <img class="logo__mark" src="assets/logo-eef.svg" alt="Emir Esparza">
+      </a>
+      <nav class="nav" aria-label="Navegación principal">
         <a href="index.html#about"    class="nav__link">About</a>
         <a href="projects.html"       class="nav__link">Proyectos</a>
         <a href="blog.html"           class="nav__link">Blog</a>
@@ -32,6 +54,8 @@
       </a>
     </div>
   </header>
+
+  <main id="contenido">
 
   <!-- Cabecera del post -->
   <div class="post-top">
@@ -53,11 +77,13 @@
 
   <!-- Imagen hero -->
   <div class="post-hero-img reveal" style="transition-delay:.26s" id="postHeroWrap">
-    <img id="postHeroImg" src="" alt="">
+    <img id="postHeroImg" src="" alt="Imagen principal del artículo">
   </div>
 
   <!-- Cuerpo del post -->
   <article class="post-body" id="postBody"></article>
+
+  </main>
 
   <!-- CTA + FOOTER -->
   <div class="dark-card">
@@ -88,8 +114,8 @@
         <div class="footer__col">
           <span class="footer__col-label">Social</span>
           <ul>
-            <li><a href="#">Instagram</a></li>
-            <li><a href="#">LinkedIn</a></li>
+            <li><span>Instagram</span></li>
+            <li><span>LinkedIn</span></li>
           </ul>
         </div>
         <div class="footer__col">
@@ -99,7 +125,7 @@
       </div>
       <div class="container footer__bottom">
         <p>2026, Todos los derechos reservados</p>
-        <a href="#">Política de privacidad</a>
+        <a href="mailto:emiresparza@gmail.com?subject=Pol%C3%ADtica%20de%20privacidad">Política de privacidad</a>
       </div>
     </footer>
   </div>
@@ -112,20 +138,75 @@
     var id     = params.get('id');
     var post   = (posts || []).find(function (p) { return p.id === id; });
 
+    function setMeta(selector, value, attr) {
+      var el = document.querySelector(selector);
+      if (el && value) el.setAttribute(attr || 'content', value);
+    }
+
+    function injectJsonLd(data) {
+      var script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.textContent = JSON.stringify(data);
+      document.head.appendChild(script);
+    }
+
     if (!post) {
       document.getElementById('postTitle').textContent = 'Post no encontrado';
+      setMeta('#robotsMeta', 'noindex, follow');
       return;
     }
 
-    document.title = post.title + ' — Emir Esparza';
+    var baseUrl = 'https://emiresparza.github.io/port-arq-v2/';
+    var pageUrl = baseUrl + 'post.html?id=' + encodeURIComponent(post.id);
+    var imageUrl = baseUrl + post.thumbnail;
+    var description = post.excerpt || 'Artículo de Emir Esparza sobre arquitectura, BIM, diseño y proceso creativo.';
+
+    document.title = post.title + ' | Emir Esparza';
     document.getElementById('postTitle').textContent = post.title;
     document.getElementById('postCat').textContent   = post.category;
     document.getElementById('postDate').textContent  = post.dateLabel;
     document.getElementById('postRead').textContent  = post.readTime + ' de lectura';
+    setMeta('#metaDescription', description);
+    setMeta('#canonicalLink', pageUrl, 'href');
+    setMeta('#ogTitle', document.title);
+    setMeta('#ogDescription', description);
+    setMeta('#ogImage', imageUrl);
+    setMeta('#ogUrl', pageUrl);
+    setMeta('#articlePublishedTime', post.date);
+    setMeta('#articleSection', post.category);
+    setMeta('#twitterTitle', document.title);
+    setMeta('#twitterDescription', description);
+    setMeta('#twitterImage', imageUrl);
 
     var heroImg = document.getElementById('postHeroImg');
     heroImg.src = post.thumbnail;
     heroImg.alt = post.title;
+    heroImg.decoding = 'async';
+
+    injectJsonLd({
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: post.title,
+      description: description,
+      image: imageUrl,
+      datePublished: post.date,
+      dateModified: post.date,
+      articleSection: post.category,
+      timeRequired: 'PT' + parseInt(post.readTime, 10) + 'M',
+      url: pageUrl,
+      author: {
+        '@type': 'Person',
+        name: 'Emir Esparza'
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: 'Emir Esparza Arquitectura'
+      },
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': pageUrl
+      }
+    });
 
     // Cuerpo
     var body = document.getElementById('postBody');

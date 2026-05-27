@@ -2,16 +2,23 @@
 (function () {
   const cursor = document.getElementById('cursor');
   if (!cursor) return;
+  document.body.classList.add('has-custom-cursor');
 
   document.addEventListener('mousemove', function (e) {
     cursor.style.left = e.clientX + 'px';
     cursor.style.top  = e.clientY + 'px';
   });
 
-  // Expandir sobre interactivos
-  document.querySelectorAll('a, button, summary, label, input').forEach(function (el) {
-    el.addEventListener('mouseenter', function () { cursor.classList.add('cursor--expanded'); });
-    el.addEventListener('mouseleave', function () { cursor.classList.remove('cursor--expanded'); });
+  // Expandir sobre interactivos, incluidos elementos creados por JS.
+  document.addEventListener('mouseover', function (e) {
+    if (e.target.closest('a, button, summary, label, input')) {
+      cursor.classList.add('cursor--expanded');
+    }
+  });
+  document.addEventListener('mouseout', function (e) {
+    if (e.target.closest('a, button, summary, label, input')) {
+      cursor.classList.remove('cursor--expanded');
+    }
   });
 })();
 

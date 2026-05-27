@@ -3,22 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emir Esparza — Arquitectura & Diseño</title>
-  <meta name="description" content="Arquitecto independiente con base en Temuco. Proyectos residenciales, interiorismo, BIM y comunicación visual.">
+  <title>Emir Esparza — Arquitectura, BIM e Interiorismo en Temuco</title>
+  <meta name="description" content="Portafolio de Emir Esparza, arquitecto y consultor BIM en Temuco. Proyectos residenciales, interiorismo, visualización, branding y comunicación visual.">
+  <meta name="author" content="Emir Esparza">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#141412">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="canonical" href="https://emiresparza.github.io/port-arq-v2/">
+  <meta property="og:locale" content="es_CL">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Emir Esparza Arquitectura">
+  <meta property="og:title" content="Emir Esparza — Arquitectura, BIM e Interiorismo en Temuco">
+  <meta property="og:description" content="Arquitectura, interiorismo y consultoría BIM para proyectos con identidad espacial, lógica técnica y comunicación visual.">
+  <meta property="og:image" content="https://emiresparza.github.io/port-arq-v2/assets/img/projects/antu.png">
+  <meta property="og:url" content="https://emiresparza.github.io/port-arq-v2/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Emir Esparza — Arquitectura, BIM e Interiorismo en Temuco">
+  <meta name="twitter:description" content="Portafolio de arquitectura, BIM, interiorismo y comunicación visual con base en Temuco, Chile.">
+  <meta name="twitter:image" content="https://emiresparza.github.io/port-arq-v2/assets/img/projects/antu.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "Emir Esparza Arquitectura",
+    "url": "https://emiresparza.github.io/port-arq-v2/",
+    "image": "https://emiresparza.github.io/port-arq-v2/assets/img/projects/antu.png",
+    "email": "mailto:emiresparza@gmail.com",
+    "telephone": "+56987283154",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Temuco",
+      "addressCountry": "CL"
+    },
+    "areaServed": "Chile",
+    "founder": {
+      "@type": "Person",
+      "name": "Emir Esparza",
+      "jobTitle": "Arquitecto y consultor BIM"
+    },
+    "knowsAbout": ["Arquitectura", "Interiorismo", "BIM", "Revit", "Archicad", "Branding", "Visualización arquitectónica"],
+    "sameAs": []
+  }
+  </script>
 </head>
 <body>
 
   <div class="cursor" id="cursor"></div>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
   <!-- HEADER -->
   <header class="header">
     <div class="header__inner">
-      <a href="#" class="logo">EEF.</a>
-      <nav class="nav">
+      <a href="index.html" class="logo" aria-label="Inicio">
+        <img class="logo__mark" src="assets/logo-eef.svg" alt="Emir Esparza">
+      </a>
+      <nav class="nav" aria-label="Navegación principal">
         <a href="#about"        class="nav__link">About</a>
         <a href="projects.html" class="nav__link">Proyectos</a>
         <a href="blog.html"     class="nav__link">Blog</a>
@@ -35,11 +78,13 @@
     </div>
   </header>
 
+  <main id="contenido">
+
   <!-- HERO -->
   <section class="hero">
     <div class="hero__bg">
       <img src="assets/img/projects/antu.png"
-           alt="" class="hero__img" id="heroImg">
+           alt="Proyecto Antü de Emir Esparza Arquitectura" class="hero__img" id="heroImg" fetchpriority="high" decoding="async">
       <div class="hero__overlay"></div>
     </div>
     <div class="hero__words" id="heroWords" aria-hidden="true">
@@ -72,7 +117,7 @@
     </div>
 
     <article class="project project--right">
-      <a href="#" class="project__link">
+      <a href="proyecto.html?id=antu" class="project__link">
         <div class="project__img-wrap">
           <img src="assets/img/projects/antu.png"
                alt="Antü" class="project__img">
@@ -89,7 +134,7 @@
     </article>
 
     <article class="project project--left">
-      <a href="#" class="project__link">
+      <a href="proyecto.html?id=casa-bv" class="project__link">
         <div class="project__img-wrap">
           <img src="assets/img/projects/casa-bv.png"
                alt="Casa BV" class="project__img">
@@ -106,7 +151,7 @@
     </article>
 
     <article class="project project--full">
-      <a href="#" class="project__link">
+      <a href="proyecto.html?id=belmonte" class="project__link">
         <div class="project__img-wrap">
           <img src="assets/img/projects/belmonte.jpg"
                alt="Belmonte" class="project__img">
@@ -122,7 +167,7 @@
     </article>
 
     <div class="projects__more">
-      <a href="#" class="btn-outline">Ver todos los proyectos</a>
+      <a href="projects.html" class="btn-outline">Ver todos los proyectos</a>
     </div>
 
     <div class="ticker">
@@ -364,6 +409,8 @@
     </div>
   </section>
 
+  </main>
+
   <!-- CTA + FOOTER — contenedor oscuro redondeado -->
   <div class="dark-card">
 
@@ -395,8 +442,8 @@
         <div class="footer__col">
           <span class="footer__col-label">Social</span>
           <ul>
-            <li><a href="#">Instagram</a></li>
-            <li><a href="#">LinkedIn</a></li>
+            <li><span>Instagram</span></li>
+            <li><span>LinkedIn</span></li>
           </ul>
         </div>
         <div class="footer__col">
@@ -406,7 +453,7 @@
       </div>
       <div class="container footer__bottom">
         <p>2026, Todos los derechos reservados</p>
-        <a href="#">Política de privacidad</a>
+        <a href="mailto:emiresparza@gmail.com?subject=Pol%C3%ADtica%20de%20privacidad">Política de privacidad</a>
       </div>
     </footer>
 
