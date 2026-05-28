@@ -52,10 +52,10 @@
         <img class="logo__mark" src="assets/logo-eef.svg" alt="Emir Esparza">
       </a>
       <nav class="nav" aria-label="Navegación principal">
-        <a href="index.html#about"     class="nav__link">About</a>
         <a href="projects.html"        class="nav__link">Proyectos</a>
+        <a href="index.html#metodologia" class="nav__link">Metodología</a>
         <a href="blog.html"            class="nav__link">Blog</a>
-        <a href="index.html#proceso"   class="nav__link">Proceso</a>
+        <a href="nosotros.html"        class="nav__link">Nosotros</a>
         <a href="index.html#contacto"  class="nav__link">Contacto</a>
       </nav>
       <a href="mailto:emiresparza@gmail.com" class="btn-cta" id="headerCta">
@@ -476,10 +476,10 @@
         <div class="footer__col">
           <span class="footer__col-label">Sitemap</span>
           <ul>
-            <li><a href="index.html#about">About</a></li>
+            <li><a href="nosotros.html">Nosotros</a></li>
             <li><a href="projects.html">Proyectos</a></li>
             <li><a href="index.html#servicios">Servicios</a></li>
-            <li><a href="index.html#proceso">Proceso</a></li>
+            <li><a href="index.html#metodologia">Metodología</a></li>
           </ul>
         </div>
         <div class="footer__col">
@@ -505,6 +505,80 @@
   <script src="main.js"></script>
   <script>
   (function () {
+    var grid = document.getElementById('projectsGrid');
+    var btns = document.querySelectorAll('.grid-toggle__btn');
+    if (!grid || !btns.length) return;
+
+    var projectDates = {
+      'antu': '2026-05-01',
+      'belmonte': '2026-04-01',
+      'casa-bv': '2025-11-01',
+      'casa-cg': '2025-09-01',
+      'branding-bosquesur': '2025-07-01',
+      'branding-aura': '2025-05-01',
+      'branding-notable': '2024-11-01',
+      'clinica-o2': '2024-09-01',
+      'clinica-pl': '2024-07-01',
+      'clinica-ta': '2024-05-01',
+      'oficinas-frindt': '2024-03-01',
+      'oficinas-cdj-group': '2023-11-01',
+      'ellas-co-portal-frances': '2023-09-01',
+      'tw-temuco': '2023-07-01',
+      'cava-del-lechon': '2023-05-01',
+      'zen426': '2023-03-01',
+      'parque-olimpia': '2023-01-01',
+      'rendering-bigdreams': '2022-10-01',
+      'rendering-lds': '2022-08-01',
+      'taller-salfa': '2022-05-01',
+      'casa-baier': '2022-02-01',
+      'casa-mn': '2021-10-01',
+      'casa-ter': '2021-07-01',
+      'casa-vm': '2021-04-01',
+      'cincocasas-llanquihue': '2020-11-01',
+      'branding-arte-facto': '2020-08-01',
+      'branding-14arq': '2020-05-01',
+      'bim-panoramica': '2020-02-01',
+      'desarrollo-grafico-caa': '2019-09-01',
+      'maqueta-publicaciones-um': '2019-05-01',
+      'diseno-material-docente-um': '2019-03-01',
+      'fragmentos-de-humanidad': '2018-10-01',
+      'videoinstalacion-mnfpn': '2018-06-01',
+      'campana-estoesatomica': '2017-10-01',
+      'bienal-arq-2015': '2015-04-01'
+    };
+
+    function getProjectId(item) {
+      var href = item.getAttribute('href') || '';
+      var match = href.match(/[?&]id=([^&]+)/);
+      return match ? decodeURIComponent(match[1]) : '';
+    }
+
+    function appendInOrder(items) {
+      items.forEach(function (item) {
+        grid.appendChild(item);
+      });
+    }
+
+    function shuffle(items) {
+      var copy = items.slice();
+      for (var i = copy.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = copy[i];
+        copy[i] = copy[j];
+        copy[j] = tmp;
+      }
+      return copy;
+    }
+
+    var projectItems = Array.from(grid.querySelectorAll('.pg-item'));
+    projectItems.forEach(function (item, index) {
+      var id = getProjectId(item);
+      item.dataset.originalIndex = index;
+      item.dataset.date = projectDates[id] || '1900-01-01';
+    });
+
+    var randomOrder = shuffle(projectItems);
+    appendInOrder(randomOrder);
 
     // ── Aparecer uno por uno en secuencia ─────────────────────────────
     var batch      = [];
@@ -528,15 +602,11 @@
       });
     }, { threshold: 0.04, rootMargin: '0px 0px -3% 0px' });
 
-    document.querySelectorAll('.pg-item').forEach(function (el) {
+    randomOrder.forEach(function (el) {
       revealObs.observe(el);
     });
 
     // ── FLIP grid toggle ──────────────────────────────────────────────
-    var grid = document.getElementById('projectsGrid');
-    var btns = document.querySelectorAll('.grid-toggle__btn');
-    if (!grid || !btns.length) return;
-
     // Filtro por tipo de proyecto
     var filter      = document.getElementById('projectFilter');
     var count       = document.getElementById('projectFilterCount');
@@ -560,7 +630,16 @@
 
       if (!active.length && allBox) allBox.checked = true;
 
-      grid.querySelectorAll('.pg-item').forEach(function (item) {
+      var orderedItems = active.length
+        ? projectItems.slice().sort(function (a, b) {
+            var dateDiff = Date.parse(b.dataset.date) - Date.parse(a.dataset.date);
+            return dateDiff || Number(a.dataset.originalIndex) - Number(b.dataset.originalIndex);
+          })
+        : randomOrder;
+
+      appendInOrder(orderedItems);
+
+      orderedItems.forEach(function (item) {
         var cat = item.querySelector('.pg-item__cat');
         var category = cat ? cat.textContent.trim() : '';
         var show = !active.length || active.indexOf(category) !== -1;
@@ -625,13 +704,12 @@
     });
 
     var baseUrl = 'https://emiresparza.github.io/port-arq-v2/';
-    var projectItems = Array.from(grid.querySelectorAll('.pg-item'));
     var itemList = document.createElement('script');
     itemList.type = 'application/ld+json';
     itemList.textContent = JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'ItemList',
-      itemListElement: projectItems.map(function (item, index) {
+      itemListElement: Array.from(grid.querySelectorAll('.pg-item')).map(function (item, index) {
         var name = item.querySelector('.pg-item__name');
         return {
           '@type': 'ListItem',

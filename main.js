@@ -97,36 +97,36 @@
   });
 })();
 
-// Header — scroll: CTA solo vuelve cerca del top; nav desaparece tras el hero
+// Header — el logo queda fijo; nav y CTA reaparecen al acercar el mouse arriba
 (function () {
   var cta = document.getElementById('headerCta');
   var nav = document.querySelector('.nav');
-  if (!cta) return;
-  var last = 0;
-  var NEAR_TOP = 280;
+  var header = document.querySelector('.header');
+  if (!cta && !nav) return;
+
+  var HIDE_AFTER = 80;
+  var REVEAL_ZONE = 96;
+  var pointerNearTop = false;
+
+  function setChromeVisible(visible) {
+    if (nav) nav.classList.toggle('is-hidden', !visible);
+    if (cta) cta.classList.toggle('is-hidden', !visible);
+  }
+
+  function syncHeader() {
+    setChromeVisible(window.scrollY <= HIDE_AFTER || pointerNearTop);
+  }
 
   window.addEventListener('scroll', function () {
-    var y    = window.scrollY;
-    var hero = window.innerHeight;
-
-    // CTA: ocultar al bajar; solo reaparece si estamos cerca del top
-    if (y > last && y > 60) {
-      cta.classList.add('is-hidden');
-    } else if (y <= NEAR_TOP) {
-      cta.classList.remove('is-hidden');
-    }
-
-    // Nav: visible solo dentro del hero
-    if (nav) {
-      if (y > hero * 0.65) {
-        nav.classList.add('is-hidden');
-      } else {
-        nav.classList.remove('is-hidden');
-      }
-    }
-
-    last = y;
+    syncHeader();
   }, { passive: true });
+
+  document.addEventListener('mousemove', function (e) {
+    var isNearTop = e.clientY <= REVEAL_ZONE || Boolean(header && header.contains(e.target));
+    if (isNearTop === pointerNearTop) return;
+    pointerNearTop = isNearTop;
+    syncHeader();
+  });
 })();
 
 // Hero: parallax en imagen + micro-parallax en palabras

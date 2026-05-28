@@ -62,10 +62,10 @@
         <img class="logo__mark" src="assets/logo-eef.svg" alt="Emir Esparza">
       </a>
       <nav class="nav" aria-label="Navegación principal">
-        <a href="#about"        class="nav__link">About</a>
         <a href="projects.html" class="nav__link">Proyectos</a>
+        <a href="#metodologia"  class="nav__link">Metodología</a>
         <a href="blog.html"     class="nav__link">Blog</a>
-        <a href="#proceso"      class="nav__link">Proceso</a>
+        <a href="nosotros.html" class="nav__link">Nosotros</a>
         <a href="#contacto"     class="nav__link">Contacto</a>
       </nav>
       <a href="mailto:emiresparza@gmail.com" class="btn-cta" id="headerCta">
@@ -352,11 +352,11 @@
     </div>
   </section>
 
-  <!-- PROCESO -->
-  <section class="process" id="proceso">
+  <!-- METODOLOGIA -->
+  <section class="process" id="metodologia">
     <div class="container process__grid">
       <div class="process__left">
-        <span class="label">Proceso</span>
+        <span class="label">Metodología</span>
         <h2 class="process__heading">Diseñado para<br>hacer realidad<br>tu visión</h2>
         <p class="process__sub">Un flujo claro y estructurado que transforma el encargo en un resultado preciso y visualmente coherente.</p>
         <a href="mailto:emiresparza@gmail.com" class="btn-cta">
@@ -433,10 +433,10 @@
         <div class="footer__col">
           <span class="footer__col-label">Sitemap</span>
           <ul>
-            <li><a href="#about">About</a></li>
+            <li><a href="nosotros.html">Nosotros</a></li>
             <li><a href="#proyectos">Proyectos</a></li>
             <li><a href="#servicios">Servicios</a></li>
-            <li><a href="#proceso">Proceso</a></li>
+            <li><a href="#metodologia">Metodología</a></li>
           </ul>
         </div>
         <div class="footer__col">
@@ -459,6 +459,55 @@
 
   </div>
 
+  <script src="data.js"></script>
+  <script>
+  (function () {
+    var section = document.getElementById('proyectos');
+    if (!section || typeof projects === 'undefined') return;
+
+    Array.from(section.children).forEach(function (item) {
+      if (!item.matches('article.project')) return;
+      item.remove();
+    });
+
+    function normalize(value) {
+      return (value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function shuffle(items) {
+      var copy = items.slice();
+      for (var i = copy.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = copy[i];
+        copy[i] = copy[j];
+        copy[j] = temp;
+      }
+      return copy;
+    }
+
+    var selected = shuffle(projects.filter(function (project) {
+      var category = normalize(project.category);
+      return category !== 'branding' && category !== 'grafica';
+    })).slice(0, 2);
+
+    var more = section.querySelector('.projects__more');
+    selected.forEach(function (project, index) {
+      var article = document.createElement('article');
+      article.className = 'project ' + (index === 0 ? 'project--right' : 'project--left');
+      article.innerHTML =
+        '<a href="proyecto.html?id=' + encodeURIComponent(project.id) + '" class="project__link">' +
+          '<div class="project__img-wrap">' +
+            '<img src="' + project.thumbnail + '" alt="' + project.title + '" class="project__img" loading="lazy">' +
+          '</div>' +
+          '<div class="project__info">' +
+            '<h3 class="project__title">' + project.title + '</h3>' +
+            '<div class="project__tags"><span>' + project.category + '</span></div>' +
+          '</div>' +
+        '</a>';
+      section.insertBefore(article, more);
+    });
+  })();
+  </script>
   <script src="main.js"></script>
   <script src="protection.js"></script>
 </body>

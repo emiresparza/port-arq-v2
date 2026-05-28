@@ -312,6 +312,24 @@ ul  { list-style: none; }
   letter-spacing: -.03em;
   text-indent: 33%;
 }
+.about--page {
+  padding-top: clamp(24px, 4vw, 56px);
+}
+.team-placeholder {
+  padding: 0 0 clamp(80px, 10vw, 140px);
+}
+.team-placeholder__line {
+  width: 100%;
+  height: 1px;
+  background: rgba(26,26,24,.18);
+}
+.team-placeholder__text {
+  max-width: 520px;
+  margin-top: 22px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.75;
+}
 
 /* ─── PROJECTS ───────────────────────────── */
 .projects {
@@ -925,6 +943,8 @@ input:focus-visible {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: clamp(14px, 1.8vw, 22px);
+  max-width: var(--max-w);
+  margin: 0 auto;
   padding: 0 var(--pad) clamp(60px, 8vw, 100px);
 }
 .projects-full.cols-2 {
