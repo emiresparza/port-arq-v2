@@ -13,6 +13,9 @@ const javascriptFiles = [
   "scripts/validate.mjs",
   "scripts/lint.mjs",
   "content/projects.mjs",
+  "content/legacy-routes.mjs",
+  "functions/proyecto.js",
+  "functions/proyecto.html.js",
   "tests/site.test.mjs"
 ];
 
@@ -28,8 +31,34 @@ for (const file of javascriptFiles) {
 }
 
 const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
-if (/linear-gradient|radial-gradient|conic-gradient/.test(css)) {
-  console.error("styles.css: la dirección visual no permite gradientes.");
+const authorizedVisualBlocks = [
+  {
+    name: "dither-pattern",
+    validates: (block) => /radial-gradient/.test(block) && /mask-image:\s*linear-gradient/.test(block)
+  },
+  {
+    name: "hero-contrast",
+    validates: (block) => (block.match(/linear-gradient/g) || []).length === 2 && /rgba\(67,\s*67,\s*67/.test(block)
+  },
+  {
+    name: "hero-dither",
+    validates: (block) => /radial-gradient/.test(block) && /mask-image:\s*linear-gradient/.test(block)
+  }
+];
+
+let cssWithoutAuthorizedVisuals = css;
+for (const { name, validates } of authorizedVisualBlocks) {
+  const expression = new RegExp(`/\\* ${name}:start \\*/([\\s\\S]*?)/\\* ${name}:end \\*/`, "g");
+  const blocks = [...css.matchAll(expression)];
+  if (blocks.length !== 1 || !validates(blocks[0][1])) {
+    console.error(`styles.css: el bloque visual ${name} no cumple su implementación autorizada.`);
+    process.exit(1);
+  }
+  cssWithoutAuthorizedVisuals = cssWithoutAuthorizedVisuals.replace(expression, "");
+}
+
+if (/linear-gradient|radial-gradient|conic-gradient/.test(cssWithoutAuthorizedVisuals)) {
+  console.error("styles.css: se detectó un gradiente fuera de los bloques visuales autorizados.");
   process.exit(1);
 }
 

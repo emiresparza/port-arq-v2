@@ -25,7 +25,7 @@
   <link rel="preload" href="/assets/fonts/manrope-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
   
   <link rel="stylesheet" href="/styles.css">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"ContactPage","name":"Contacto — EEAD","url":"https://eead.cl/contacto/","about":{"@type":"ProfessionalService","name":"EEAD"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"ContactPage","name":"Contacto — EEAD","url":"https://eead.cl/contacto/","about":{"@type":"ProfessionalService","name":"EEAD","email":"emiresparza@gmail.com","telephone":"+56987283154"}}</script>
   <script src="/main.js" defer></script>
 </head>
 <body>
@@ -35,8 +35,8 @@
     <a class="brand" href="/" aria-label="EEAD, inicio">
       <img class="brand__symbol" data-brand-image src="/assets/brand/eead-symbol.svg" width="96" height="96" alt="" loading="eager" decoding="async">
     </a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-principal">
-      <span>Menú</span>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-principal" aria-label="Abrir menú principal">
+      <span data-menu-label>Menú</span>
       <span class="menu-toggle__line" aria-hidden="true"></span>
     </button>
     <nav class="site-nav" id="menu-principal" aria-label="Navegación principal">
@@ -47,7 +47,7 @@
       <a href="/contacto/" aria-current="page">Contacto</a>
     </nav>
   </header>
-<main id="contenido">
+<main id="contenido" tabindex="-1">
 
   <header class="page-intro page-intro--contact">
     <p class="eyebrow">Contacto</p>
@@ -59,6 +59,16 @@
     <aside>
       <p class="eyebrow">Antes de enviar</p>
       <p>No necesita tener todo definido. Una ubicación, una etapa aproximada y el objetivo principal son suficientes para comenzar.</p>
+      <div class="contact-channels">
+        <a href="mailto:emiresparza@gmail.com">
+          <span>Correo</span>
+          <strong>emiresparza@gmail.com</strong>
+        </a>
+        <a href="https://wa.me/56987283154" target="_blank" rel="noopener" aria-label="Abrir WhatsApp de EEAD en una nueva pestaña">
+          <span>WhatsApp</span>
+          <strong>+56 9 8728 3154</strong>
+        </a>
+      </div>
       <dl>
         <div><dt>Base</dt><dd>Temuco, Chile</dd></div>
         <div><dt>Cobertura</dt><dd>Proyectos en Chile y apoyo técnico remoto</dd></div>
@@ -144,7 +154,7 @@
         <button class="button button--primary" type="submit" data-submit>
           <span data-submit-label>Enviar consulta</span>
         </button>
-        <p>Al enviar, acepta que EEAD use estos datos únicamente para responder su consulta.</p>
+        <p>Al enviar, acepta que EEAD use estos datos únicamente para responder su consulta. Consulte la <a href="/privacidad/">política de privacidad</a>.</p>
       </div>
       <div class="form-status" data-form-status role="status" aria-live="polite" tabindex="-1"></div>
     </form>
@@ -154,15 +164,21 @@
   <footer class="site-footer">
     <div class="site-footer__top">
       <div class="footer-brand">
-        <img data-brand-image src="/assets/brand/eead-full.svg" width="2504" height="960" alt="EEAD — Arquitectura y Diseño" loading="lazy" decoding="async">
+        <div class="footer-lockup">
+          <img class="footer-lockup__symbol" data-brand-image src="/assets/brand/eead-symbol.svg" width="960" height="960" alt="" loading="lazy" decoding="async">
+          <div>
+            <span class="footer-wordmark">EEAD</span>
+            <p class="footer-descriptor">Arquitectura e interiorismo<br>Temuco, Chile</p>
+          </div>
+        </div>
       </div>
-      <p>Arquitectura e interiorismo<br>Temuco, Chile</p>
       <nav aria-label="Navegación secundaria">
         <a href="/proyectos/">Proyectos</a>
         <a href="/servicios/">Servicios</a>
         <a href="/oficina-tecnica/">Oficina técnica</a>
         <a href="/estudio/">Estudio</a>
         <a href="/contacto/">Contacto</a>
+        <a href="/privacidad/">Privacidad</a>
       </nav>
     </div>
     <div class="site-footer__bottom">

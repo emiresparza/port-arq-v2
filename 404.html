@@ -35,8 +35,8 @@
     <a class="brand" href="/" aria-label="EEAD, inicio">
       <img class="brand__symbol" data-brand-image src="/assets/brand/eead-symbol.svg" width="96" height="96" alt="" loading="eager" decoding="async">
     </a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-principal">
-      <span>Menú</span>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-principal" aria-label="Abrir menú principal">
+      <span data-menu-label>Menú</span>
       <span class="menu-toggle__line" aria-hidden="true"></span>
     </button>
     <nav class="site-nav" id="menu-principal" aria-label="Navegación principal">
@@ -47,7 +47,7 @@
       <a href="/contacto/">Contacto</a>
     </nav>
   </header>
-<main id="contenido">
+<main id="contenido" tabindex="-1">
 
   <section class="not-found">
     <p class="eyebrow">Error 404</p>
@@ -63,15 +63,21 @@
   <footer class="site-footer">
     <div class="site-footer__top">
       <div class="footer-brand">
-        <img data-brand-image src="/assets/brand/eead-full.svg" width="2504" height="960" alt="EEAD — Arquitectura y Diseño" loading="lazy" decoding="async">
+        <div class="footer-lockup">
+          <img class="footer-lockup__symbol" data-brand-image src="/assets/brand/eead-symbol.svg" width="960" height="960" alt="" loading="lazy" decoding="async">
+          <div>
+            <span class="footer-wordmark">EEAD</span>
+            <p class="footer-descriptor">Arquitectura e interiorismo<br>Temuco, Chile</p>
+          </div>
+        </div>
       </div>
-      <p>Arquitectura e interiorismo<br>Temuco, Chile</p>
       <nav aria-label="Navegación secundaria">
         <a href="/proyectos/">Proyectos</a>
         <a href="/servicios/">Servicios</a>
         <a href="/oficina-tecnica/">Oficina técnica</a>
         <a href="/estudio/">Estudio</a>
         <a href="/contacto/">Contacto</a>
+        <a href="/privacidad/">Privacidad</a>
       </nav>
     </div>
     <div class="site-footer__bottom">

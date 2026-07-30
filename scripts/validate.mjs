@@ -12,18 +12,15 @@ const indexableFiles = [
   "servicios/index.html",
   "oficina-tecnica/index.html",
   "estudio/index.html",
-  "contacto/index.html"
+  "contacto/index.html",
+  "privacidad/index.html"
 ];
 
 const allHtmlFiles = [
   ...indexableFiles,
-  "404.html",
-  "projects.html",
-  "proyecto.html",
-  "nosotros.html",
-  "blog.html",
-  "post.html"
+  "404.html"
 ];
+const legacyHtmlFiles = ["projects.html", "proyecto.html", "nosotros.html", "blog.html", "post.html"];
 
 function report(condition, message) {
   if (!condition) errors.push(message);
@@ -100,6 +97,10 @@ for (const relativePath of allHtmlFiles) {
     }
     report(fs.existsSync(resolvePublicPath(href)), `${relativePath}: enlace roto ${href}`);
   }
+}
+
+for (const legacyFile of legacyHtmlFiles) {
+  report(!fs.existsSync(path.join(root, legacyFile)), `${legacyFile} no debe seguir entregando HTML con estado 200`);
 }
 
 const publicHtml = indexableFiles.map((file) => fs.readFileSync(path.join(root, file), "utf8")).join("\n");

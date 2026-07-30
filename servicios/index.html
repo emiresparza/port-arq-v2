@@ -35,8 +35,8 @@
     <a class="brand" href="/" aria-label="EEAD, inicio">
       <img class="brand__symbol" data-brand-image src="/assets/brand/eead-symbol.svg" width="96" height="96" alt="" loading="eager" decoding="async">
     </a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-principal">
-      <span>Menú</span>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-principal" aria-label="Abrir menú principal">
+      <span data-menu-label>Menú</span>
       <span class="menu-toggle__line" aria-hidden="true"></span>
     </button>
     <nav class="site-nav" id="menu-principal" aria-label="Navegación principal">
@@ -47,7 +47,7 @@
       <a href="/contacto/">Contacto</a>
     </nav>
   </header>
-<main id="contenido">
+<main id="contenido" tabindex="-1">
 
   <header class="page-intro">
     <p class="eyebrow">Servicios</p>
@@ -55,59 +55,79 @@
     <p>EEAD acompaña proyectos completos y etapas específicas, manteniendo una relación directa entre intención arquitectónica, representación y desarrollo técnico.</p>
   </header>
 
-  <section class="service-detail" id="arquitectura">
-    <div class="service-detail__number">01</div>
-    <div>
-      <p class="eyebrow">Arquitectura e interiorismo</p>
+  <section class="service-chapter" id="arquitectura">
+    <div class="service-chapter__content">
+      <p class="service-chapter__number">01 / Arquitectura</p>
       <h2>Espacios coherentes desde el programa hasta el detalle.</h2>
+      <div class="service-chapter__copy">
+        <p>Desarrollamos viviendas, espacios de trabajo, equipamiento y remodelaciones. Cada encargo se estructura desde sus condiciones reales: personas, lugar, presupuesto, normativa y forma de construir.</p>
+        <ul>
+          <li>Estudios de cabida y definición de programa</li>
+          <li>Anteproyecto y visualización</li>
+          <li>Proyecto de arquitectura e interiorismo</li>
+          <li>Especificaciones y coordinación técnica</li>
+          <li>Apoyo durante licitación y obra</li>
+        </ul>
+        <a class="text-link" href="/proyectos/casa-alicia/">Ver Casa Alicia</a>
+      </div>
     </div>
-    <div class="service-detail__copy">
-      <p>Desarrollamos viviendas, espacios de trabajo, equipamiento y remodelaciones. Cada encargo se estructura desde sus condiciones reales: personas, lugar, presupuesto, normativa y forma de construir.</p>
-      <ul>
-        <li>Estudios de cabida y definición de programa</li>
-        <li>Anteproyecto y visualización</li>
-        <li>Proyecto de arquitectura e interiorismo</li>
-        <li>Especificaciones y coordinación técnica</li>
-        <li>Apoyo durante licitación y obra</li>
-      </ul>
-    </div>
+    <a class="service-chapter__media" href="/proyectos/casa-alicia/" aria-label="Ver proyecto Casa Alicia">
+      <picture class="responsive-media">
+    <source type="image/avif" srcset="/assets/img/optimized/project-details/Casa%20Alicia/Renders/A-480.avif 480w, /assets/img/optimized/project-details/Casa%20Alicia/Renders/A-640.avif 640w, /assets/img/optimized/project-details/Casa%20Alicia/Renders/A-800.avif 800w, /assets/img/optimized/project-details/Casa%20Alicia/Renders/A-960.avif 960w, /assets/img/optimized/project-details/Casa%20Alicia/Renders/A-1200.avif 1200w, /assets/img/optimized/project-details/Casa%20Alicia/Renders/A-1600.avif 1600w, /assets/img/optimized/project-details/Casa%20Alicia/Renders/A-1672.avif 1672w" sizes="(max-width: 760px) 100vw, 58vw">
+    <source type="image/webp" srcset="/assets/img/optimized/project-details/Casa%20Alicia/Renders/A-480.webp 480w, /assets/img/optimized/project-details/Casa%20Alicia/Renders/A-640.webp 640w, /assets/img/optimized/project-details/Casa%20Alicia/Renders/A-800.webp 800w, /assets/img/optimized/project-details/Casa%20Alicia/Renders/A-960.webp 960w, /assets/img/optimized/project-details/Casa%20Alicia/Renders/A-1200.webp 1200w, /assets/img/optimized/project-details/Casa%20Alicia/Renders/A-1600.webp 1600w, /assets/img/optimized/project-details/Casa%20Alicia/Renders/A-1672.webp 1672w" sizes="(max-width: 760px) 100vw, 58vw">
+    <img src="/assets/img/optimized/project-details/Casa%20Alicia/Renders/A-1672.webp" srcset="/assets/img/optimized/project-details/Casa%20Alicia/Renders/A-480.webp 480w, /assets/img/optimized/project-details/Casa%20Alicia/Renders/A-640.webp 640w, /assets/img/optimized/project-details/Casa%20Alicia/Renders/A-800.webp 800w, /assets/img/optimized/project-details/Casa%20Alicia/Renders/A-960.webp 960w, /assets/img/optimized/project-details/Casa%20Alicia/Renders/A-1200.webp 1200w, /assets/img/optimized/project-details/Casa%20Alicia/Renders/A-1600.webp 1600w, /assets/img/optimized/project-details/Casa%20Alicia/Renders/A-1672.webp 1672w" sizes="(max-width: 760px) 100vw, 58vw" width="1672" height="941" alt="Proyecto relacionado: Casa Alicia" loading="lazy" decoding="async">
+  </picture>
+    </a>
   </section>
 
-  <section class="service-detail" id="oficina-tecnica">
-    <div class="service-detail__number">02</div>
-    <div>
-      <p class="eyebrow">Oficina técnica externa</p>
+  <section class="service-chapter service-chapter--dark" id="oficina-tecnica">
+    <div class="service-chapter__content">
+      <p class="service-chapter__number">02 / Oficina técnica</p>
       <h2>Capacidad técnica flexible para equipos con carga variable.</h2>
+      <div class="service-chapter__copy">
+        <p>Nos integramos a oficinas, constructoras y equipos de proyecto para modelar, coordinar y documentar entregas específicas con criterios verificables.</p>
+        <ul>
+          <li>Modelación BIM y levantamiento</li>
+          <li>Coordinación de especialidades</li>
+          <li>Planimetría y detalles constructivos</li>
+          <li>Revisión de interferencias y consistencia</li>
+          <li>Protocolos y apoyo a equipos internos</li>
+        </ul>
+        <a class="text-link" href="/oficina-tecnica/">Conocer la oficina técnica</a>
+      </div>
     </div>
-    <div class="service-detail__copy">
-      <p>Nos integramos a oficinas, constructoras y equipos de proyecto para modelar, coordinar y documentar entregas específicas con criterios verificables.</p>
-      <ul>
-        <li>Modelación BIM y levantamiento</li>
-        <li>Coordinación de especialidades</li>
-        <li>Planimetría y detalles constructivos</li>
-        <li>Revisión de interferencias y consistencia</li>
-        <li>Protocolos y apoyo a equipos internos</li>
-      </ul>
-      <a class="text-link" href="/oficina-tecnica/">Conocer la oficina técnica</a>
-    </div>
+    <a class="service-chapter__media" href="/proyectos/zenteno/" aria-label="Ver proyecto Zenteno">
+      <picture class="responsive-media">
+    <source type="image/avif" srcset="/assets/img/optimized/project-details/Zenteno/Render/E-480.avif 480w, /assets/img/optimized/project-details/Zenteno/Render/E-640.avif 640w, /assets/img/optimized/project-details/Zenteno/Render/E-800.avif 800w, /assets/img/optimized/project-details/Zenteno/Render/E-960.avif 960w, /assets/img/optimized/project-details/Zenteno/Render/E-1200.avif 1200w, /assets/img/optimized/project-details/Zenteno/Render/E-1492.avif 1492w" sizes="(max-width: 760px) 100vw, 58vw">
+    <source type="image/webp" srcset="/assets/img/optimized/project-details/Zenteno/Render/E-480.webp 480w, /assets/img/optimized/project-details/Zenteno/Render/E-640.webp 640w, /assets/img/optimized/project-details/Zenteno/Render/E-800.webp 800w, /assets/img/optimized/project-details/Zenteno/Render/E-960.webp 960w, /assets/img/optimized/project-details/Zenteno/Render/E-1200.webp 1200w, /assets/img/optimized/project-details/Zenteno/Render/E-1492.webp 1492w" sizes="(max-width: 760px) 100vw, 58vw">
+    <img src="/assets/img/optimized/project-details/Zenteno/Render/E-1492.webp" srcset="/assets/img/optimized/project-details/Zenteno/Render/E-480.webp 480w, /assets/img/optimized/project-details/Zenteno/Render/E-640.webp 640w, /assets/img/optimized/project-details/Zenteno/Render/E-800.webp 800w, /assets/img/optimized/project-details/Zenteno/Render/E-960.webp 960w, /assets/img/optimized/project-details/Zenteno/Render/E-1200.webp 1200w, /assets/img/optimized/project-details/Zenteno/Render/E-1492.webp 1492w" sizes="(max-width: 760px) 100vw, 58vw" width="1492" height="1054" alt="Axonometría del proyecto relacionado Zenteno" loading="lazy" decoding="async">
+  </picture>
+    </a>
   </section>
 
-  <section class="service-detail" id="visualizacion">
-    <div class="service-detail__number">03</div>
-    <div>
-      <p class="eyebrow">Visualización arquitectónica</p>
+  <section class="service-chapter" id="visualizacion">
+    <div class="service-chapter__content">
+      <p class="service-chapter__number">03 / Visualización</p>
       <h2>Imágenes que sirven para evaluar, no solo para presentar.</h2>
+      <div class="service-chapter__copy">
+        <p>Producimos imágenes con criterio arquitectónico para validar atmósferas, materialidad, escala y decisiones de proyecto antes de construir.</p>
+        <ul>
+          <li>Dirección de imagen y encuadres</li>
+          <li>Modelación y preparación de escenas</li>
+          <li>Imágenes interiores y exteriores</li>
+          <li>Series para venta, concursos y aprobación</li>
+          <li>Apoyo visual durante el diseño</li>
+        </ul>
+        <a class="text-link" href="/proyectos/render-pocuro/">Ver Render Pocuro</a>
+      </div>
     </div>
-    <div class="service-detail__copy">
-      <p>Producimos imágenes con criterio arquitectónico para validar atmósferas, materialidad, escala y decisiones de proyecto antes de construir.</p>
-      <ul>
-        <li>Dirección de imagen y encuadres</li>
-        <li>Modelación y preparación de escenas</li>
-        <li>Imágenes interiores y exteriores</li>
-        <li>Series para venta, concursos y aprobación</li>
-        <li>Apoyo visual durante el diseño</li>
-      </ul>
-    </div>
+    <a class="service-chapter__media" href="/proyectos/render-pocuro/" aria-label="Ver proyecto Render Pocuro">
+      <picture class="responsive-media">
+    <source type="image/avif" srcset="/assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-480.avif 480w, /assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-640.avif 640w, /assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-800.avif 800w, /assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-960.avif 960w, /assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-1200.avif 1200w, /assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-1600.avif 1600w, /assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-1920.avif 1920w" sizes="(max-width: 760px) 100vw, 58vw">
+    <source type="image/webp" srcset="/assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-480.webp 480w, /assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-640.webp 640w, /assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-800.webp 800w, /assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-960.webp 960w, /assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-1200.webp 1200w, /assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-1600.webp 1600w, /assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-1920.webp 1920w" sizes="(max-width: 760px) 100vw, 58vw">
+    <img src="/assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-1920.webp" srcset="/assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-480.webp 480w, /assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-640.webp 640w, /assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-800.webp 800w, /assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-960.webp 960w, /assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-1200.webp 1200w, /assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-1600.webp 1600w, /assets/img/optimized/project-details/Render%20Pocuro/PNG%20_%20Sala%20Multiuso/SA3-1920.webp 1920w" sizes="(max-width: 760px) 100vw, 58vw" width="3840" height="2160" alt="Visualización del proyecto relacionado Render Pocuro" loading="lazy" decoding="async">
+  </picture>
+    </a>
   </section>
 
   <section class="contact-band">
@@ -120,15 +140,21 @@
   <footer class="site-footer">
     <div class="site-footer__top">
       <div class="footer-brand">
-        <img data-brand-image src="/assets/brand/eead-full.svg" width="2504" height="960" alt="EEAD — Arquitectura y Diseño" loading="lazy" decoding="async">
+        <div class="footer-lockup">
+          <img class="footer-lockup__symbol" data-brand-image src="/assets/brand/eead-symbol.svg" width="960" height="960" alt="" loading="lazy" decoding="async">
+          <div>
+            <span class="footer-wordmark">EEAD</span>
+            <p class="footer-descriptor">Arquitectura e interiorismo<br>Temuco, Chile</p>
+          </div>
+        </div>
       </div>
-      <p>Arquitectura e interiorismo<br>Temuco, Chile</p>
       <nav aria-label="Navegación secundaria">
         <a href="/proyectos/">Proyectos</a>
         <a href="/servicios/">Servicios</a>
         <a href="/oficina-tecnica/">Oficina técnica</a>
         <a href="/estudio/">Estudio</a>
         <a href="/contacto/">Contacto</a>
+        <a href="/privacidad/">Privacidad</a>
       </nav>
     </div>
     <div class="site-footer__bottom">

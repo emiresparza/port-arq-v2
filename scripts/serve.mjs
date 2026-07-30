@@ -3,6 +3,10 @@ import http from "node:http";
 import path from "node:path";
 import zlib from "node:zlib";
 import { fileURLToPath } from "node:url";
+import {
+  legacyProjectTarget,
+  legacyStaticRedirects
+} from "../content/legacy-routes.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const port = Number(process.env.PORT || 4173);
@@ -17,11 +21,29 @@ const contentTypes = {
   ".avif": "image/avif",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
-  ".png": "image/png"
+  ".png": "image/png",
+  ".svg": "image/svg+xml",
+  ".woff2": "font/woff2"
 };
 
 const server = http.createServer((request, response) => {
-  const pathname = decodeURIComponent(new URL(request.url, "http://localhost").pathname);
+  const requestUrl = new URL(request.url, "http://localhost");
+  const pathname = decodeURIComponent(requestUrl.pathname);
+  const staticRedirect = legacyStaticRedirects.get(pathname);
+  const isLegacyProjectRoute = pathname === "/proyecto" || pathname === "/proyecto.html";
+  const redirectTarget = staticRedirect || (isLegacyProjectRoute
+    ? legacyProjectTarget(requestUrl.searchParams.get("id") || "")
+    : "");
+
+  if (redirectTarget) {
+    response.writeHead(301, {
+      location: redirectTarget,
+      "cache-control": "public, max-age=3600"
+    });
+    response.end();
+    return;
+  }
+
   const relative = pathname === "/" ? "index.html" : pathname.replace(/^\//, "");
   const candidate = path.extname(relative) ? relative : path.join(relative, "index.html");
   let filePath = path.resolve(root, candidate);

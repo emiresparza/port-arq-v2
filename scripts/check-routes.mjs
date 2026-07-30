@@ -3,6 +3,11 @@ import http from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { projects } from "../content/projects.mjs";
+import {
+  legacyProjectMap,
+  legacyProjectTarget,
+  legacyStaticRedirects
+} from "../content/legacy-routes.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const routes = [
@@ -12,11 +17,25 @@ const routes = [
   "/servicios/",
   "/oficina-tecnica/",
   "/estudio/",
-  "/contacto/"
+  "/contacto/",
+  "/privacidad/"
 ];
 
 const server = http.createServer((request, response) => {
-  const pathname = new URL(request.url, "http://localhost").pathname;
+  const requestUrl = new URL(request.url, "http://localhost");
+  const pathname = requestUrl.pathname;
+  const staticRedirect = legacyStaticRedirects.get(pathname);
+  const isLegacyProjectRoute = pathname === "/proyecto" || pathname === "/proyecto.html";
+  const redirectTarget = staticRedirect || (isLegacyProjectRoute
+    ? legacyProjectTarget(requestUrl.searchParams.get("id") || "")
+    : "");
+
+  if (redirectTarget) {
+    response.writeHead(301, { location: redirectTarget });
+    response.end();
+    return;
+  }
+
   const relative = pathname === "/" ? "index.html" : pathname.replace(/^\//, "");
   const candidate = path.extname(relative) ? relative : path.join(relative, "index.html");
   const filePath = path.resolve(root, candidate);
@@ -46,6 +65,23 @@ for (const route of routes) {
 const missing = await fetch(`http://127.0.0.1:${port}/ruta-inexistente/`);
 if (missing.status !== 404) failures.push(`/ruta-inexistente/ (${missing.status})`);
 
+for (const [from, target] of legacyStaticRedirects) {
+  const response = await fetch(`http://127.0.0.1:${port}${from}`, { redirect: "manual" });
+  if (response.status !== 301 || response.headers.get("location") !== target) {
+    failures.push(`${from} (${response.status} -> ${response.headers.get("location")})`);
+  }
+}
+
+for (const id of Object.keys(legacyProjectMap)) {
+  const target = legacyProjectTarget(id);
+  for (const pathname of ["/proyecto", "/proyecto.html"]) {
+    const response = await fetch(`http://127.0.0.1:${port}${pathname}?id=${id}`, { redirect: "manual" });
+    if (response.status !== 301 || response.headers.get("location") !== target) {
+      failures.push(`${pathname}?id=${id} (${response.status} -> ${response.headers.get("location")})`);
+    }
+  }
+}
+
 server.close();
 
 if (failures.length) {
@@ -53,4 +89,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Rutas correctas: ${routes.length} respuestas 200 y página 404 verificada.`);
+console.log(`Rutas correctas: ${routes.length} respuestas 200, ${legacyStaticRedirects.size + Object.keys(legacyProjectMap).length * 2} redirecciones 301 y página 404 verificada.`);
