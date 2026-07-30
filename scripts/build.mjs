@@ -23,6 +23,12 @@ const escapeHtml = (value = "") =>
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
 
+const limitWords = (value = "", maximum = 200) => {
+  const words = String(value).trim().split(/\s+/).filter(Boolean);
+  if (words.length <= maximum) return words.join(" ");
+  return `${words.slice(0, maximum).join(" ").replace(/[,:;]$/, "")}…`;
+};
+
 const encodePublicPath = (publicPath) =>
   publicPath.split("/").map((segment) => encodeURIComponent(segment)).join("/");
 
@@ -226,7 +232,8 @@ ${footer()}
 `;
 }
 
-function projectCard(project) {
+function projectCard(project, { headingLevel = "h2" } = {}) {
+  const Heading = headingLevel === "h3" ? "h3" : "h2";
   const metadata = [
     project.scope?.split(",")[0]?.trim() || project.category,
     project.year,
@@ -242,7 +249,7 @@ function projectCard(project) {
           })}
         </div>
         <div class="project-card__meta">
-          <h2>${escapeHtml(project.title)}</h2>
+          <${Heading}>${escapeHtml(project.title)}</${Heading}>
           <p>${metadata.map(escapeHtml).join(' <span aria-hidden="true">·</span> ')}</p>
         </div>
       </a>
@@ -478,99 +485,87 @@ function projectsPage() {
 }
 
 function projectPage(project) {
-  const related = project.related.map((slug) => projectBySlug.get(slug)).filter(Boolean);
+  const related = project.related.map((slug) => projectBySlug.get(slug)).filter(Boolean).slice(0, 3);
   const projectIndex = projects.indexOf(project);
   const previous = projects[(projectIndex - 1 + projects.length) % projects.length];
   const next = projects[(projectIndex + 1) % projects.length];
+  const typology = project.scope?.split(",")[0]?.trim() || project.category;
+  const description = limitWords(project.description, 200);
   const facts = [
     ["Ubicación", project.location],
     ["Año", project.year],
-    ["Estado", project.status],
     ["Superficie", project.surface],
+    ["Estado", project.status],
+    ["Tipología", typology],
     ["Alcance", project.scope]
-  ].filter(([, value]) => value);
-  const gallerySource = project.gallerySelection
+  ].filter(([, value]) => value).slice(0, 6);
+  const selectedImages = project.gallerySelection
     ? project.gallerySelection.map((index) => project.images[index]).filter(Boolean)
-    : project.images.filter(([src]) => src !== project.cover).slice(0, 9);
-  const galleryLayouts = ["full", "seven", "five", "half", "half", "full", "five", "seven", "full"];
-  const gallerySizes = {
-    full: "100vw",
-    seven: "(max-width: 760px) 100vw, 58vw",
-    five: "(max-width: 760px) 100vw, 42vw",
-    half: "(max-width: 760px) 100vw, 50vw"
-  };
+    : project.images;
+  const gallerySource = selectedImages
+    .filter(([src]) => src !== project.cover)
+    .slice(0, 4);
+  const coverAlt = project.images.find(([src]) => src === project.cover)?.[1]
+    || `Imagen principal del proyecto ${project.title}`;
   const body = `
   <article class="project-detail">
     <header class="project-hero">
-      <div class="project-hero__heading">
-        <p class="eyebrow">${escapeHtml(project.category)}</p>
-        <h1>${escapeHtml(project.title)}</h1>
-        <p>${escapeHtml(project.description)}</p>
-      </div>
-      ${facts.length ? `<dl class="project-facts">
-        ${facts.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}
-      </dl>` : ""}
-      <div class="project-hero__media">
-        ${image(project.cover, project.images[0][1], { eager: true, sizes: "100vw" })}
+      <div class="project-container project-hero__grid">
+        <div class="project-hero__content">
+          <p class="project-kicker">${escapeHtml(project.category)}</p>
+          <h1 class="project-title">${escapeHtml(project.title)}</h1>
+          <p class="project-description">${escapeHtml(description)}</p>
+        </div>
+        ${facts.length ? `<dl class="project-meta">
+          ${facts.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}
+        </dl>` : ""}
       </div>
     </header>
 
-    <section class="project-narrative" aria-label="Desarrollo del proyecto">
-      <div>
-        <p class="eyebrow">El problema</p>
-        <h2>${escapeHtml(project.narrativeTitles.problem)}</h2>
-        <p>${escapeHtml(project.problem)}</p>
-      </div>
-      <div>
-        <p class="eyebrow">Decisión</p>
-        <h2>${escapeHtml(project.narrativeTitles.decision)}</h2>
-        <p>${escapeHtml(project.decision)}</p>
-      </div>
-      <div>
-        <p class="eyebrow">Desarrollo</p>
-        <h2>${escapeHtml(project.narrativeTitles.development)}</h2>
-        <p>${escapeHtml(project.development)}</p>
-      </div>
-    </section>
+    <figure class="project-cover project-container">
+      ${image(project.cover, coverAlt, {
+        eager: true,
+        sizes: "(max-width: 760px) calc(100vw - 48px), 1280px"
+      })}
+    </figure>
 
-    <section class="project-gallery" aria-labelledby="galeria-${project.slug}">
-      <div class="section__heading">
-        <p class="eyebrow">Galería</p>
-        <h2 id="galeria-${project.slug}">Imágenes del proyecto</h2>
+    ${gallerySource.length ? `<section class="project-gallery project-container" aria-labelledby="galeria-${project.slug}">
+      <div class="project-section-heading">
+        <p class="project-kicker">Galería</p>
+        <h2 id="galeria-${project.slug}">Secuencia visual</h2>
       </div>
-      <div class="gallery-grid">
+      <div class="project-gallery-grid">
         ${gallerySource.map(([src, alt], index) => {
-          const layout = galleryLayouts[index] || "half";
+          const layout = index === 0 ? "is-main" : index === 3 ? "is-additional" : "is-secondary";
+          const sizes = layout === "is-secondary"
+            ? "(max-width: 760px) calc(100vw - 48px), 620px"
+            : "(max-width: 760px) calc(100vw - 48px), 1280px";
           return `
-          <figure class="gallery-item gallery-item--${layout}">
-            ${image(src, alt, {
-              eager: false,
-              sizes: gallerySizes[layout]
-            })}
-            <figcaption>${escapeHtml(alt)}</figcaption>
+          <figure class="project-gallery-item ${layout}">
+            ${image(src, alt, { eager: false, sizes })}
           </figure>`;
         }).join("")}
       </div>
-    </section>
+    </section>` : ""}
 
-    <nav class="project-pagination" aria-label="Proyecto anterior y siguiente">
+    <nav class="project-nav project-container" aria-label="Proyecto anterior y siguiente">
       <a href="/proyectos/${previous.slug}/" rel="prev">
-        <span>Anterior</span>
-        <strong>${escapeHtml(previous.title)}</strong>
+        <span class="project-nav__label">Anterior</span>
+        <strong class="project-nav__title">${escapeHtml(previous.title)}</strong>
       </a>
       <a href="/proyectos/${next.slug}/" rel="next">
-        <span>Siguiente</span>
-        <strong>${escapeHtml(next.title)}</strong>
+        <span class="project-nav__label">Siguiente</span>
+        <strong class="project-nav__title">${escapeHtml(next.title)}</strong>
       </a>
     </nav>
 
-    <section class="related-projects" aria-labelledby="relacionados-${project.slug}">
-      <div class="section__heading">
-        <p class="eyebrow">Continuar explorando</p>
+    <section class="project-related project-container" aria-labelledby="relacionados-${project.slug}">
+      <div class="project-section-heading">
+        <p class="project-kicker">Continuar explorando</p>
         <h2 id="relacionados-${project.slug}">Proyectos relacionados</h2>
       </div>
-      <div class="project-grid project-grid--related">
-        ${related.map((item) => projectCard(item)).join("")}
+      <div class="related-grid">
+        ${related.map((item) => projectCard(item, { headingLevel: "h3" })).join("")}
       </div>
     </section>
   </article>`;
@@ -581,6 +576,7 @@ function projectPage(project) {
     pathname: `/proyectos/${project.slug}/`,
     current: "proyectos",
     body,
+    bodyClass: "page-project-detail",
     ogImage: project.cover,
     ogType: "article",
     preloadImage: project.cover,

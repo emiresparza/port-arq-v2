@@ -36,20 +36,41 @@ test("la arquitectura pública contiene todas las rutas requeridas", () => {
   routes.forEach((route) => assert.ok(fs.existsSync(path.join(root, route)), route));
 });
 
-test("cada proyecto tiene una ruta estática con contenido editorial inicial", () => {
+test("cada proyecto usa una ficha editorial compacta y conserva su navegación", () => {
   assert.ok(projects.length >= 8 && projects.length <= 12);
+  const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
 
   projects.forEach((project) => {
     const file = path.join(root, "proyectos", project.slug, "index.html");
     assert.ok(fs.existsSync(file), project.slug);
     const html = fs.readFileSync(file, "utf8");
-    assert.match(html, new RegExp(`<h1>${project.title}</h1>`));
-    assert.match(html, /El problema/);
-    assert.match(html, /Decisión/);
-    assert.match(html, /Desarrollo/);
-    assert.match(html, /Galería/);
+    const description = html.match(/<p class="project-description">([\s\S]*?)<\/p>/)?.[1] || "";
+    const facts = [...html.matchAll(/<dl class="project-meta">[\s\S]*?<\/dl>/g)]
+      .flatMap((match) => [...match[0].matchAll(/<dt>/g)]);
+    const galleryItems = [...html.matchAll(/<figure class="project-gallery-item /g)];
+    const relatedCards = html.match(/<div class="related-grid">([\s\S]*?)<\/div>\s*<\/section>/)?.[1]
+      .match(/<article class="project-card"/g) || [];
+
+    assert.match(html, new RegExp(`<h1 class="project-title">${project.title}</h1>`));
+    assert.match(html, /<body class="page-project-detail">/);
+    assert.ok(description.split(/\s+/).filter(Boolean).length <= 200, project.slug);
+    assert.ok(facts.length <= 6, project.slug);
+    assert.ok(galleryItems.length <= 4, project.slug);
+    assert.equal(relatedCards.length, Math.min(project.related.length, 3), project.slug);
+    assert.match(html, /<nav class="project-nav project-container"/);
+    assert.match(html, /rel="prev"/);
+    assert.match(html, /rel="next"/);
+    assert.match(html, /Secuencia visual/);
     assert.match(html, /Proyectos relacionados/);
+    assert.doesNotMatch(html, /project-narrative|El problema|<figcaption>/);
   });
+
+  assert.match(css, /\.project-hero__grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(12/);
+  assert.match(css, /\.project-cover\s*\{[\s\S]*?max-height:\s*70svh;[\s\S]*?aspect-ratio:\s*2 \/ 1/);
+  assert.match(css, /\.related-grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(3/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.project-cover\s*\{[\s\S]*?aspect-ratio:\s*4 \/ 3/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.project-nav\s*\{[\s\S]*?grid-template-columns:\s*1fr/);
+  assert.doesNotMatch(css, /project-narrative|project-pagination|gallery-item--/);
 });
 
 test("el índice de proyectos conserva un orden curado y una grilla editorial regular", () => {
