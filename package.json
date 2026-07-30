@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/optimize-images.mjs && node scripts/build.mjs && node scripts/validate.mjs",
+    "build": "node scripts/optimize-images.mjs && node scripts/build.mjs && node scripts/validate.mjs && node scripts/prepare-sites.mjs",
     "lint": "node scripts/lint.mjs",
     "test": "node --test tests/site.test.mjs",
     "validate": "node scripts/validate.mjs",

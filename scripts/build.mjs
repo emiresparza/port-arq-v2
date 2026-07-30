@@ -226,18 +226,24 @@ ${footer()}
 `;
 }
 
-function projectCard(project, { featured = false } = {}) {
+function projectCard(project) {
+  const metadata = [
+    project.scope?.split(",")[0]?.trim() || project.category,
+    project.year,
+    project.location
+  ].filter(Boolean);
+
   return `
-    <article class="project-card${featured ? " project-card--featured" : ""}" data-project-card data-category="${project.category}">
+    <article class="project-card" data-project-card data-category="${project.category}">
       <a href="/proyectos/${project.slug}/">
         <div class="project-card__media">
           ${image(project.cover, `${project.title}: ${project.description}`, {
-            sizes: featured ? "(max-width: 760px) 100vw, 66vw" : "(max-width: 760px) 100vw, 50vw"
+            sizes: "(max-width: 760px) calc(100vw - 48px), (max-width: 1024px) calc(50vw - 56px), (max-width: 1440px) calc((100vw - 208px) / 3), 400px"
           })}
         </div>
         <div class="project-card__meta">
           <h2>${escapeHtml(project.title)}</h2>
-          <p>${escapeHtml(project.category)} <span aria-hidden="true">·</span> ${escapeHtml(project.location)}</p>
+          <p>${metadata.map(escapeHtml).join(' <span aria-hidden="true">·</span> ')}</p>
         </div>
       </a>
     </article>`;
@@ -454,6 +460,7 @@ function projectsPage() {
     pathname: "/proyectos/",
     current: "proyectos",
     body,
+    bodyClass: "page-projects",
     ogImage: projects[2].cover,
     jsonLd: {
       "@context": "https://schema.org",

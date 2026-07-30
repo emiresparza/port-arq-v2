@@ -52,6 +52,32 @@ test("cada proyecto tiene una ruta estática con contenido editorial inicial", (
   });
 });
 
+test("el índice de proyectos conserva un orden curado y una grilla editorial regular", () => {
+  const html = fs.readFileSync(path.join(root, "proyectos/index.html"), "utf8");
+  const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+  const projectLinks = [...html.matchAll(/<article class="project-card"[\s\S]*?<a href="\/proyectos\/([^/]+)\//g)]
+    .map((match) => match[1]);
+
+  assert.deepEqual(projectLinks, [
+    "antu",
+    "big-dreams",
+    "casa-alicia",
+    "casa-bv",
+    "casa-cg",
+    "cdl",
+    "homeoffice-cg",
+    "oficina-gl",
+    "quincho-ss",
+    "render-pocuro",
+    "zenteno"
+  ]);
+  assert.match(html, /<body class="page-projects">/);
+  assert.match(css, /\.page-projects \.project-grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(3/);
+  assert.match(css, /@media \(max-width: 1024px\)[\s\S]*?\.page-projects \.project-grid\s*\{[\s\S]*?repeat\(2/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-projects \.project-grid\s*\{[\s\S]*?grid-template-columns:\s*1fr/);
+  assert.doesNotMatch(css, /project-grid--editorial|project-card--featured/);
+});
+
 test("la home conserva SEO y aplica la composición editorial de referencia", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const expectedH1 = "<h1><span>Arquitectura</span><span>diseñada para</span><span>construirse</span><span>mejor.</span></h1>";
