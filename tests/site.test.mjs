@@ -99,6 +99,56 @@ test("el índice de proyectos conserva un orden curado y una grilla editorial re
   assert.doesNotMatch(css, /project-grid--editorial|project-card--featured/);
 });
 
+test("la oficina técnica conserva una estructura editorial compacta y responsive", () => {
+  const html = fs.readFileSync(path.join(root, "oficina-tecnica/index.html"), "utf8");
+  const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+  const standardFooter = html.slice(html.indexOf('<footer class="site-footer">'));
+
+  assert.match(html, /<body class="page-technical">/);
+  assert.equal((html.match(/<h1(?:\s|>)/g) || []).length, 1);
+  assert.match(html, /Capacidad técnica externa, integrada a tu equipo\./);
+  assert.match(html, /Orden técnico para proyectos en desarrollo\./);
+  assert.match(html, /Cada entrega debe tener fuente, revisión y salida\./);
+  assert.equal((html.match(/<tbody>[\s\S]*?<\/tbody>/)?.[0].match(/<tr>/g) || []).length, 4);
+  assert.ok(html.indexOf('class="technical-hero"') < html.indexOf('class="technical-method"'));
+  assert.ok(html.indexOf('class="technical-method"') < html.indexOf('class="technical-deliverables"'));
+  assert.ok(html.indexOf('class="technical-deliverables"') < html.indexOf('class="technical-case-study"'));
+  assert.doesNotMatch(html, /technical-intro|technical-pillars|class="deliverables"|class="technical-case"/);
+  assert.match(standardFooter, /Proyectos claros, precisos y construibles\./);
+  assert.match(standardFooter, />Privacidad</);
+  assert.match(css, /\.page-technical \.technical-hero\s*\{[\s\S]*?72vh/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?technical-deliverables tbody td[\s\S]*?display:\s*grid/);
+});
+
+test("Estudio usa una narrativa editorial compacta sobre la retícula compartida", () => {
+  const html = fs.readFileSync(path.join(root, "estudio/index.html"), "utf8");
+  const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+  const main = html.match(/<main[\s\S]*?<\/main>/)?.[0] || "";
+  const principles = html.match(/<div class="studio-principles__grid">([\s\S]*?)<\/div>/)?.[1] || "";
+
+  assert.match(html, /<html lang="es-CL">/);
+  assert.match(html, /<body class="page-studio">/);
+  assert.match(html, /<a href="\/estudio\/" aria-current="page">Estudio<\/a>/);
+  assert.equal((main.match(/<h1(?:\s|>)/g) || []).length, 1);
+  assert.equal((main.match(/<section\b/g) || []).length, 3);
+  assert.equal((principles.match(/<article>/g) || []).length, 3);
+  assert.match(main, /Una oficina pequeña\./);
+  assert.match(main, /Una forma integral de resolver arquitectura\./);
+  assert.match(main, /La arquitectura se vuelve simple cuando las decisiones están resueltas\./);
+  assert.match(main, /Arquitecto especializado en diseño, visualización y coordinación BIM\./);
+  assert.match(main, /Conversemos sobre lo que necesita resolver\./);
+  assert.match(main, /href="\/contacto\/">Iniciar conversación<\/a>/);
+  assert.ok(main.indexOf('class="studio-hero"') < main.indexOf('class="studio-approach"'));
+  assert.ok(main.indexOf('class="studio-approach"') < main.indexOf('class="studio-direction"'));
+  assert.ok(main.indexOf('class="studio-direction"') < main.indexOf('class="studio-cta"'));
+  assert.doesNotMatch(main, /studio-statement|studio-director|studio-values|contact-band|manifesto/);
+  assert.match(css, /\.page-studio \.studio-hero__grid,[\s\S]*?grid-template-columns:\s*repeat\(12/);
+  assert.match(css, /@media \(max-width: 1100px\)[\s\S]*?\.page-studio \.studio-hero__grid,[\s\S]*?repeat\(8/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-studio \.studio-hero__grid,[\s\S]*?repeat\(4/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-studio \.studio-principles__grid\s*\{[\s\S]*?grid-template-columns:\s*1fr/);
+  assert.doesNotMatch(css, /\.page-studio[\s\S]*?min-height:\s*100(?:s?vh|%)/);
+});
+
 test("la home conserva SEO y aplica la composición editorial de referencia", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const expectedH1 = "<h1><span>Arquitectura</span><span>diseñada para</span><span>construirse</span><span>mejor.</span></h1>";
@@ -162,14 +212,31 @@ test("el hero incorpora movimiento limitado, dither fijo y ticker accesible", ()
   assert.match(javascript, /targetScrollY = viewportHeight \* \(-0\.015 \+ \(progress \* 0\.05\)\)/);
 });
 
-test("Syne 800 se carga localmente y solo se aplica al wordmark del footer", () => {
+test("todas las páginas comparten el footer editorial original", () => {
   const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
-  const syneDeclarations = css.match(/font-family:\s*"Syne"/g) || [];
+  const files = [
+    "index.html",
+    "proyectos/index.html",
+    ...projects.map((project) => `proyectos/${project.slug}/index.html`),
+    "servicios/index.html",
+    "oficina-tecnica/index.html",
+    "estudio/index.html",
+    "contacto/index.html",
+    "privacidad/index.html",
+    "404.html"
+  ];
+  const footers = files.map((file) => {
+    const html = fs.readFileSync(path.join(root, file), "utf8");
+    const footer = html.match(/<footer class="site-footer">[\s\S]*?<\/footer>/)?.[0];
+    assert.ok(footer, file);
+    assert.match(footer, /Proyectos claros, precisos y construibles\./);
+    assert.match(footer, />Privacidad</);
+    return footer;
+  });
 
-  assert.ok(fs.existsSync(path.join(root, "assets/fonts/syne-latin-800-normal.woff2")));
-  assert.equal(syneDeclarations.length, 2);
-  assert.match(css, /\.footer-wordmark\s*\{[\s\S]*?font-family:\s*"Syne", sans-serif;/);
-  assert.match(css, /\.manifesto::before,[\s\S]*?radial-gradient/);
+  assert.equal(new Set(footers).size, 1);
+  assert.match(css, /\.footer-wordmark\s*\{[\s\S]*?font-family:\s*"Syne"/);
+  assert.match(css, /\.site-footer\s*\{[\s\S]*?text-transform:\s*uppercase/);
 });
 
 test("el carrusel usa controles nativos accesibles sin autoplay ni dependencias", () => {

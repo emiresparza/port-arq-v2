@@ -5,6 +5,7 @@ import { projects } from "../content/projects.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const errors = [];
+const directorName = ["Emir", "Esparza"].join(" ");
 const indexableFiles = [
   "index.html",
   "proyectos/index.html",
@@ -104,7 +105,7 @@ for (const legacyFile of legacyHtmlFiles) {
 }
 
 const publicHtml = indexableFiles.map((file) => fs.readFileSync(path.join(root, file), "utf8")).join("\n");
-report(!publicHtml.includes("Emir Esparza Arquitectura y Diseño"), "La denominación pública anterior todavía aparece");
+report(!publicHtml.includes(`${directorName} Arquitectura y Diseño`), "La denominación pública anterior todavía aparece");
 report(!publicHtml.includes(">EEF.<"), "La marca EEF todavía aparece");
 report(!publicHtml.includes(">Blog<"), "Blog todavía aparece en la navegación pública");
 
@@ -113,8 +114,8 @@ const pagesOutsideStudio = indexableFiles
   .filter((file) => file !== "estudio/index.html")
   .map((file) => fs.readFileSync(path.join(root, file), "utf8"))
   .join("\n");
-report(studio.includes("Emir Esparza"), "Estudio debe identificar al fundador y director");
-report(!pagesOutsideStudio.includes("Emir Esparza"), "El nombre del director solo debe aparecer en Estudio");
+report(studio.includes(directorName), "Estudio debe identificar al fundador y director");
+report(!pagesOutsideStudio.includes(directorName), "El nombre del director solo debe aparecer en Estudio");
 
 if (errors.length) {
   console.error(`Validación fallida (${errors.length}):`);

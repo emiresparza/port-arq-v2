@@ -757,85 +757,124 @@ ${projectCTA()}`;
   });
 }
 
-function technicalOfficePage() {
-  const proofImage = projectBySlug.get("zenteno").images.at(-1)[0];
-  const caseStudy = projectBySlug.get("zenteno");
-  const body = `
-  <header class="page-intro page-intro--technical technical-intro">
-    <p class="eyebrow">Oficina técnica externa</p>
-    <h1>Capacidad técnica cuando el proyecto la necesita.</h1>
-    <p>EEAD se integra a equipos de arquitectura, construcción e inmobiliarios para transformar información fragmentada en modelos, planos y decisiones coordinadas.</p>
-    <div class="technical-intro__background" aria-hidden="true">
-      ${image(proofImage, "Axonometría general del proyecto Zenteno", { sizes: "100vw" })}
+function technicalHero(proofImage) {
+  return `
+  <header class="technical-hero" aria-labelledby="technical-title">
+    <div class="technical-shell technical-hero__grid">
+      <p class="eyebrow">OFICINA TÉCNICA EXTERNA</p>
+      <h1 id="technical-title">Capacidad técnica externa, integrada a tu equipo.</h1>
+      <p class="technical-hero__lead">Desarrollo BIM, documentación y soporte técnico para arquitectos, constructoras, ingenierías e inmobiliarias. Nos integramos al flujo del proyecto para ordenar información, producir entregables claros y avanzar con mayor trazabilidad.</p>
+      <div class="technical-hero__actions">
+        <a class="technical-action technical-action--primary" href="/contacto/">Solicitar reunión</a>
+        <a class="technical-action" href="#caso-zenteno">Ver caso relacionado</a>
+      </div>
+      <p class="technical-hero__metadata">BIM · documentación · coordinación · visualización</p>
+      <figure class="technical-hero__media">
+        ${image(proofImage, "Vista axonométrica del modelo arquitectónico del proyecto Zenteno", {
+          eager: true,
+          sizes: "(max-width: 760px) calc(100vw - 48px), (max-width: 1100px) 42vw, 32vw"
+        })}
+      </figure>
     </div>
-  </header>
+  </header>`;
+}
 
-  <section class="technical-pillars" aria-labelledby="capacidades-tecnicas">
-    <div class="section__heading section__heading--light">
-      <p class="eyebrow">Sistema de trabajo</p>
-      <h2 id="capacidades-tecnicas">Modelo, documentación y control.</h2>
-    </div>
-    <div class="technical-pillars__grid">
-      <article>
-        <span>01</span>
-        <h3>Modelo</h3>
-        <p>Una fuente común para revisar geometría, niveles, encuentros y coordinación entre disciplinas.</p>
-      </article>
-      <article>
-        <span>02</span>
-        <h3>Documentación</h3>
-        <p>Planos, detalles y láminas con jerarquías gráficas consistentes y alcance explícito.</p>
-      </article>
-      <article>
-        <span>03</span>
-        <h3>Control</h3>
-        <p>Revisiones trazables, listas de pendientes y criterios verificables antes de cada entrega.</p>
-      </article>
-    </div>
-  </section>
-
-  <section class="deliverables" aria-labelledby="matriz-entregables">
-    <div class="deliverables__intro">
-      <p class="eyebrow">Matriz de entregables</p>
-      <h2 id="matriz-entregables">Cada salida tiene una fuente y un control.</h2>
-      <p>La matriz se ajusta al encargo; esta estructura base hace visible qué se desarrolla, cómo se revisa y en qué formato se entrega.</p>
-    </div>
-    <div class="deliverables__table" tabindex="0" role="region" aria-label="Matriz de entregables técnicos">
-      <table>
-        <thead>
-          <tr><th>Entregable</th><th>Fuente</th><th>Control</th><th>Salida</th></tr>
-        </thead>
-        <tbody>
-          <tr><th>Modelo coordinado</th><td>Antecedentes y especialidades</td><td>Geometría, niveles e interferencias</td><td>RVT / IFC</td></tr>
-          <tr><th>Planimetría</th><td>Modelo aprobado</td><td>Escala, cotas y nomenclatura</td><td>PDF / DWG</td></tr>
-          <tr><th>Detalles</th><td>Puntos críticos</td><td>Encuentros, tolerancias y materiales</td><td>PDF / DWG</td></tr>
-          <tr><th>Registro</th><td>Revisiones del equipo</td><td>Responsables, fecha y estado</td><td>XLSX / PDF</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="technical-case">
-    <div class="technical-case__media">
-      ${image(proofImage, "Axonometría general utilizada para coordinar el proyecto Zenteno", {
-        sizes: "(max-width: 760px) 100vw, 58vw"
-      })}
-    </div>
-    <div class="technical-case__copy">
-      <p class="eyebrow">Caso relacionado</p>
-      <h2>${escapeHtml(caseStudy.title)}</h2>
-      <p>La lectura simultánea de inserción, envolvente y espacios interiores permite revisar el proyecto desde la escala urbana hasta sus decisiones de detalle.</p>
-      <a class="text-link" href="/proyectos/${caseStudy.slug}/">Ver caso de estudio</a>
-      <a class="text-link" href="/contacto/?motivo=apoyo-tecnico">Solicitar apoyo técnico</a>
+function technicalMethod() {
+  return `
+  <section class="technical-method" aria-labelledby="technical-method-title">
+    <div class="technical-shell technical-method__grid">
+      <header class="technical-method__intro">
+        <h2 id="technical-method-title">Orden técnico para proyectos en desarrollo.</h2>
+        <p>Trabajamos sobre modelos, planos y criterios existentes para convertir información dispersa en documentación coordinada, revisable y lista para avanzar.</p>
+      </header>
+      <div class="technical-method__pillars">
+        <article>
+          <span>01</span>
+          <h3>Modelo</h3>
+          <p>Una base común para revisar geometría, niveles, criterios espaciales y coordinación entre disciplinas.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>Documentación</h3>
+          <p>Planos y láminas con jerarquías claras, nomenclatura consistente y alcance explícito.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>Control</h3>
+          <p>Revisiones trazables, responsables definidos y observaciones verificables antes de cada entrega.</p>
+        </article>
+      </div>
     </div>
   </section>`;
+}
+
+function technicalDeliverables() {
+  return `
+  <section class="technical-deliverables" aria-labelledby="technical-deliverables-title">
+    <div class="technical-shell technical-deliverables__grid">
+      <header class="technical-deliverables__intro">
+        <p class="eyebrow">ENTREGABLES</p>
+        <h2 id="technical-deliverables-title">Cada entrega debe tener fuente, revisión y salida.</h2>
+        <p>No producimos documentos aislados. Cada salida debe responder a un insumo claro, un criterio de revisión y un formato útil para el equipo.</p>
+      </header>
+      <div class="technical-deliverables__table">
+        <table>
+          <thead>
+            <tr><th>Entregable</th><th>Fuente</th><th>Control</th><th>Salida</th></tr>
+          </thead>
+          <tbody>
+            <tr><th>Modelo coordinado</th><td data-label="Fuente">Antecedentes y especialidades</td><td data-label="Control">Geometría, niveles e interferencias</td><td data-label="Salida">RVT / IFC</td></tr>
+            <tr><th>Planimetría</th><td data-label="Fuente">Modelo y criterios de proyecto</td><td data-label="Control">Escala, capas y nomenclatura</td><td data-label="Salida">PDF / DWG</td></tr>
+            <tr><th>Detalles</th><td data-label="Fuente">Puntos críticos del proyecto</td><td data-label="Control">Encuentros, tolerancias y materialidad</td><td data-label="Salida">PDF / DWG</td></tr>
+            <tr><th>Registro</th><td data-label="Fuente">Revisiones del equipo</td><td data-label="Control">Responsable, fecha y estado</td><td data-label="Salida">XLSX / PDF</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>`;
+}
+
+function technicalCaseStudy(caseStudy, proofImage) {
+  return `
+  <section class="technical-case-study" id="caso-zenteno" aria-labelledby="technical-case-title">
+    <div class="technical-shell technical-case-study__grid">
+      <figure class="technical-case-study__media">
+        ${image(proofImage, "Axonometría general del proyecto Zenteno utilizada para revisar inserción, envolvente y encuentros", {
+          sizes: "(max-width: 760px) calc(100vw - 48px), (max-width: 1100px) 52vw, 48vw"
+        })}
+      </figure>
+      <div class="technical-case-study__copy">
+        <p class="eyebrow">CASO RELACIONADO</p>
+        <h2 id="technical-case-title">${escapeHtml(caseStudy.title)}</h2>
+        <p>La lectura simultánea de inserción urbana, envolvente y encuentros permitió revisar el proyecto desde la escala urbana hasta sus decisiones de detalle.</p>
+        <div class="technical-case-study__actions">
+          <a class="technical-action technical-action--primary" href="/proyectos/${caseStudy.slug}/">Ver caso de estudio</a>
+          <a class="technical-action" href="/contacto/">Solicitar apoyo técnico</a>
+        </div>
+      </div>
+    </div>
+  </section>`;
+}
+
+function technicalOfficePage() {
+  const caseStudy = projectBySlug.get("zenteno");
+  const proofImage = caseStudy.images.at(-1)[0];
+  const body = `${technicalHero(proofImage)}
+
+${technicalMethod()}
+
+${technicalDeliverables()}
+
+${technicalCaseStudy(caseStudy, proofImage)}`;
 
   return page({
-    title: "Oficina técnica externa y coordinación BIM — EEAD",
-    description: "Apoyo técnico externo para oficinas y equipos: modelación BIM, coordinación de especialidades, planimetría y documentación desde Temuco.",
+    title: "Oficina técnica externa y desarrollo BIM — EEAD",
+    description: "Desarrollo BIM, documentación y soporte técnico externo para arquitectos, constructoras, ingenierías e inmobiliarias.",
     pathname: "/oficina-tecnica/",
     current: "oficina-tecnica",
     body,
+    bodyClass: "page-technical",
+    preloadImage: proofImage,
     ogImage: proofImage,
     jsonLd: {
       "@context": "https://schema.org",
@@ -843,59 +882,124 @@ function technicalOfficePage() {
       name: "Oficina técnica externa",
       provider: { "@type": "ProfessionalService", name: "EEAD", url: `${siteUrl}/` },
       areaServed: "Chile",
-      serviceType: ["Modelación BIM", "Coordinación de especialidades", "Documentación técnica"]
+      serviceType: ["Desarrollo BIM", "Documentación técnica", "Coordinación", "Visualización"]
     }
   });
 }
 
-function studioPage() {
-  const body = `
-  <header class="page-intro">
-    <p class="eyebrow">Estudio</p>
-    <h1>Una oficina pequeña con mirada integral.</h1>
-    <p>EEAD trabaja en la intersección entre diseño, representación y desarrollo técnico. Esa continuidad permite sostener las decisiones importantes desde el primer esquema hasta la documentación.</p>
-  </header>
+const studioPrinciples = [
+  {
+    number: "01",
+    title: "Claridad antes que efecto",
+    description: "Cada recurso debe explicar, ordenar o mejorar el proyecto."
+  },
+  {
+    number: "02",
+    title: "Diseño con información",
+    description: "Las decisiones se apoyan en condiciones reales y se verifican durante el desarrollo."
+  },
+  {
+    number: "03",
+    title: "Coordinación temprana",
+    description: "Anticipamos encuentros, incompatibilidades y cambios antes de que lleguen a obra."
+  }
+];
 
-  <section class="studio-statement">
-    <p>Creemos en una arquitectura precisa: sensible al lugar, clara para quienes la usan y rigurosa en la forma en que se comunica y construye.</p>
-  </section>
+function studioHero() {
+  return `
+  <header class="studio-hero" aria-labelledby="studio-title">
+    <div class="studio-shell studio-hero__grid">
+      <p class="eyebrow">Estudio</p>
+      <div class="studio-hero__content">
+        <h1 id="studio-title">
+          <span>Una oficina pequeña.</span>
+          <span>Una forma integral de resolver arquitectura.</span>
+        </h1>
+        <p>EEAD es un estudio de arquitectura con base en Temuco. Diseñamos, coordinamos y documentamos proyectos residenciales y de hospitalidad para reducir errores, improvisación e incertidumbre antes de construir.</p>
+      </div>
+    </div>
+  </header>`;
+}
 
-  <section class="studio-director">
-    <div>
-      <p class="eyebrow">Dirección</p>
-      <h2>Emir Esparza</h2>
-      <p class="role">Fundador y director</p>
+function studioApproach() {
+  return `
+  <section class="studio-approach" aria-labelledby="studio-approach-title">
+    <div class="studio-shell studio-approach__grid">
+      <div class="studio-approach__intro">
+        <p class="eyebrow">Enfoque</p>
+        <h2 id="studio-approach-title">La arquitectura se vuelve simple cuando las decisiones están resueltas.</h2>
+      </div>
+      <div class="studio-approach__detail">
+        <p>Trabajamos cada proyecto como un sistema continuo de diseño, visualización, coordinación BIM y documentación. Cada etapa confirma la anterior y prepara la siguiente, para que la obra avance con mayor claridad y menos improvisación.</p>
+        <ul aria-label="Ámbitos de trabajo">
+          <li>Arquitectura residencial</li>
+          <li>Hospitality y turismo</li>
+          <li>BIM y documentación</li>
+          <li>Interiorismo y visualización</li>
+        </ul>
+      </div>
     </div>
-    <div>
-      <p>Arquitecto con experiencia en diseño, interiorismo, visualización y coordinación BIM. Dirige EEAD desde Temuco y articula equipos específicos según la escala y las necesidades de cada proyecto.</p>
-      <p>Su práctica combina criterio editorial, experiencia docente y desarrollo técnico para hacer legibles decisiones complejas y mantenerlas consistentes durante el proceso.</p>
-    </div>
-  </section>
-
-  <section class="studio-values" aria-labelledby="principios-estudio">
-    <div class="section__heading">
-      <p class="eyebrow">Principios</p>
-      <h2 id="principios-estudio">Cómo trabaja EEAD</h2>
-    </div>
-    <div>
-      <article><span>01</span><h3>Claridad antes que efecto</h3><p>Cada recurso debe explicar, organizar o mejorar el proyecto.</p></article>
-      <article><span>02</span><h3>Diseño con información</h3><p>Las decisiones se apoyan en condiciones reales y se comprueban durante el desarrollo.</p></article>
-      <article><span>03</span><h3>Coordinación temprana</h3><p>Anticipar encuentros reduce cambios tardíos y protege la intención arquitectónica.</p></article>
-    </div>
-  </section>
-
-  <section class="contact-band">
-    <p class="eyebrow">Temuco · Chile</p>
-    <h2>Cuéntenos qué necesita resolver.</h2>
-    <a class="button button--primary" href="/contacto/">Iniciar conversación</a>
   </section>`;
+}
+
+function studioDirection() {
+  const principles = studioPrinciples.map((principle) => `
+          <article>
+            <span aria-hidden="true">${principle.number}</span>
+            <h3>${principle.title}</h3>
+            <p>${principle.description}</p>
+          </article>`).join("");
+
+  return `
+  <section class="studio-direction" aria-labelledby="studio-direction-title">
+    <div class="studio-shell">
+      <div class="studio-direction__grid">
+        <div class="studio-direction__identity">
+          <p class="eyebrow">Dirección</p>
+          <h2 id="studio-direction-title">Emir Esparza</h2>
+          <p class="studio-direction__role">Fundador y director</p>
+        </div>
+        <p class="studio-direction__bio">Arquitecto especializado en diseño, visualización y coordinación BIM. Dirige EEAD desde Temuco y articula equipos según la escala de cada proyecto, manteniendo una misma lógica de trabajo: decisiones claras, información útil y documentación construible.</p>
+      </div>
+      <div class="studio-principles" aria-labelledby="studio-principles-title">
+        <div class="studio-principles__heading">
+          <p class="eyebrow">Principios</p>
+          <h2 id="studio-principles-title">Cómo trabajamos</h2>
+        </div>
+        <div class="studio-principles__grid">${principles}
+        </div>
+      </div>
+    </div>
+  </section>`;
+}
+
+function studioCta() {
+  return `
+  <section class="studio-cta" aria-labelledby="studio-cta-title">
+    <div class="studio-shell studio-cta__grid">
+      <p class="eyebrow">Temuco · Chile</p>
+      <div class="studio-cta__message">
+        <h2 id="studio-cta-title">Conversemos sobre lo que necesita resolver.</h2>
+        <p>Proyecto nuevo, ampliación o desarrollo técnico.</p>
+      </div>
+      <a class="button button--light" href="/contacto/">Iniciar conversación</a>
+    </div>
+  </section>`;
+}
+
+function studioPage() {
+  const body = `${studioHero()}
+${studioApproach()}
+${studioDirection()}
+${studioCta()}`;
 
   return page({
     title: "Estudio de arquitectura en Temuco — EEAD",
-    description: "Conoce EEAD, oficina de arquitectura, interiorismo y desarrollo técnico fundada y dirigida por Emir Esparza en Temuco, Chile.",
+    description: "EEAD es un estudio de arquitectura en Temuco que integra diseño, visualización, coordinación BIM y documentación antes de construir.",
     pathname: "/estudio/",
     current: "estudio",
     body,
+    bodyClass: "page-studio",
     ogImage: projects[0].cover,
     jsonLd: {
       "@context": "https://schema.org",
