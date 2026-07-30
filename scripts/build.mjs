@@ -601,99 +601,143 @@ function projectPage(project) {
   });
 }
 
+function servicesHero() {
+  return `
+  <header class="services-hero" aria-labelledby="services-title">
+    <div class="services-shell services-hero__inner">
+      <p class="eyebrow">SERVICIOS</p>
+      <h1 id="services-title">Resolver el proyecto antes de construir.</h1>
+      <p class="services-hero__lead">Arquitectura, documentación BIM y visualización integradas en un mismo proceso para coordinar decisiones, reducir errores y llegar a obra con mayor claridad.</p>
+      <div class="services-hero__actions">
+        <a class="button button--primary" href="#capacidades">Ver capacidades</a>
+        <a class="button services-button--secondary" href="/contacto/">Conversar sobre un proyecto</a>
+      </div>
+    </div>
+  </header>`;
+}
+
+function servicesIntro() {
+  return `
+    <header class="services-intro">
+      <p class="eyebrow">CAPACIDADES</p>
+      <h2 id="capabilities-title">Tres capacidades. Un solo criterio.</h2>
+      <p>Cada servicio puede desarrollarse de manera independiente o integrarse según la etapa y complejidad del proyecto.</p>
+    </header>`;
+}
+
+function serviceRow(service) {
+  return `
+      <article class="service-row" id="${service.id}">
+        <p class="service-row__number" aria-label="Servicio ${service.number}">${service.number}</p>
+        <h3>${escapeHtml(service.title)}</h3>
+        <div class="service-row__content">
+          <p class="service-row__description">${escapeHtml(service.description)}</p>
+          <p class="service-row__scope-label">Alcance habitual</p>
+          <ul class="service-row__scope">
+            ${service.scope.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+          </ul>
+          <a class="text-link service-row__link" href="${service.href}">${escapeHtml(service.linkLabel)}</a>
+        </div>
+        <figure class="service-row__media">
+          ${image(service.image, service.imageAlt, {
+            sizes: "(max-width: 760px) calc(100vw - 48px), (max-width: 1100px) 48vw, 34vw"
+          })}
+        </figure>
+      </article>`;
+}
+
+function technicalSupport() {
+  return `
+  <section class="technical-support" aria-labelledby="technical-support-title">
+    <div class="services-shell technical-support__inner">
+      <p class="eyebrow">SOPORTE PARA EQUIPOS</p>
+      <h2 id="technical-support-title">Capacidad técnica cuando el proyecto lo requiere.</h2>
+      <div class="technical-support__copy">
+        <p>Apoyamos a oficinas, constructoras e inmobiliarias con modelado BIM, documentación y visualización por alcance definido. Nos integramos a procesos existentes sin agregar complejidad operativa.</p>
+        <a class="text-link" href="/oficina-tecnica/">Conocer soporte técnico</a>
+      </div>
+    </div>
+  </section>`;
+}
+
+function projectCTA() {
+  return `
+  <section class="project-cta" aria-labelledby="project-cta-title">
+    <div class="services-shell project-cta__inner">
+      <div class="project-cta__copy">
+        <h2 id="project-cta-title">Definamos qué necesita resolver tu proyecto.</h2>
+        <p>Revisamos su etapa, alcance y entregables antes de preparar una propuesta.</p>
+      </div>
+      <div class="project-cta__actions">
+        <a class="button button--primary" href="/contacto/">Solicitar una conversación</a>
+        <a class="button services-button--secondary" href="/proyectos/">Ver proyectos</a>
+      </div>
+    </div>
+  </section>`;
+}
+
 function servicesPage() {
-  const architectureProject = projectBySlug.get("casa-alicia");
+  const architectureProject = projectBySlug.get("antu");
   const technicalProject = projectBySlug.get("zenteno");
   const visualizationProject = projectBySlug.get("render-pocuro");
-  const body = `
-  <header class="page-intro">
-    <p class="eyebrow">Servicios</p>
-    <h1>Capacidades integradas para decidir y construir mejor.</h1>
-    <p>EEAD acompaña proyectos completos y etapas específicas, manteniendo una relación directa entre intención arquitectónica, representación y desarrollo técnico.</p>
-  </header>
+  const services = [
+    {
+      id: "arquitectura",
+      number: "01",
+      title: "Arquitectura e interiorismo",
+      description: "Desarrollamos viviendas y espacios de hospitalidad desde el programa hasta el detalle. Ordenamos distribución, materialidad y experiencia espacial con criterio constructivo.",
+      scope: ["Anteproyecto", "desarrollo arquitectónico", "interiorismo", "especificaciones"],
+      href: "/proyectos/",
+      linkLabel: "Ver arquitectura",
+      image: architectureProject.cover,
+      imageAlt: "Vista exterior del proyecto Antü, un volumen horizontal revestido en madera"
+    },
+    {
+      id: "bim-documentacion",
+      number: "02",
+      title: "BIM y documentación",
+      description: "Modelamos, coordinamos y documentamos el proyecto para anticipar interferencias, ordenar especialidades y reducir decisiones improvisadas durante la construcción.",
+      scope: ["Modelado BIM", "planimetría", "coordinación", "documentación ejecutiva"],
+      href: "/oficina-tecnica/",
+      linkLabel: "Ver BIM y documentación",
+      image: technicalProject.images.at(-1)[0],
+      imageAlt: "Vista axonométrica del modelo arquitectónico coordinado del proyecto Zenteno"
+    },
+    {
+      id: "visualizacion",
+      number: "03",
+      title: "Visualización arquitectónica",
+      description: "Producimos imágenes para evaluar atmósfera, escala y materialidad antes de construir. No solo sirven para presentar el proyecto: también ayudan a decidirlo.",
+      scope: ["Imágenes interiores y exteriores", "estudios de materialidad", "recorridos", "apoyo comercial"],
+      href: `/proyectos/${visualizationProject.slug}/`,
+      linkLabel: "Ver visualización",
+      image: visualizationProject.images[17][0],
+      imageAlt: "Visualización interior de una sala multiuso con comedor, cocina y luz natural"
+    }
+  ];
+  const body = `${servicesHero()}
 
-  <section class="service-chapter" id="arquitectura">
-    <div class="service-chapter__content">
-      <p class="service-chapter__number">01 / Arquitectura</p>
-      <h2>Espacios coherentes desde el programa hasta el detalle.</h2>
-      <div class="service-chapter__copy">
-        <p>Desarrollamos viviendas, espacios de trabajo, equipamiento y remodelaciones. Cada encargo se estructura desde sus condiciones reales: personas, lugar, presupuesto, normativa y forma de construir.</p>
-        <ul>
-          <li>Estudios de cabida y definición de programa</li>
-          <li>Anteproyecto y visualización</li>
-          <li>Proyecto de arquitectura e interiorismo</li>
-          <li>Especificaciones y coordinación técnica</li>
-          <li>Apoyo durante licitación y obra</li>
-        </ul>
-        <a class="text-link" href="/proyectos/${architectureProject.slug}/">Ver ${escapeHtml(architectureProject.title)}</a>
+  <section class="services-matrix" id="capacidades" aria-labelledby="capabilities-title">
+    <div class="services-shell">
+${servicesIntro()}
+      <div class="services-matrix__rows">
+${services.map(serviceRow).join("")}
       </div>
     </div>
-    <a class="service-chapter__media" href="/proyectos/${architectureProject.slug}/" aria-label="Ver proyecto ${escapeHtml(architectureProject.title)}">
-      ${image(architectureProject.cover, `Proyecto relacionado: ${architectureProject.title}`, {
-        sizes: "(max-width: 760px) 100vw, 58vw"
-      })}
-    </a>
   </section>
 
-  <section class="service-chapter service-chapter--dark" id="oficina-tecnica">
-    <div class="service-chapter__content">
-      <p class="service-chapter__number">02 / Oficina técnica</p>
-      <h2>Capacidad técnica flexible para equipos con carga variable.</h2>
-      <div class="service-chapter__copy">
-        <p>Nos integramos a oficinas, constructoras y equipos de proyecto para modelar, coordinar y documentar entregas específicas con criterios verificables.</p>
-        <ul>
-          <li>Modelación BIM y levantamiento</li>
-          <li>Coordinación de especialidades</li>
-          <li>Planimetría y detalles constructivos</li>
-          <li>Revisión de interferencias y consistencia</li>
-          <li>Protocolos y apoyo a equipos internos</li>
-        </ul>
-        <a class="text-link" href="/oficina-tecnica/">Conocer la oficina técnica</a>
-      </div>
-    </div>
-    <a class="service-chapter__media" href="/proyectos/${technicalProject.slug}/" aria-label="Ver proyecto ${escapeHtml(technicalProject.title)}">
-      ${image(technicalProject.images.at(-1)[0], `Axonometría del proyecto relacionado ${technicalProject.title}`, {
-        sizes: "(max-width: 760px) 100vw, 58vw"
-      })}
-    </a>
-  </section>
+${technicalSupport()}
 
-  <section class="service-chapter" id="visualizacion">
-    <div class="service-chapter__content">
-      <p class="service-chapter__number">03 / Visualización</p>
-      <h2>Imágenes que sirven para evaluar, no solo para presentar.</h2>
-      <div class="service-chapter__copy">
-        <p>Producimos imágenes con criterio arquitectónico para validar atmósferas, materialidad, escala y decisiones de proyecto antes de construir.</p>
-        <ul>
-          <li>Dirección de imagen y encuadres</li>
-          <li>Modelación y preparación de escenas</li>
-          <li>Imágenes interiores y exteriores</li>
-          <li>Series para venta, concursos y aprobación</li>
-          <li>Apoyo visual durante el diseño</li>
-        </ul>
-        <a class="text-link" href="/proyectos/${visualizationProject.slug}/">Ver ${escapeHtml(visualizationProject.title)}</a>
-      </div>
-    </div>
-    <a class="service-chapter__media" href="/proyectos/${visualizationProject.slug}/" aria-label="Ver proyecto ${escapeHtml(visualizationProject.title)}">
-      ${image(visualizationProject.images[17][0], `Visualización del proyecto relacionado ${visualizationProject.title}`, {
-        sizes: "(max-width: 760px) 100vw, 58vw"
-      })}
-    </a>
-  </section>
-
-  <section class="contact-band">
-    <p class="eyebrow">¿Qué etapa necesita resolver?</p>
-    <h2>Definamos un alcance útil para su proyecto.</h2>
-    <a class="button button--primary" href="/contacto/">Hablemos</a>
-  </section>`;
+${projectCTA()}`;
 
   return page({
-    title: "Servicios de arquitectura, oficina técnica y visualización — EEAD",
-    description: "Servicios EEAD de arquitectura e interiorismo, oficina técnica externa y visualización arquitectónica para proyectos en Chile.",
+    title: "Servicios de arquitectura, BIM y visualización — EEAD",
+    description: "Arquitectura, documentación BIM y visualización integradas para coordinar decisiones, reducir errores y llegar a obra con mayor claridad.",
     pathname: "/servicios/",
     current: "servicios",
     body,
-    ogImage: projects[1].cover,
+    bodyClass: "page-services",
+    ogImage: architectureProject.cover,
     jsonLd: {
       "@context": "https://schema.org",
       "@type": "Service",
@@ -705,7 +749,7 @@ function servicesPage() {
         name: "Servicios",
         itemListElement: [
           { "@type": "Offer", itemOffered: { "@type": "Service", name: "Arquitectura e interiorismo" } },
-          { "@type": "Offer", itemOffered: { "@type": "Service", name: "Oficina técnica externa" } },
+          { "@type": "Offer", itemOffered: { "@type": "Service", name: "BIM y documentación" } },
           { "@type": "Offer", itemOffered: { "@type": "Service", name: "Visualización arquitectónica" } }
         ]
       }
