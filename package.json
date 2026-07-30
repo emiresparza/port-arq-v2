@@ -1,0 +1,19 @@
+{
+  "name": "eead-site",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/optimize-images.mjs && node scripts/build.mjs && node scripts/validate.mjs",
+    "lint": "node scripts/lint.mjs",
+    "test": "node --test tests/site.test.mjs",
+    "validate": "node scripts/validate.mjs",
+    "check:routes": "node scripts/check-routes.mjs",
+    "preview": "node scripts/serve.mjs"
+  },
+  "devDependencies": {
+    "@fontsource-variable/manrope": "^5.3.0",
+    "lighthouse": "^13.4.1",
+    "sharp": "^0.35.3"
+  }
+}

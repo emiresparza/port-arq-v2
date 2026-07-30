@@ -1,0 +1,13 @@
+# Reglas compatibles con Cloudflare Pages y Netlify
+/projects.html        /proyectos/          301
+/nosotros.html        /estudio/            301
+/blog.html            /                    301
+/post.html            /                    301
+/index.html           /                    301
+/proyectos/belmonte/              /proyectos/             301
+/proyectos/bim-panoramica/        /proyectos/             301
+/proyectos/oficinas-cdj-group/    /proyectos/             301
+/proyectos/clinica-o2/            /proyectos/             301
+/proyectos/taller-salfa/          /proyectos/             301
+/proyectos/rendering-lds/         /proyectos/             301
+/proyectos/rendering-bigdreams/   /proyectos/big-dreams/  301

@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /blog.html
+Disallow: /post.html
 
-Sitemap: https://emiresparza.github.io/port-arq-v2/sitemap.xml
+Sitemap: https://eead.cl/sitemap.xml

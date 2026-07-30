@@ -1,162 +1,152 @@
-// Custom cursor
 (function () {
-  const cursor = document.getElementById('cursor');
-  if (!cursor) return;
-  document.body.classList.add('has-custom-cursor');
+  "use strict";
 
-  document.addEventListener('mousemove', function (e) {
-    cursor.style.left = e.clientX + 'px';
-    cursor.style.top  = e.clientY + 'px';
-  });
+  const menuButton = document.querySelector(".menu-toggle");
+  const menu = document.querySelector(".site-nav");
 
-  // Expandir sobre interactivos, incluidos elementos creados por JS.
-  document.addEventListener('mouseover', function (e) {
-    if (e.target.closest('a, button, summary, label, input')) {
-      cursor.classList.add('cursor--expanded');
-    }
-  });
-  document.addEventListener('mouseout', function (e) {
-    if (e.target.closest('a, button, summary, label, input')) {
-      cursor.classList.remove('cursor--expanded');
-    }
-  });
-})();
+  if (menuButton && menu) {
+    const setMenu = (open) => {
+      menuButton.setAttribute("aria-expanded", String(open));
+      menu.classList.toggle("is-open", open);
+      document.body.classList.toggle("menu-open", open);
+      menuButton.querySelector("span").textContent = open ? "Cerrar" : "Menú";
+    };
 
-// Scroll reveal — imágenes primero, texto después
-(function () {
-  function markReveal(sel, isImg, baseDelay) {
-    document.querySelectorAll(sel).forEach(function (el) {
-      el.classList.add('reveal');
-      if (isImg) el.classList.add('reveal--img');
-      if (baseDelay) el.style.transitionDelay = baseDelay + 's';
+    menuButton.addEventListener("click", () => {
+      setMenu(menuButton.getAttribute("aria-expanded") !== "true");
+    });
+
+    menu.addEventListener("click", (event) => {
+      if (event.target.closest("a")) setMenu(false);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && menuButton.getAttribute("aria-expanded") === "true") {
+        setMenu(false);
+        menuButton.focus();
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 960) setMenu(false);
     });
   }
 
-  // Imágenes: sin delay, trigger temprano
-  markReveal('.project__img-wrap', true,  0);
-  markReveal('.service__card',      true,  0);
+  const filterButtons = Array.from(document.querySelectorAll("[data-filter]"));
+  const projectCards = Array.from(document.querySelectorAll("[data-project-card]"));
+  const filterStatus = document.querySelector("[data-filter-status]");
 
-  // Texto: delay base 0.3s — aparece después de la imagen
-  markReveal('.hero__bottom',      false, 0.2);
-  markReveal('.about__text',       false, 0.3);
-  markReveal('.about__cta',        false, 0.45);
-  markReveal('.services__intro',   false, 0.3);
-  markReveal('.awards__intro',     false, 0.3);
-  markReveal('.process__heading',  false, 0.3);
-  markReveal('.process__sub',      false, 0.44);
-  markReveal('.cta__title',        false, 0.2);
-  markReveal('.cta .btn-cta',      false, 0.4);
-  markReveal('.footer__brand',     false, 0.1);
+  filterButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const filter = button.dataset.filter;
+      let visible = 0;
 
-  // Stagger por grupo (labels, proyectos, awards, pasos, footer cols)
-  function staggerGroup(sel, isImg, step, baseDelay) {
-    var byParent = new Map();
-    document.querySelectorAll(sel).forEach(function (el) {
-      var p = el.parentElement;
-      if (!byParent.has(p)) byParent.set(p, []);
-      byParent.get(p).push(el);
+      filterButtons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+      projectCards.forEach((card) => {
+        const matches = filter === "Todos" || card.dataset.category === filter;
+        card.hidden = !matches;
+        if (matches) visible += 1;
+      });
+
+      if (filterStatus) {
+        filterStatus.textContent = `${visible} ${visible === 1 ? "proyecto visible" : "proyectos visibles"}.`;
+      }
     });
-    byParent.forEach(function (children) {
-      children.forEach(function (el, i) {
-        el.classList.add('reveal');
-        if (isImg) el.classList.add('reveal--img');
-        el.style.transitionDelay = (baseDelay + Math.min(i * step, 0.4)) + 's';
+  });
+
+  const form = document.getElementById("contact-form");
+
+  if (form) {
+    const submitButton = form.querySelector("[data-submit]");
+    const submitLabel = form.querySelector("[data-submit-label]");
+    const status = form.querySelector("[data-form-status]");
+    const controls = Array.from(form.querySelectorAll("input:not([type='hidden']), select, textarea"));
+    const fieldNames = {
+      nombre: "Escriba su nombre.",
+      correo: "Escriba un correo válido.",
+      tipo_encargo: "Seleccione el tipo de encargo.",
+      ubicacion: "Indique la ubicación del proyecto.",
+      etapa_actual: "Seleccione la etapa actual.",
+      mensaje: "Cuéntenos brevemente qué necesita resolver."
+    };
+
+    const errorElement = (control) => {
+      const describedBy = (control.getAttribute("aria-describedby") || "").split(" ");
+      const errorId = describedBy.find((id) => id.startsWith("error-"));
+      return errorId ? document.getElementById(errorId) : null;
+    };
+
+    const validateControl = (control) => {
+      const error = errorElement(control);
+      if (!error) return control.validity.valid;
+
+      if (control.validity.valid) {
+        control.removeAttribute("aria-invalid");
+        error.textContent = "";
+        return true;
+      }
+
+      control.setAttribute("aria-invalid", "true");
+      error.textContent = fieldNames[control.name] || "Revise este campo.";
+      return false;
+    };
+
+    controls.forEach((control) => {
+      control.addEventListener("blur", () => validateControl(control));
+      control.addEventListener("input", () => {
+        if (control.hasAttribute("aria-invalid")) validateControl(control);
+      });
+      control.addEventListener("change", () => {
+        if (control.hasAttribute("aria-invalid")) validateControl(control);
       });
     });
-  }
 
-  staggerGroup('.label',         false, 0,    0.2);
-  staggerGroup('.project',       true,  0.12, 0);
-  staggerGroup('.awards__row',   false, 0.14, 0.3);
-  staggerGroup('.process__step', false, 0.14, 0.3);
-  staggerGroup('.footer__col',   false, 0.14, 0.15);
+    const requestedReason = new URLSearchParams(window.location.search).get("motivo");
+    if (requestedReason === "apoyo-tecnico") {
+      const technicalOption = form.querySelector("input[name='motivo'][value='Necesito apoyo técnico']");
+      if (technicalOption) technicalOption.checked = true;
+    }
 
-  // Hero words: stagger en carga
-  document.querySelectorAll('.hero__words span').forEach(function (el, i) {
-    el.classList.add('reveal');
-    el.style.transitionDelay = (0.1 + i * 0.14) + 's';
-  });
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      status.className = "form-status";
+      status.textContent = "";
 
-  // Observer para imágenes: trigger temprano
-  var imgObs = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (e.isIntersecting) { e.target.classList.add('is-visible'); imgObs.unobserve(e.target); }
+      const invalid = controls.filter((control) => !validateControl(control));
+      if (invalid.length) {
+        status.classList.add("is-error");
+        status.textContent = "Revise los campos señalados antes de enviar.";
+        invalid[0].focus();
+        return;
+      }
+
+      submitButton.disabled = true;
+      submitButton.setAttribute("aria-busy", "true");
+      submitLabel.textContent = "Enviando…";
+      status.textContent = "Enviando su consulta.";
+
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          body: new FormData(form),
+          headers: { Accept: "application/json" }
+        });
+
+        if (!response.ok) throw new Error(`Respuesta ${response.status}`);
+
+        form.reset();
+        status.classList.add("is-success");
+        status.textContent = "Gracias. Su consulta fue enviada correctamente; EEAD responderá dentro de 2 días hábiles.";
+        status.focus();
+      } catch (error) {
+        status.classList.add("is-error");
+        status.textContent = "No pudimos enviar la consulta. Revise su conexión e inténtelo nuevamente.";
+        status.focus();
+      } finally {
+        submitButton.disabled = false;
+        submitButton.removeAttribute("aria-busy");
+        submitLabel.textContent = "Enviar consulta";
+      }
     });
-  }, { threshold: 0.05, rootMargin: '0px 0px -10px 0px' });
-
-  // Observer para texto: necesita más scroll
-  var txtObs = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (e.isIntersecting) { e.target.classList.add('is-visible'); txtObs.unobserve(e.target); }
-    });
-  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
-
-  document.querySelectorAll('.reveal').forEach(function (el) {
-    if (el.classList.contains('reveal--img')) imgObs.observe(el);
-    else txtObs.observe(el);
-  });
-})();
-
-// Header — el logo queda fijo; nav y CTA reaparecen al acercar el mouse arriba
-(function () {
-  var cta = document.getElementById('headerCta');
-  var nav = document.querySelector('.nav');
-  var header = document.querySelector('.header');
-  if (!cta && !nav) return;
-
-  var HIDE_AFTER = 80;
-  var REVEAL_ZONE = 96;
-  var pointerNearTop = false;
-
-  function setChromeVisible(visible) {
-    if (nav) nav.classList.toggle('is-hidden', !visible);
-    if (cta) cta.classList.toggle('is-hidden', !visible);
   }
-
-  function syncHeader() {
-    setChromeVisible(window.scrollY <= HIDE_AFTER || pointerNearTop);
-  }
-
-  window.addEventListener('scroll', function () {
-    syncHeader();
-  }, { passive: true });
-
-  document.addEventListener('mousemove', function (e) {
-    var isNearTop = e.clientY <= REVEAL_ZONE || Boolean(header && header.contains(e.target));
-    if (isNearTop === pointerNearTop) return;
-    pointerNearTop = isNearTop;
-    syncHeader();
-  });
-})();
-
-// Hero: parallax en imagen + micro-parallax en palabras
-(function () {
-  const img   = document.getElementById('heroImg');
-  const words = document.querySelectorAll('.hero__words span');
-  if (!img) return;
-
-  let tx = 0, ty = 0, cx = 0, cy = 0;
-  const RANGE = 28;
-
-  document.addEventListener('mousemove', function (e) {
-    const nx = (e.clientX / window.innerWidth  - 0.5) * 2;
-    const ny = (e.clientY / window.innerHeight - 0.5) * 2;
-    tx = -nx * RANGE;
-    ty = -ny * RANGE;
-  });
-
-  (function animate() {
-    cx += (tx - cx) * 0.055;
-    cy += (ty - cy) * 0.055;
-    img.style.transform = 'scale(1.08) translate(' + cx + 'px, ' + cy + 'px)';
-
-    // cada palabra tiene su propio depth
-    words.forEach(function (word) {
-      var d = parseFloat(word.dataset.depth) || 0.5;
-      word.style.transform =
-        'translate(' + (cx * d * 0.6) + 'px, ' + (cy * d * 0.6) + 'px)';
-    });
-
-    requestAnimationFrame(animate);
-  })();
 })();

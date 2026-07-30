@@ -1,2 +1,4 @@
 screenshots-dom/
 presentacion-proyecto.pdf
+node_modules/
+.tmp/
