@@ -107,7 +107,7 @@ test("la oficina técnica conserva una estructura editorial compacta y responsiv
 
   assert.match(html, /<body class="page-technical">/);
   assert.equal((html.match(/<h1(?:\s|>)/g) || []).length, 1);
-  assert.match(html, /Capacidad técnica, integrada a tu equipo\./);
+  assert.match(html, /<span>Capacidad técnica,<\/span> <span>integrada a tu equipo\.<\/span>/);
   assert.match(html, /Del criterio de diseño a una documentación coherente\./);
   assert.match(html, /<h3>Modelo arquitectónico<\/h3>[\s\S]*?<h3>Desarrollo<\/h3>[\s\S]*?<h3>Documentación<\/h3>/);
   assert.match(html, /Cada entrega debe conservar la lógica del proyecto\./);
@@ -115,20 +115,21 @@ test("la oficina técnica conserva una estructura editorial compacta y responsiv
   assert.equal((deliverablesTable.match(/<tbody>[\s\S]*?<\/tbody>/)?.[0].match(/<tr>/g) || []).length, 5);
   assert.doesNotMatch(deliverablesTable, /Salida/);
   assert.ok(html.indexOf("Desarrollo arquitectónico") < html.indexOf("modelado BIM"));
-  assert.ok(html.indexOf('class="technical-hero"') < html.indexOf('class="technical-method"'));
+  assert.ok(html.indexOf('class="hero site-hero site-hero--technical"') < html.indexOf('class="technical-method"'));
   assert.ok(html.indexOf('class="technical-method"') < html.indexOf('class="technical-deliverables"'));
   assert.ok(html.indexOf('class="technical-deliverables"') < html.indexOf('class="technical-case-study"'));
   assert.doesNotMatch(html, /technical-intro|technical-pillars|class="deliverables"|class="technical-case"/);
-  assert.match(standardFooter, /ARQUITECTURA CLARA\. DECISIONES CONSTRUIBLES\./);
+  assert.match(standardFooter, /Arquitectura simple\./);
   assert.match(standardFooter, />Privacidad</);
-  assert.match(css, /\.page-technical \.technical-hero\s*\{[\s\S]*?100svh/);
-  assert.match(css, /\.page-technical \.technical-hero__media\s*\{[\s\S]*?position:\s*absolute/);
+  assert.match(css, /--site-hero-height:\s*max\(720px, calc\(100svh - var\(--hero-ticker-height\)\)\)/);
+  assert.match(css, /\.site-hero \.hero__media\s*\{[\s\S]*?position|\.site-hero \.hero__media,[\s\S]*?position:\s*absolute/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*?technical-deliverables tbody td[\s\S]*?display:\s*grid/);
 });
 
 test("Servicios presenta cuatro áreas en el orden y las rutas acordadas", () => {
   const html = fs.readFileSync(path.join(root, "servicios/index.html"), "utf8");
   const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+  const optimizer = fs.readFileSync(path.join(root, "scripts/optimize-images.mjs"), "utf8");
   const main = html.match(/<main[\s\S]*?<\/main>/)?.[0] || "";
   const serviceTitles = [...main.matchAll(/<article class="service-row"[\s\S]*?<h3>([^<]+)<\/h3>/g)]
     .map((match) => match[1]);
@@ -139,9 +140,11 @@ test("Servicios presenta cuatro áreas en el orden y las rutas acordadas", () =>
     "Visualización + render",
     "Oficina técnica externa"
   ]);
-  assert.match(main, /class="services-hero__media"/);
-  assert.match(main, /ChatGPT%20Image%2027%20may%202026%2C%2011_34_21%20p\.m\.-1671\.avif/);
-  assert.match(main, /Resolver el proyecto<br>antes de construir\./);
+  assert.match(main, /class="hero site-hero site-hero--services"/);
+  assert.match(main, /assets\/img\/optimized\/Servicios\/EEAD%20Hero%20Servicios-[0-9]+\.avif/);
+  assert.match(main, /alt="Vivienda contemporánea de hormigón y madera integrada al paisaje"/);
+  assert.match(optimizer, /\/assets\/img\/Servicios\/EEAD Hero Servicios\.png/);
+  assert.match(main, /<span>Resolver el proyecto<\/span> <span>antes de construir\.<\/span>/);
   assert.match(main, /Arquitectura, documentación BIM y visualización integradas en un mismo proceso para coordinar decisiones, reducir errores y llegar a obra con mayor claridad\./);
   assert.doesNotMatch(main, /Ver capacidades/);
   assert.match(main, /class="button button--primary" href="\/contacto\/">Conversar sobre un proyecto<\/a>/);
@@ -207,7 +210,7 @@ test("Estudio reproduce la composición editorial breve del mockup", () => {
 
 test("la home conserva SEO y aplica la composición editorial de referencia", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
-  const expectedH1 = "<h1><span>Arquitectura</span><span>diseñada para</span><span>construirse</span><span>mejor.</span></h1>";
+  const expectedH1 = '<h1 id="home-title"><span>Arquitectura</span> <span>diseñada para</span> <span>construirse</span> <span>mejor.</span></h1>';
   const carouselLinks = [...html.matchAll(/<article class="project-carousel__slide"[\s\S]*?<a href="(\/proyectos\/[^"]+\/)"/g)]
     .map((match) => match[1]);
 
@@ -222,7 +225,7 @@ test("la home conserva SEO y aplica la composición editorial de referencia", ()
   assert.ok(html.includes("Porque una buena arquitectura no solo debe verse bien. También debe estar bien resuelta."));
   assert.match(
     html,
-    /<div class="home-hero-shell">[\s\S]*?<section class="hero"[\s\S]*?<section class="editorial-ticker"[\s\S]*?<\/div>\s*<section class="manifesto"/
+    /<div class="home-hero-shell">[\s\S]*?<section class="hero site-hero site-hero--home"[\s\S]*?<section class="editorial-ticker"[\s\S]*?<\/div>\s*<section class="manifesto"/
   );
   assert.ok(html.indexOf('class="hero__media"') < html.indexOf('class="hero__contrast"'));
   assert.ok(html.indexOf('class="hero__contrast"') < html.indexOf('class="hero__dither"'));
@@ -282,10 +285,11 @@ test("el hero incorpora movimiento limitado, dither fijo y ticker accesible", ()
   assert.ok(html.includes("data-hero-pointer"));
   const tickerGroups = [...html.matchAll(/<div class="editorial-ticker__group" aria-hidden="true">([\s\S]*?)<\/div>/g)]
     .map((match) => match[1]);
-  assert.equal(tickerGroups.length, 2);
-  assert.equal(tickerGroups[0], tickerGroups[1]);
+  assert.equal(tickerGroups.length, 8);
+  tickerGroups.forEach((group) => assert.equal(group, tickerGroups[0]));
   assert.match(html, /editorial-ticker__viewport" aria-hidden="true"/);
   assert.match(html, /<p class="sr-only">Arquitectura e interiorismo\./);
+  assert.match(html, /class="button button--primary" href="\/proyectos\/">Proyectos<\/a>[\s\S]*?class="button button--primary" href="\/contacto\/">Agenda una reunión<\/a>/);
 
   assert.match(css, /\/\* hero-contrast:start \*\//);
   assert.match(css, /\/\* hero-dither:start \*\//);
@@ -296,6 +300,9 @@ test("el hero incorpora movimiento limitado, dither fijo y ticker accesible", ()
   assert.match(css, /\.page-home \.editorial-ticker\s*\{[\s\S]*?flex:\s*0 0 auto/);
   assert.match(css, /@keyframes eead-ticker/);
   assert.match(css, /animation:\s*eead-ticker 28s linear infinite/);
+  assert.match(css, /\.page-home \.editorial-ticker\s*\{[\s\S]*?background:\s*var\(--surface-soft\);[\s\S]*?color:\s*#000/);
+  assert.match(css, /\.page-home \.editorial-ticker__group\s*\{[\s\S]*?font-family:\s*"Manrope"[\s\S]*?font-weight:\s*300/);
+  assert.match(css, /transform:\s*translate3d\(-12\.5%, 0, 0\)/);
   assert.match(css, /prefers-reduced-motion:[\s\S]*?editorial-ticker__track[\s\S]*?animation:\s*none !important/);
 
   assert.match(javascript, /IntersectionObserver/);
@@ -324,7 +331,12 @@ test("todas las páginas comparten el footer editorial actualizado", () => {
     const html = fs.readFileSync(path.join(root, file), "utf8");
     const footer = html.match(/<footer class="site-footer">[\s\S]*?<\/footer>/)?.[0];
     assert.ok(footer, file);
-    assert.match(footer, /ARQUITECTURA CLARA\. DECISIONES CONSTRUIBLES\./);
+    assert.match(footer, /Arquitectura simple\./);
+    assert.match(footer, /mailto:hola@eead\.cl/);
+    assert.match(footer, /https:\/\/wa\.me\/56987283154/);
+    assert.match(footer, /https:\/\/www\.instagram\.com\/eead\.cl\//);
+    assert.match(footer, /❤ Hecho con amor desde Temuco por [\s\S]*?>ARQit!<\/a> Diseñado por humanos\./);
+    assert.doesNotMatch(footer, /ARQUITECTURA CLARA|DECISIONES CONSTRUIBLES/);
     assert.match(footer, />Privacidad</);
     return footer;
   });
@@ -332,6 +344,41 @@ test("todas las páginas comparten el footer editorial actualizado", () => {
   assert.equal(new Set(footers).size, 1);
   assert.match(css, /\.footer-wordmark\s*\{[\s\S]*?font-family:\s*"Syne"/);
   assert.match(css, /\.site-footer\s*\{[\s\S]*?text-transform:\s*uppercase/);
+});
+
+test("los heroes visuales y los controles globales comparten una sola implementación", () => {
+  const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+  const javascript = fs.readFileSync(path.join(root, "main.js"), "utf8");
+  const heroFiles = ["index.html", "servicios/index.html", "oficina-tecnica/index.html", "estudio/index.html"];
+  const allFiles = [
+    ...heroFiles,
+    "proyectos/index.html",
+    ...projects.map((project) => `proyectos/${project.slug}/index.html`),
+    "contacto/index.html",
+    "privacidad/index.html",
+    "404.html"
+  ];
+
+  heroFiles.forEach((file) => {
+    const html = fs.readFileSync(path.join(root, file), "utf8");
+    assert.match(html, /class="hero site-hero site-hero--(?:home|services|technical|studio)" data-hero-motion/);
+    ["data-hero-scroll", "data-hero-pointer", 'class="hero__contrast"', 'class="hero__dither"', 'class="hero__content hero__grid"']
+      .forEach((token) => assert.ok(html.includes(token), `${file}: ${token}`));
+  });
+
+  allFiles.forEach((file) => {
+    const html = fs.readFileSync(path.join(root, file), "utf8");
+    assert.match(html, /class="floating-controls"/);
+    assert.match(html, /data-scroll-top/);
+    assert.match(html, /aria-label="Contactar por WhatsApp"/);
+    assert.match(html, /class="floating-control__icon"[\s\S]*?<path fill="currentColor"/);
+    assert.doesNotMatch(html, />WA<\/span>/);
+  });
+
+  assert.match(css, /--button-height:\s*46px/);
+  assert.match(css, /\.site-nav a::after\s*\{\s*bottom:\s*0/);
+  assert.match(css, /safe-area-inset-bottom/);
+  assert.match(javascript, /window\.scrollTo\(\{ top: 0, behavior: reduceMotion\.matches \? "auto" : "smooth" \}\)/);
 });
 
 test("todos los navbar blancos usan la variante tipográfica en mayúsculas", () => {
@@ -426,10 +473,8 @@ test("Contacto usa una sección compacta y un formulario accesible de cinco camp
   [
     '<body class="page-contact">',
     "<title>Contacto — EEAD Arquitectura e interiorismo</title>",
-    "<p class=\"eyebrow\">CONTACTO</p>",
-    "Conversemos sobre tu proyecto.",
+    '<h1 id="contact-title"><span>Conversemos</span> <span>sobre tu</span> <span>proyecto</span></h1>',
     "Cuéntanos qué necesitas resolver, dónde se ubica el proyecto y en qué etapa se encuentra. Con esa información podremos orientarte sobre los próximos pasos.",
-    'id="contact-channels-title">CANALES DIRECTOS</h2>',
     'id="contact-form-title">CUÉNTANOS TU ENCARGO</h2>',
     'action="https://formsubmit.co/ajax/emiresparza@gmail.com"',
     "Arquitectura e interiorismo",
@@ -438,8 +483,12 @@ test("Contacto usa una sección compacta y un formulario accesible de cinco camp
     "<option>Otro</option>",
     'placeholder="Comuna, ciudad o región"',
     'placeholder="Describa brevemente el proyecto, su etapa actual y cualquier plazo o condición relevante."',
-    'href="mailto:emiresparza@gmail.com"',
+    'href="mailto:hola@eead.cl"',
     'href="https://wa.me/56987283154"',
+    'href="https://www.instagram.com/eead.cl/"',
+    "HOLA@EEAD.CL",
+    "(+569) 87 28 31 54",
+    "@eead.cl",
     'class="contact-channel__arrow" aria-hidden="true">↗</span>',
     'href="/privacidad/"',
     'name="_honey"',
@@ -447,6 +496,10 @@ test("Contacto usa una sección compacta y un formulario accesible de cinco camp
     'aria-live="polite"',
     'aria-atomic="true"'
   ].forEach((value) => assert.ok(html.includes(value), value));
+
+  ["CONTACTO</p>", "CANALES DIRECTOS</h2>", "Conversemos sobre tu proyecto."].forEach((value) => {
+    assert.ok(!html.includes(value), value);
+  });
 
   [
     "Antes de enviar",
@@ -469,6 +522,8 @@ test("Contacto usa una sección compacta y un formulario accesible de cinco camp
   assert.match(css, /\.contact-page__form-area\s*\{[\s\S]*?grid-column:\s*7 \/ 13/);
   assert.match(css, /\.page-contact \.field input,[\s\S]*?background:\s*transparent/);
   assert.match(css, /\.page-contact \.field input:focus-visible,[\s\S]*?var\(--accent\)/);
+  assert.match(css, /\.contact-page::before/);
+  assert.match(css, /\.contact-page\s*\{[\s\S]*?background:\s*var\(--ink\)/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-contact \.form-grid,[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
   assert.match(css, /@media \(min-width: 1101px\)[\s\S]*?\.contact-page__intro\s*\{[\s\S]*?position:\s*sticky/);
   assert.doesNotMatch(css, /\.contact-page\s*\{[\s\S]*?min-height:\s*100/);

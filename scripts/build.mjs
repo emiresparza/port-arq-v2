@@ -6,6 +6,10 @@ import { legacyStaticRedirects } from "../content/legacy-routes.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const siteUrl = "https://eead.cl";
+const contactEmail = "hola@eead.cl";
+const whatsappNumber = "56987283154";
+const whatsappUrl = `https://wa.me/${whatsappNumber}`;
+const instagramUrl = "https://www.instagram.com/eead.cl/";
 const defaultImage = "/assets/img/project-details/antu/img-0.webp";
 const buildDate = "2026-07-30";
 const syneSource = path.join(root, "node_modules", "@fontsource", "syne", "files", "syne-latin-800-normal.woff2");
@@ -159,6 +163,12 @@ function footer() {
           </div>
         </div>
       </div>
+      <div class="footer-contact" aria-label="Contacto EEAD">
+        <p>Arquitectura simple.</p>
+        <a href="mailto:${contactEmail}">${contactEmail}</a>
+        <a href="${whatsappUrl}" target="_blank" rel="noopener noreferrer">(+569) 87 28 31 54</a>
+        <a href="${instagramUrl}" target="_blank" rel="noopener noreferrer">@eead.cl</a>
+      </div>
       <nav aria-label="Navegación secundaria">
         <a href="/proyectos/">Proyectos</a>
         <a href="/servicios/">Servicios</a>
@@ -170,9 +180,48 @@ function footer() {
     </div>
     <div class="site-footer__bottom">
       <p>© ${new Date().getFullYear()} EEAD</p>
-      <p>ARQUITECTURA CLARA. DECISIONES CONSTRUIBLES.</p>
+      <p class="footer-credit">❤ Hecho con amor desde Temuco por <a href="https://arqit.eead.cl/" target="_blank" rel="noopener noreferrer">ARQit!</a> Diseñado por humanos.</p>
     </div>
   </footer>`;
+}
+
+function floatingControls() {
+  return `
+  <aside class="floating-controls" aria-label="Accesos rápidos">
+    <button class="floating-control floating-control--top" type="button" data-scroll-top aria-label="Volver al inicio de la página" hidden>
+      <span aria-hidden="true">↑</span>
+    </button>
+    <a class="floating-control floating-control--whatsapp" href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp">
+      <svg class="floating-control__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.273.297-1.04 1.016-1.04 2.479s1.065 2.875 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.262.489 1.693.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.29.173-1.414-.074-.123-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.981.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.9 6.989c-.002 5.45-4.437 9.884-9.892 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+      </svg>
+    </a>
+  </aside>`;
+}
+
+function sharedHero({ variant, label = "", titleId, title, copy, heroImage, imageAlt, mediaClass = "", element = "header" }) {
+  return `
+  <${element} class="hero site-hero site-hero--${variant}" data-hero-motion aria-labelledby="${titleId}">
+    <div class="hero__media" data-hero-media>
+      <div class="hero__media-scroll" data-hero-scroll>
+        <div class="hero__media-pointer" data-hero-pointer>
+          ${image(heroImage, imageAlt, {
+            className: `hero__image${mediaClass ? ` ${mediaClass}` : ""}`,
+            eager: true,
+            sizes: "100vw"
+          })}
+        </div>
+      </div>
+    </div>
+    <div class="hero__contrast" aria-hidden="true"></div>
+    <div class="hero__dither" aria-hidden="true"></div>
+    <div class="hero__content hero__grid">
+      <div class="hero__stack">
+${label ? `        <p class="eyebrow">${label}</p>\n` : ""}        <h1 id="${titleId}">${title}</h1>
+        <div class="hero__copy">${copy}</div>
+      </div>
+    </div>
+  </${element}>`;
 }
 
 function page({
@@ -227,6 +276,7 @@ ${header(current)}
 ${body}
 </main>
 ${footer()}
+${floatingControls()}
 </body>
 </html>
 `;
@@ -281,6 +331,12 @@ function homeTickerGroup() {
     .join("");
 }
 
+function homeTickerTrack() {
+  return Array.from({ length: 8 }, () =>
+    `<div class="editorial-ticker__group" aria-hidden="true">${homeTickerGroup()}</div>`
+  ).join("");
+}
+
 function homePage() {
   const prioritySlugs = ["zenteno", "casa-alicia", "antu", "quincho-ss"];
   const prioritySlugSet = new Set(prioritySlugs);
@@ -292,40 +348,25 @@ function homePage() {
   const activeProject = carouselProjects[activeProjectIndex];
   const body = `
   <div class="home-hero-shell">
-    <section class="hero" data-hero-motion>
-      <div class="hero__media" data-hero-media>
-        <div class="hero__media-scroll" data-hero-scroll>
-          <div class="hero__media-pointer" data-hero-pointer>
-            ${image(defaultImage, "Vista interior del proyecto Antü, arquitectura de EEAD", {
-              className: "hero__image",
-              eager: true,
-              sizes: "100vw"
-            })}
-          </div>
-        </div>
-      </div>
-      <div class="hero__contrast" aria-hidden="true"></div>
-      <div class="hero__dither" aria-hidden="true"></div>
-      <div class="hero__content hero__grid">
-        <div class="hero__stack">
-          <h1><span>Arquitectura</span><span>diseñada para</span><span>construirse</span><span>mejor.</span></h1>
-          <div class="hero__copy">
-            <p class="hero__lead">Somos un estudio de <span class="hero__emphasis">Arquitectura</span>, <span class="hero__emphasis">Diseño</span> e <span class="hero__emphasis">Interiorismo</span> fundado en el sur de <span class="hero__emphasis">Chile</span>. Trabajamos con <span class="hero__emphasis">Personas</span> y <span class="hero__emphasis">Empresas</span> para transformar ideas en proyectos <span class="hero__emphasis">Claros</span>, <span class="hero__emphasis">Precisos</span> y bien <span class="hero__emphasis">Resueltos</span>, integrando <span class="hero__emphasis">Diseño</span>, <span class="hero__emphasis">Visualización</span> y <span class="hero__emphasis">Desarrollo</span> técnico antes de la obra.</p>
-            <div class="hero__actions">
-              <a class="button button--light" href="/proyectos/">Proyectos</a>
-              <a class="button button--primary" href="/contacto/">Agenda una reunión</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+${sharedHero({
+      variant: "home",
+      titleId: "home-title",
+      title: "<span>Arquitectura</span> <span>diseñada para</span> <span>construirse</span> <span>mejor.</span>",
+      copy: `<p class="hero__lead">Somos un estudio de <span class="hero__emphasis">Arquitectura</span>, <span class="hero__emphasis">Diseño</span> e <span class="hero__emphasis">Interiorismo</span> fundado en el sur de <span class="hero__emphasis">Chile</span>. Trabajamos con <span class="hero__emphasis">Personas</span> y <span class="hero__emphasis">Empresas</span> para transformar ideas en proyectos <span class="hero__emphasis">Claros</span>, <span class="hero__emphasis">Precisos</span> y bien <span class="hero__emphasis">Resueltos</span>, integrando <span class="hero__emphasis">Diseño</span>, <span class="hero__emphasis">Visualización</span> y <span class="hero__emphasis">Desarrollo</span> técnico antes de la obra.</p>
+        <div class="hero__actions">
+          <a class="button button--primary" href="/proyectos/">Proyectos</a>
+          <a class="button button--primary" href="/contacto/">Agenda una reunión</a>
+        </div>`,
+      heroImage: defaultImage,
+      imageAlt: "Vista interior del proyecto Antü, arquitectura de EEAD",
+      element: "section"
+    })}
 
     <section class="editorial-ticker" aria-label="Servicios y enfoque de EEAD">
       <p class="sr-only">Arquitectura e interiorismo. Proyectos que se entienden antes de construir. Diseño, visualización y oficina técnica externa. Chile.</p>
       <div class="editorial-ticker__viewport" aria-hidden="true">
         <div class="editorial-ticker__track">
-          <div class="editorial-ticker__group" aria-hidden="true">${homeTickerGroup()}</div>
-          <div class="editorial-ticker__group" aria-hidden="true">${homeTickerGroup()}</div>
+          ${homeTickerTrack()}
         </div>
       </div>
     </section>
@@ -606,24 +647,16 @@ function projectPage(project) {
 }
 
 function servicesHero(heroImage) {
-  return `
-  <header class="services-hero" aria-labelledby="services-title">
-    <figure class="services-hero__media">
-      ${image(heroImage, "Interior de Casa BV con vistas al paisaje y mobiliario de madera", {
-        eager: true,
-        sizes: "100vw"
-      })}
-    </figure>
-    <div class="services-hero__overlay" aria-hidden="true"></div>
-    <div class="services-shell services-hero__inner">
-      <p class="eyebrow">SERVICIOS</p>
-      <h1 id="services-title">Resolver el proyecto<br>antes de construir.</h1>
-      <p class="services-hero__lead">Arquitectura, documentación BIM y visualización integradas en un mismo proceso para coordinar decisiones, reducir errores y llegar a obra con mayor claridad.</p>
-      <div class="services-hero__actions">
-        <a class="button button--primary" href="/contacto/">Conversar sobre un proyecto</a>
-      </div>
-    </div>
-  </header>`;
+  return sharedHero({
+    variant: "services",
+    label: "SERVICIOS",
+    titleId: "services-title",
+    title: "<span>Resolver el proyecto</span> <span>antes de construir.</span>",
+    copy: `<p class="hero__lead">Arquitectura, documentación BIM y visualización integradas en un mismo proceso para coordinar decisiones, reducir errores y llegar a obra con mayor claridad.</p>
+      <div class="hero__actions"><a class="button button--primary" href="/contacto/">Conversar sobre un proyecto</a></div>`,
+    heroImage,
+    imageAlt: "Vivienda contemporánea de hormigón y madera integrada al paisaje"
+  });
 }
 
 function servicesIntro() {
@@ -682,7 +715,6 @@ function projectCTA() {
 
 function servicesPage() {
   const architectureProject = projectBySlug.get("antu");
-  const heroProject = projectBySlug.get("casa-bv");
   const workspaceProject = projectBySlug.get("homeoffice-cg");
   const technicalProject = projectBySlug.get("zenteno");
   const visualizationProject = projectBySlug.get("render-pocuro");
@@ -740,7 +772,7 @@ function servicesPage() {
       imageAlt: "Vista axonométrica del modelo arquitectónico coordinado del proyecto Zenteno"
     }
   ];
-  const heroImage = heroProject.images.at(-1)[0];
+  const heroImage = "/assets/img/Servicios/EEAD Hero Servicios.png";
   const body = `${servicesHero(heroImage)}
 
   <section class="services-matrix" id="capacidades" aria-labelledby="services-areas-title">
@@ -784,31 +816,17 @@ ${projectCTA()}`;
 }
 
 function technicalHero(proofImage) {
-  return `
-  <header class="technical-hero" aria-labelledby="technical-title">
-    <span class="technical-hero__dither" aria-hidden="true"></span>
-    <div class="technical-shell technical-hero__grid">
-      <p class="eyebrow">OFICINA TÉCNICA EXTERNA</p>
-      <h1 id="technical-title">Capacidad técnica, integrada a tu equipo.</h1>
-      <div class="technical-hero__lead">
-        <p>Colaboramos con arquitectos, constructoras, ingenierías e inmobiliarias para desarrollar, representar y documentar proyectos sin perder su intención arquitectónica.</p>
-        <p>Nos integramos al proceso para ordenar la información, profundizar decisiones y transformar antecedentes existentes en un proyecto claro, coherente y preparado para avanzar.</p>
-      </div>
-      <div class="technical-hero__actions">
-        <a class="technical-action technical-action--primary" href="/contacto/">Solicitar reunión</a>
-        <a class="technical-action" href="#caso-zenteno">Ver caso relacionado</a>
-      </div>
-      <p class="technical-hero__metadata">Desarrollo arquitectónico · documentación · modelado BIM · detalles · visualización</p>
-    </div>
-    <figure class="technical-hero__media">
-      ${image(proofImage, "Escritorio de arquitectura con un monitor que muestra láminas de proyecto en Revit", {
-        className: "technical-hero__image",
-        eager: true,
-        sizes: "100vw"
-      })}
-      <figcaption class="sr-only" aria-hidden="true">Vista axonométrica del modelo arquitectónico del proyecto Zenteno.</figcaption>
-    </figure>
-  </header>`;
+  return sharedHero({
+    variant: "technical",
+    label: "OFICINA TÉCNICA EXTERNA",
+    titleId: "technical-title",
+    title: "<span>Capacidad técnica,</span> <span>integrada a tu equipo.</span>",
+    copy: `<div class="hero__lead"><p>Colaboramos con arquitectos, constructoras, ingenierías e inmobiliarias para desarrollar, representar y documentar proyectos sin perder su intención arquitectónica.</p><p>Nos integramos al proceso para ordenar la información, profundizar decisiones y transformar antecedentes existentes en un proyecto claro, coherente y preparado para avanzar.</p></div>
+      <div class="hero__actions"><a class="button button--primary" href="/contacto/">Solicitar reunión</a><a class="button button--light" href="#caso-zenteno">Ver caso relacionado</a></div>
+      <p class="hero__metadata">Desarrollo arquitectónico · documentación · modelado BIM · detalles · visualización</p>`,
+    heroImage: proofImage,
+    imageAlt: "Escritorio de arquitectura con un monitor que muestra láminas de proyecto en Revit"
+  });
 }
 
 function technicalMethod() {
@@ -933,27 +951,15 @@ ${technicalCaseStudy(caseStudy, proofImage)}`;
 }
 
 function studioHero(heroImage) {
-  return `
-  <header class="studio-hero" aria-labelledby="studio-title">
-    <div class="studio-shell studio-hero__inner">
-      <div class="studio-hero__content">
-        <p class="eyebrow">ESTUDIO</p>
-        <h1 id="studio-title">
-          <span>Una oficina pequeña.</span>
-          <span>Una forma integral de</span>
-          <span>resolver arquitectura.</span>
-        </h1>
-        <p>EEAD es un estudio de arquitectura con base en Temuco. Diseñamos, visualizamos y desarrollamos proyectos con una mirada integral para transformar ideas en decisiones claras, precisas y construibles.</p>
-      </div>
-    </div>
-    <figure class="studio-hero__media">
-      ${image(heroImage, "Mesa de trabajo con planos de arquitectura, lámpara, anteojos y material de proyecto.", {
-        className: "studio-hero__image",
-        eager: true,
-        sizes: "100vw"
-      })}
-    </figure>
-  </header>`;
+  return sharedHero({
+    variant: "studio",
+    label: "ESTUDIO",
+    titleId: "studio-title",
+    title: "<span>Una oficina pequeña.</span> <span>Una forma integral de</span> <span>resolver arquitectura.</span>",
+    copy: '<p class="hero__lead">EEAD es un estudio de arquitectura con base en Temuco. Diseñamos, visualizamos y desarrollamos proyectos con una mirada integral para transformar ideas en decisiones claras, precisas y construibles.</p>',
+    heroImage,
+    imageAlt: "Mesa de trabajo con planos de arquitectura, lámpara, anteojos y material de proyecto."
+  });
 }
 
 function studioOverview() {
@@ -1048,20 +1054,23 @@ function contactPage() {
     <div class="contact-page__grid">
       <div class="contact-page__intro">
         <header class="contact-page__heading">
-          <p class="eyebrow">CONTACTO</p>
-          <h1 id="contact-title">Conversemos sobre tu proyecto.</h1>
+          <h1 id="contact-title"><span>Conversemos</span> <span>sobre tu</span> <span>proyecto</span></h1>
           <p>Cuéntanos qué necesitas resolver, dónde se ubica el proyecto y en qué etapa se encuentra. Con esa información podremos orientarte sobre los próximos pasos.</p>
         </header>
-        <section class="contact-channels" aria-labelledby="contact-channels-title">
-          <h2 id="contact-channels-title">CANALES DIRECTOS</h2>
-          <a href="mailto:emiresparza@gmail.com">
+        <section class="contact-channels" aria-label="Canales directos">
+          <a href="mailto:hola@eead.cl">
             <span class="contact-channel__label">CORREO</span>
-            <strong class="contact-channel__value">emiresparza@gmail.com</strong>
+            <strong class="contact-channel__value">HOLA@EEAD.CL</strong>
             <span class="contact-channel__arrow" aria-hidden="true">↗</span>
           </a>
           <a href="https://wa.me/56987283154" target="_blank" rel="noopener noreferrer" aria-label="Abrir WhatsApp de EEAD en una nueva pestaña">
             <span class="contact-channel__label">WHATSAPP</span>
-            <strong class="contact-channel__value">+56 9 8728 3154</strong>
+            <strong class="contact-channel__value">(+569) 87 28 31 54</strong>
+            <span class="contact-channel__arrow" aria-hidden="true">↗</span>
+          </a>
+          <a href="https://www.instagram.com/eead.cl/" target="_blank" rel="noopener noreferrer" aria-label="Abrir Instagram de EEAD en una nueva pestaña">
+            <span class="contact-channel__label">INSTAGRAM</span>
+            <strong class="contact-channel__value">@eead.cl</strong>
             <span class="contact-channel__arrow" aria-hidden="true">↗</span>
           </a>
         </section>
@@ -1138,7 +1147,7 @@ function contactPage() {
       about: {
         "@type": "ProfessionalService",
         name: "EEAD",
-        email: "emiresparza@gmail.com",
+        email: "hola@eead.cl",
         telephone: "+56987283154"
       }
     }

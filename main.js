@@ -11,6 +11,21 @@
     window.addEventListener("scroll", updateHeader, { passive: true });
   }
 
+  const scrollTopButton = document.querySelector("[data-scroll-top]");
+
+  if (scrollTopButton) {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateScrollTopButton = () => {
+      scrollTopButton.hidden = window.scrollY < 180;
+    };
+
+    scrollTopButton.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: reduceMotion.matches ? "auto" : "smooth" });
+    });
+    updateScrollTopButton();
+    window.addEventListener("scroll", updateScrollTopButton, { passive: true });
+  }
+
   const motionHero = document.querySelector("[data-hero-motion]");
 
   if (motionHero) {

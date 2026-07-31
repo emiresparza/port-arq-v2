@@ -29,6 +29,7 @@ await sharp(brandSymbolSource)
 
 const sources = new Set(
   [
+    "/assets/img/Servicios/EEAD Hero Servicios.png",
     "/assets/img/oficina-tecnica/hero-oficina-tecnica.png",
     "/assets/img/estudio/estudio-eead-hero.jpg",
     "/assets/img/estudio/emir-esparza-perfil.png",
