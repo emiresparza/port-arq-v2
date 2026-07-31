@@ -290,7 +290,6 @@ function homePage() {
   ];
   const activeProjectIndex = carouselProjects.findIndex((project) => project.slug === "casa-alicia");
   const activeProject = carouselProjects[activeProjectIndex];
-  const technicalImage = projectBySlug.get("zenteno").images.at(-1)[0];
   const body = `
   <div class="home-hero-shell">
     <section class="hero" data-hero-motion>
@@ -367,43 +366,43 @@ function homePage() {
 
   <section class="home-services" aria-labelledby="servicios-inicio">
     <div class="home-services__intro">
-      <p class="eyebrow">02 / Servicios</p>
-      <h2 id="servicios-inicio">Tres capacidades, un proceso coordinado.</h2>
-      <p>EEAD acompaña decisiones desde el primer esquema hasta la información necesaria para construir.</p>
+      <p class="eyebrow">Servicios</p>
+      <h2 id="servicios-inicio">Cuatro áreas, Una misma forma de trabajar.</h2>
+      <p>En EEAD abordamos la arquitectura desde una premisa simple: resolver antes de construir. Integramos diseño, visualización, coordinación y documentación para reducir errores, anticipar decisiones y llevar cada proyecto a obra con mayor claridad.</p>
     </div>
     <div class="home-services__chapters">
       <article>
         <span aria-hidden="true">01</span>
-        <h3>Arquitectura e interiorismo</h3>
-        <p>Del programa y la estrategia espacial al desarrollo técnico.</p>
+        <h3>Arquitectura + Interiores</h3>
+        <p>Diseñamos <strong>viviendas, refugios, lofts, remodelaciones, interiores y proyectos de hospitality</strong> con una mirada integral.</p>
+        <p>Cada propuesta responde al lugar, al uso, a la materialidad y a la forma real en que será construida. Desde las primeras decisiones hasta la documentación final, buscamos una arquitectura contemporánea, precisa y coherente.</p>
+        <p class="home-service__scope"><strong>Diseño arquitectónico · Interiorismo · Remodelaciones · Hospitality</strong></p>
         <a class="button button--primary button--compact" href="/servicios/#arquitectura">Explorar arquitectura</a>
       </article>
       <article>
         <span aria-hidden="true">02</span>
-        <h3>Oficina técnica externa</h3>
-        <p>Modelación, coordinación y documentación para equipos y oficinas.</p>
-        <a class="button button--primary button--compact" href="/oficina-tecnica/">Explorar oficina técnica</a>
+        <h3>Workspaces</h3>
+        <p>Diseñamos <strong>oficinas y espacios de trabajo en casa</strong> que integran identidad, ergonomía, tecnología y funcionalidad.</p>
+        <p>Organizamos cada elemento para mejorar la concentración, el bienestar y el aprovechamiento del espacio, creando entornos que se adaptan a la forma actual de trabajar.</p>
+        <p class="home-service__scope"><strong>Oficinas · Home office · Estudios creativos · Espacios de productividad</strong></p>
+        <a class="button button--primary button--compact" href="/contacto/">Explorar workspaces</a>
       </article>
       <article>
         <span aria-hidden="true">03</span>
-        <h3>Visualización arquitectónica</h3>
-        <p>Imágenes para evaluar, comunicar y decidir con mayor precisión.</p>
+        <h3>Visualización + Render</h3>
+        <p>Creamos <strong>imágenes, renders y modelos tridimensionales</strong> para comprender, evaluar y comunicar un proyecto antes de construirlo.</p>
+        <p>La visualización no es solo una herramienta estética: permite revisar proporciones, materiales, iluminación y decisiones de diseño cuando todavía es posible corregirlas de forma simple y eficiente.</p>
+        <p class="home-service__scope"><strong>Modelado 3D · Renders arquitectónicos · Imágenes comerciales · Estudios visuales</strong></p>
         <a class="button button--primary button--compact" href="/servicios/#visualizacion">Explorar visualización</a>
       </article>
-    </div>
-  </section>
-
-  <section class="technical-strip" aria-labelledby="documentacion-tecnica">
-    <div class="technical-strip__media">
-      ${image(technicalImage, "Axonometría general del proyecto Zenteno utilizada para revisar su volumetría", {
-        sizes: "(max-width: 760px) 100vw, 58vw"
-      })}
-    </div>
-    <div class="technical-strip__copy">
-      <p class="eyebrow">03 / Documentación</p>
-      <h2 id="documentacion-tecnica"><span>La forma</span><span>también se</span><span>comprueba.</span></h2>
-      <p>Modelos, axonometrías y matrices de control convierten una intención espacial en información coordinada y verificable.</p>
-      <a class="text-link" href="/oficina-tecnica/">Ver metodología técnica</a>
+      <article>
+        <span aria-hidden="true">04</span>
+        <h3>Oficina Técnica Externa</h3>
+        <p>Apoyamos a <strong>arquitectos, constructoras, inmobiliarias y oficinas de diseño</strong> en el desarrollo, representación y documentación de sus proyectos.</p>
+        <p>Nos incorporamos como una extensión especializada del equipo, aportando capacidad técnica en dibujo, BIM, modelado y coordinación, sin aumentar innecesariamente la estructura interna de la oficina.</p>
+        <p class="home-service__scope"><strong>Documentación · Dibujo técnico · Modelado BIM · Apoyo especializado</strong></p>
+        <a class="button button--primary button--compact" href="/oficina-tecnica/">Explorar oficina técnica</a>
+      </article>
     </div>
   </section>
 
@@ -439,9 +438,10 @@ function homePage() {
       },
       areaServed: "Chile",
       serviceType: [
-        "Arquitectura e interiorismo",
-        "Oficina técnica externa",
-        "Visualización arquitectónica"
+        "Arquitectura e interiores",
+        "Workspaces",
+        "Visualización y render",
+        "Oficina técnica externa"
       ]
     }
   });

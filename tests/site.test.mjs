@@ -193,6 +193,29 @@ test("la home conserva SEO y aplica la composición editorial de referencia", ()
   assert.match(html, /"@type":"ProfessionalService"/);
 });
 
+test("la home presenta cuatro áreas de servicio y conecta directamente con el cierre", () => {
+  const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  const services = html.match(/<section class="home-services"[\s\S]*?<\/section>/)?.[0] || "";
+
+  assert.match(services, /<p class="eyebrow">Servicios<\/p>/);
+  assert.match(services, /Cuatro áreas, Una misma forma de trabajar\./);
+  assert.equal((services.match(/<article>/g) || []).length, 4);
+  assert.deepEqual(
+    [...services.matchAll(/<h3>([^<]+)<\/h3>/g)].map((match) => match[1]),
+    [
+      "Arquitectura + Interiores",
+      "Workspaces",
+      "Visualización + Render",
+      "Oficina Técnica Externa"
+    ]
+  );
+  assert.equal((services.match(/class="button button--primary button--compact"/g) || []).length, 4);
+  assert.match(services, /href="\/contacto\/">Explorar workspaces<\/a>/);
+  assert.doesNotMatch(html, /class="technical-strip"/);
+  assert.doesNotMatch(html, /03 \/ Documentación/);
+  assert.ok(html.indexOf('class="home-services"') < html.indexOf('class="home-closure"'));
+});
+
 test("el hero incorpora movimiento limitado, dither fijo y ticker accesible", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
