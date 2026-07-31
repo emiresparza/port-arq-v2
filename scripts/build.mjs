@@ -170,7 +170,7 @@ function footer() {
     </div>
     <div class="site-footer__bottom">
       <p>© ${new Date().getFullYear()} EEAD</p>
-      <p>Proyectos claros, precisos y construibles.</p>
+      <p>ARQUITECTURA CLARA. DECISIONES CONSTRUIBLES.</p>
     </div>
   </footer>`;
 }
@@ -605,16 +605,22 @@ function projectPage(project) {
   });
 }
 
-function servicesHero() {
+function servicesHero(heroImage) {
   return `
   <header class="services-hero" aria-labelledby="services-title">
+    <figure class="services-hero__media">
+      ${image(heroImage, "Interior de Casa BV con vistas al paisaje y mobiliario de madera", {
+        eager: true,
+        sizes: "100vw"
+      })}
+    </figure>
+    <div class="services-hero__overlay" aria-hidden="true"></div>
     <div class="services-shell services-hero__inner">
       <p class="eyebrow">SERVICIOS</p>
-      <h1 id="services-title">Resolver el proyecto antes de construir.</h1>
+      <h1 id="services-title">Resolver el proyecto<br>antes de construir.</h1>
       <p class="services-hero__lead">Arquitectura, documentación BIM y visualización integradas en un mismo proceso para coordinar decisiones, reducir errores y llegar a obra con mayor claridad.</p>
       <div class="services-hero__actions">
-        <a class="button button--primary" href="#capacidades">Ver capacidades</a>
-        <a class="button services-button--secondary" href="/contacto/">Conversar sobre un proyecto</a>
+        <a class="button button--primary" href="/contacto/">Conversar sobre un proyecto</a>
       </div>
     </div>
   </header>`;
@@ -623,9 +629,15 @@ function servicesHero() {
 function servicesIntro() {
   return `
     <header class="services-intro">
-      <p class="eyebrow">CAPACIDADES</p>
-      <h2 id="capabilities-title">Tres capacidades. Un solo criterio.</h2>
-      <p>Cada servicio puede desarrollarse de manera independiente o integrarse según la etapa y complejidad del proyecto.</p>
+      <h2 id="services-areas-title">
+        <span>Cuatro áreas.</span>
+        <span>Una misma</span>
+        <span>forma de trabajar.</span>
+      </h2>
+      <div class="services-intro__copy">
+        <p>Cada servicio puede desarrollarse de manera independiente o integrarse según la etapa, el alcance y la complejidad del proyecto.</p>
+        <p>En todos los casos trabajamos con una misma premisa: claridad antes que improvisación.</p>
+      </div>
     </header>`;
 }
 
@@ -635,12 +647,10 @@ function serviceRow(service) {
         <p class="service-row__number" aria-label="Servicio ${service.number}">${service.number}</p>
         <h3>${escapeHtml(service.title)}</h3>
         <div class="service-row__content">
-          <p class="service-row__description">${escapeHtml(service.description)}</p>
-          <p class="service-row__scope-label">Alcance habitual</p>
-          <ul class="service-row__scope">
-            ${service.scope.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
-          </ul>
-          <a class="text-link service-row__link" href="${service.href}">${escapeHtml(service.linkLabel)}</a>
+          <div class="service-row__description">
+            ${service.description.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
+          </div>
+          <a class="button service-row__link" href="${service.href}">${escapeHtml(service.linkLabel)}</a>
         </div>
         <figure class="service-row__media">
           ${image(service.image, service.imageAlt, {
@@ -650,31 +660,21 @@ function serviceRow(service) {
       </article>`;
 }
 
-function technicalSupport() {
-  return `
-  <section class="technical-support" aria-labelledby="technical-support-title">
-    <div class="services-shell technical-support__inner">
-      <p class="eyebrow">SOPORTE PARA EQUIPOS</p>
-      <h2 id="technical-support-title">Capacidad técnica cuando el proyecto lo requiere.</h2>
-      <div class="technical-support__copy">
-        <p>Apoyamos a oficinas, constructoras e inmobiliarias con modelado BIM, documentación y visualización por alcance definido. Nos integramos a procesos existentes sin agregar complejidad operativa.</p>
-        <a class="text-link" href="/oficina-tecnica/">Conocer soporte técnico</a>
-      </div>
-    </div>
-  </section>`;
-}
-
 function projectCTA() {
   return `
   <section class="project-cta" aria-labelledby="project-cta-title">
     <div class="services-shell project-cta__inner">
       <div class="project-cta__copy">
-        <h2 id="project-cta-title">Definamos qué necesita resolver tu proyecto.</h2>
-        <p>Revisamos su etapa, alcance y entregables antes de preparar una propuesta.</p>
+        <h2 id="project-cta-title">
+          <span>Definamos qué</span>
+          <span>necesita resolver</span>
+          <span>tu proyecto.</span>
+        </h2>
+        <p>Revisamos su etapa, alcance, información disponible y entregables antes de preparar una propuesta clara.</p>
       </div>
       <div class="project-cta__actions">
         <a class="button button--primary" href="/contacto/">Solicitar una conversación</a>
-        <a class="button services-button--secondary" href="/proyectos/">Ver proyectos</a>
+        <a class="button button--primary" href="/proyectos/">Ver proyectos</a>
       </div>
     </div>
   </section>`;
@@ -682,46 +682,68 @@ function projectCTA() {
 
 function servicesPage() {
   const architectureProject = projectBySlug.get("antu");
+  const heroProject = projectBySlug.get("casa-bv");
+  const workspaceProject = projectBySlug.get("homeoffice-cg");
   const technicalProject = projectBySlug.get("zenteno");
   const visualizationProject = projectBySlug.get("render-pocuro");
   const services = [
     {
       id: "arquitectura",
       number: "01",
-      title: "Arquitectura e interiorismo",
-      description: "Desarrollamos viviendas y espacios de hospitalidad desde el programa hasta el detalle. Ordenamos distribución, materialidad y experiencia espacial con criterio constructivo.",
-      scope: ["Anteproyecto", "desarrollo arquitectónico", "interiorismo", "especificaciones"],
+      title: "Arquitectura + interiores",
+      description: [
+        "Diseñamos viviendas, refugios, lofts, remodelaciones, interiores y proyectos de hospitality desde el programa hasta el detalle constructivo.",
+        "Ordenamos uso, distribución, materialidad y experiencia espacial con criterio arquitectónico y constructivo."
+      ],
       href: "/proyectos/",
-      linkLabel: "Ver arquitectura",
+      linkLabel: "Ver arquitectura e interiores",
       image: architectureProject.cover,
       imageAlt: "Vista exterior del proyecto Antü, un volumen horizontal revestido en madera"
     },
     {
-      id: "bim-documentacion",
+      id: "workspaces",
       number: "02",
-      title: "BIM y documentación",
-      description: "Modelamos, coordinamos y documentamos el proyecto para anticipar interferencias, ordenar especialidades y reducir decisiones improvisadas durante la construcción.",
-      scope: ["Modelado BIM", "planimetría", "coordinación", "documentación ejecutiva"],
-      href: "/oficina-tecnica/",
-      linkLabel: "Ver BIM y documentación",
-      image: technicalProject.images.at(-1)[0],
-      imageAlt: "Vista axonométrica del modelo arquitectónico coordinado del proyecto Zenteno"
+      title: "Workspaces",
+      description: [
+        "Diseñamos oficinas y espacios de trabajo en casa que integran identidad, ergonomía, tecnología y funcionalidad.",
+        "Organizamos cada elemento para mejorar el uso del espacio, la concentración y la experiencia cotidiana de trabajo."
+      ],
+      href: "/contacto/",
+      linkLabel: "Ver workspaces",
+      image: workspaceProject.cover,
+      imageAlt: "Homeoffice compacto con mobiliario a medida, iluminación integrada y dos puestos de trabajo"
     },
     {
       id: "visualizacion",
       number: "03",
-      title: "Visualización arquitectónica",
-      description: "Producimos imágenes para evaluar atmósfera, escala y materialidad antes de construir. No solo sirven para presentar el proyecto: también ayudan a decidirlo.",
-      scope: ["Imágenes interiores y exteriores", "estudios de materialidad", "recorridos", "apoyo comercial"],
+      title: "Visualización + render",
+      description: [
+        "Producimos imágenes, renders y modelos tridimensionales para evaluar atmósfera, escala, iluminación y materialidad antes de construir.",
+        "La visualización no solo sirve para presentar el proyecto: también permite comprenderlo, revisarlo y tomar mejores decisiones."
+      ],
       href: `/proyectos/${visualizationProject.slug}/`,
       linkLabel: "Ver visualización",
       image: visualizationProject.images[17][0],
       imageAlt: "Visualización interior de una sala multiuso con comedor, cocina y luz natural"
+    },
+    {
+      id: "oficina-tecnica-externa",
+      number: "04",
+      title: "Oficina técnica externa",
+      description: [
+        "Apoyamos a arquitectos, constructoras, inmobiliarias y oficinas de diseño en el desarrollo, representación y documentación de sus proyectos.",
+        "Nos integramos como una extensión especializada del equipo, aportando capacidad técnica por alcance definido y sin aumentar innecesariamente su estructura interna."
+      ],
+      href: "/oficina-tecnica/",
+      linkLabel: "Conocer oficina técnica",
+      image: technicalProject.images.at(-1)[0],
+      imageAlt: "Vista axonométrica del modelo arquitectónico coordinado del proyecto Zenteno"
     }
   ];
-  const body = `${servicesHero()}
+  const heroImage = heroProject.images.at(-1)[0];
+  const body = `${servicesHero(heroImage)}
 
-  <section class="services-matrix" id="capacidades" aria-labelledby="capabilities-title">
+  <section class="services-matrix" id="capacidades" aria-labelledby="services-areas-title">
     <div class="services-shell">
 ${servicesIntro()}
       <div class="services-matrix__rows">
@@ -730,18 +752,17 @@ ${services.map(serviceRow).join("")}
     </div>
   </section>
 
-${technicalSupport()}
-
 ${projectCTA()}`;
 
   return page({
-    title: "Servicios de arquitectura, BIM y visualización — EEAD",
-    description: "Arquitectura, documentación BIM y visualización integradas para coordinar decisiones, reducir errores y llegar a obra con mayor claridad.",
+    title: "Servicios de arquitectura, workspaces y oficina técnica — EEAD",
+    description: "Arquitectura e interiores, workspaces, visualización y soporte técnico coordinados para anticipar decisiones y llegar a obra con claridad.",
     pathname: "/servicios/",
     current: "servicios",
     body,
     bodyClass: "page-services",
     ogImage: architectureProject.cover,
+    preloadImage: heroImage,
     jsonLd: {
       "@context": "https://schema.org",
       "@type": "Service",
@@ -752,9 +773,10 @@ ${projectCTA()}`;
         "@type": "OfferCatalog",
         name: "Servicios",
         itemListElement: [
-          { "@type": "Offer", itemOffered: { "@type": "Service", name: "Arquitectura e interiorismo" } },
-          { "@type": "Offer", itemOffered: { "@type": "Service", name: "BIM y documentación" } },
-          { "@type": "Offer", itemOffered: { "@type": "Service", name: "Visualización arquitectónica" } }
+          { "@type": "Offer", itemOffered: { "@type": "Service", name: "Arquitectura e interiores" } },
+          { "@type": "Offer", itemOffered: { "@type": "Service", name: "Workspaces" } },
+          { "@type": "Offer", itemOffered: { "@type": "Service", name: "Visualización y render" } },
+          { "@type": "Offer", itemOffered: { "@type": "Service", name: "Oficina técnica externa" } }
         ]
       }
     }
@@ -764,22 +786,28 @@ ${projectCTA()}`;
 function technicalHero(proofImage) {
   return `
   <header class="technical-hero" aria-labelledby="technical-title">
+    <span class="technical-hero__dither" aria-hidden="true"></span>
     <div class="technical-shell technical-hero__grid">
       <p class="eyebrow">OFICINA TÉCNICA EXTERNA</p>
-      <h1 id="technical-title">Capacidad técnica externa, integrada a tu equipo.</h1>
-      <p class="technical-hero__lead">Desarrollo BIM, documentación y soporte técnico para arquitectos, constructoras, ingenierías e inmobiliarias. Nos integramos al flujo del proyecto para ordenar información, producir entregables claros y avanzar con mayor trazabilidad.</p>
+      <h1 id="technical-title">Capacidad técnica, integrada a tu equipo.</h1>
+      <div class="technical-hero__lead">
+        <p>Colaboramos con arquitectos, constructoras, ingenierías e inmobiliarias para desarrollar, representar y documentar proyectos sin perder su intención arquitectónica.</p>
+        <p>Nos integramos al proceso para ordenar la información, profundizar decisiones y transformar antecedentes existentes en un proyecto claro, coherente y preparado para avanzar.</p>
+      </div>
       <div class="technical-hero__actions">
         <a class="technical-action technical-action--primary" href="/contacto/">Solicitar reunión</a>
         <a class="technical-action" href="#caso-zenteno">Ver caso relacionado</a>
       </div>
-      <p class="technical-hero__metadata">BIM · documentación · coordinación · visualización</p>
-      <figure class="technical-hero__media">
-        ${image(proofImage, "Vista axonométrica del modelo arquitectónico del proyecto Zenteno", {
-          eager: true,
-          sizes: "(max-width: 760px) calc(100vw - 48px), (max-width: 1100px) 42vw, 32vw"
-        })}
-      </figure>
+      <p class="technical-hero__metadata">Desarrollo arquitectónico · documentación · modelado BIM · detalles · visualización</p>
     </div>
+    <figure class="technical-hero__media">
+      ${image(proofImage, "Escritorio de arquitectura con un monitor que muestra láminas de proyecto en Revit", {
+        className: "technical-hero__image",
+        eager: true,
+        sizes: "100vw"
+      })}
+      <figcaption class="sr-only" aria-hidden="true">Vista axonométrica del modelo arquitectónico del proyecto Zenteno.</figcaption>
+    </figure>
   </header>`;
 }
 
@@ -788,24 +816,31 @@ function technicalMethod() {
   <section class="technical-method" aria-labelledby="technical-method-title">
     <div class="technical-shell technical-method__grid">
       <header class="technical-method__intro">
-        <h2 id="technical-method-title">Orden técnico para proyectos en desarrollo.</h2>
-        <p>Trabajamos sobre modelos, planos y criterios existentes para convertir información dispersa en documentación coordinada, revisable y lista para avanzar.</p>
+        <p class="eyebrow">DESARROLLO DE PROYECTO</p>
+        <h2 id="technical-method-title">Del criterio de diseño a una documentación coherente.</h2>
+        <div class="technical-method__description">
+          <p>Trabajamos sobre anteproyectos, modelos, planos y definiciones existentes para llevar la arquitectura a un mayor nivel de desarrollo.</p>
+          <p>Cada decisión se revisa como parte de un sistema: distribución, geometría, materialidad, envolvente y encuentros constructivos deben responder a una misma lógica de proyecto.</p>
+        </div>
       </header>
       <div class="technical-method__pillars">
         <article>
           <span>01</span>
-          <h3>Modelo</h3>
-          <p>Una base común para revisar geometría, niveles, criterios espaciales y coordinación entre disciplinas.</p>
+          <h3>Modelo arquitectónico</h3>
+          <p>Construimos una base común para comprender el proyecto, revisar su geometría y relacionar correctamente plantas, niveles, envolvente y espacios.</p>
+          <p>El modelo no es un resultado aislado: es una herramienta para desarrollar y verificar la arquitectura.</p>
         </article>
         <article>
           <span>02</span>
-          <h3>Documentación</h3>
-          <p>Planos y láminas con jerarquías claras, nomenclatura consistente y alcance explícito.</p>
+          <h3>Desarrollo</h3>
+          <p>Profundizamos las decisiones que permiten pasar de una idea general a un proyecto definido.</p>
+          <p>Resolvemos dimensiones, materialidades, sistemas, encuentros y puntos críticos manteniendo coherencia entre la intención de diseño y su construcción.</p>
         </article>
         <article>
           <span>03</span>
-          <h3>Control</h3>
-          <p>Revisiones trazables, responsables definidos y observaciones verificables antes de cada entrega.</p>
+          <h3>Documentación</h3>
+          <p>Representamos el proyecto mediante planos, láminas, detalles y especificaciones con jerarquías claras y un lenguaje gráfico consistente.</p>
+          <p>La documentación debe permitir comprender la arquitectura, revisarla y continuar su desarrollo sin interpretaciones innecesarias.</p>
         </article>
       </div>
     </div>
@@ -818,19 +853,20 @@ function technicalDeliverables() {
     <div class="technical-shell technical-deliverables__grid">
       <header class="technical-deliverables__intro">
         <p class="eyebrow">ENTREGABLES</p>
-        <h2 id="technical-deliverables-title">Cada entrega debe tener fuente, revisión y salida.</h2>
-        <p>No producimos documentos aislados. Cada salida debe responder a un insumo claro, un criterio de revisión y un formato útil para el equipo.</p>
+        <h2 id="technical-deliverables-title">Cada entrega debe conservar la lógica del proyecto.</h2>
+        <p>No producimos modelos, planos o imágenes como piezas independientes. Cada documento debe responder a los antecedentes disponibles, a una decisión arquitectónica y a una etapa concreta del proyecto.</p>
       </header>
       <div class="technical-deliverables__table">
         <table>
           <thead>
-            <tr><th>Entregable</th><th>Fuente</th><th>Control</th><th>Salida</th></tr>
+            <tr><th scope="col">Entregable</th><th scope="col">Base de trabajo</th><th scope="col">Qué se resuelve</th></tr>
           </thead>
           <tbody>
-            <tr><th>Modelo coordinado</th><td data-label="Fuente">Antecedentes y especialidades</td><td data-label="Control">Geometría, niveles e interferencias</td><td data-label="Salida">RVT / IFC</td></tr>
-            <tr><th>Planimetría</th><td data-label="Fuente">Modelo y criterios de proyecto</td><td data-label="Control">Escala, capas y nomenclatura</td><td data-label="Salida">PDF / DWG</td></tr>
-            <tr><th>Detalles</th><td data-label="Fuente">Puntos críticos del proyecto</td><td data-label="Control">Encuentros, tolerancias y materialidad</td><td data-label="Salida">PDF / DWG</td></tr>
-            <tr><th>Registro</th><td data-label="Fuente">Revisiones del equipo</td><td data-label="Control">Responsable, fecha y estado</td><td data-label="Salida">XLSX / PDF</td></tr>
+            <tr><th scope="row">Modelo arquitectónico</th><td data-label="Base de trabajo">Antecedentes, levantamientos y especialidades</td><td data-label="Qué se resuelve">Geometría, niveles, espacios y relaciones generales</td></tr>
+            <tr><th scope="row">Planimetría</th><td data-label="Base de trabajo">Modelo y criterios de proyecto</td><td data-label="Qué se resuelve">Plantas, cortes, elevaciones y organización gráfica</td></tr>
+            <tr><th scope="row">Detalles constructivos</th><td data-label="Base de trabajo">Puntos críticos del proyecto</td><td data-label="Qué se resuelve">Encuentros, espesores, tolerancias y materialidad</td></tr>
+            <tr><th scope="row">Especificaciones</th><td data-label="Base de trabajo">Decisiones de diseño y sistemas propuestos</td><td data-label="Qué se resuelve">Materiales, componentes y criterios de ejecución</td></tr>
+            <tr><th scope="row">Visualizaciones</th><td data-label="Base de trabajo">Modelo, materialidad y contexto</td><td data-label="Qué se resuelve">Escala, atmósfera, iluminación y lectura del proyecto</td></tr>
           </tbody>
         </table>
       </div>
@@ -843,14 +879,18 @@ function technicalCaseStudy(caseStudy, proofImage) {
   <section class="technical-case-study" id="caso-zenteno" aria-labelledby="technical-case-title">
     <div class="technical-shell technical-case-study__grid">
       <figure class="technical-case-study__media">
-        ${image(proofImage, "Axonometría general del proyecto Zenteno utilizada para revisar inserción, envolvente y encuentros", {
+        ${image(proofImage, "Axonometría general del proyecto Zenteno y su relación con el contexto", {
           sizes: "(max-width: 760px) calc(100vw - 48px), (max-width: 1100px) 52vw, 48vw"
         })}
+        <figcaption>Axonometría general del proyecto Zenteno utilizada para revisar su relación con el contexto, la envolvente y los principales encuentros arquitectónicos.</figcaption>
       </figure>
       <div class="technical-case-study__copy">
         <p class="eyebrow">CASO RELACIONADO</p>
         <h2 id="technical-case-title">${escapeHtml(caseStudy.title)}</h2>
-        <p>La lectura simultánea de inserción urbana, envolvente y encuentros permitió revisar el proyecto desde la escala urbana hasta sus decisiones de detalle.</p>
+        <div class="technical-case-study__description">
+          <p>El desarrollo del modelo permitió revisar el proyecto desde distintas escalas: su relación con el entorno, la configuración de la envolvente y la resolución de encuentros específicos.</p>
+          <p>Esta lectura simultánea ayudó a mantener una misma lógica arquitectónica desde las decisiones generales hasta los detalles.</p>
+        </div>
         <div class="technical-case-study__actions">
           <a class="technical-action technical-action--primary" href="/proyectos/${caseStudy.slug}/">Ver caso de estudio</a>
           <a class="technical-action" href="/contacto/">Solicitar apoyo técnico</a>
@@ -863,7 +903,8 @@ function technicalCaseStudy(caseStudy, proofImage) {
 function technicalOfficePage() {
   const caseStudy = projectBySlug.get("zenteno");
   const proofImage = caseStudy.images.at(-1)[0];
-  const body = `${technicalHero(proofImage)}
+  const heroImage = "/assets/img/oficina-tecnica/hero-oficina-tecnica.png";
+  const body = `${technicalHero(heroImage)}
 
 ${technicalMethod()}
 
@@ -872,13 +913,13 @@ ${technicalDeliverables()}
 ${technicalCaseStudy(caseStudy, proofImage)}`;
 
   return page({
-    title: "Oficina técnica externa y desarrollo BIM — EEAD",
-    description: "Desarrollo BIM, documentación y soporte técnico externo para arquitectos, constructoras, ingenierías e inmobiliarias.",
+    title: "Oficina técnica externa y desarrollo arquitectónico — EEAD",
+    description: "Desarrollo, representación y documentación arquitectónica integrada a equipos externos, con criterio y continuidad entre diseño y construcción.",
     pathname: "/oficina-tecnica/",
     current: "oficina-tecnica",
     body,
     bodyClass: "page-technical",
-    preloadImage: proofImage,
+    preloadImage: heroImage,
     ogImage: proofImage,
     jsonLd: {
       "@context": "https://schema.org",
@@ -886,93 +927,69 @@ ${technicalCaseStudy(caseStudy, proofImage)}`;
       name: "Oficina técnica externa",
       provider: { "@type": "ProfessionalService", name: "EEAD", url: `${siteUrl}/` },
       areaServed: "Chile",
-      serviceType: ["Desarrollo BIM", "Documentación técnica", "Coordinación", "Visualización"]
+      serviceType: ["Desarrollo arquitectónico", "Documentación", "Modelado BIM", "Detalles constructivos", "Visualización"]
     }
   });
 }
 
-const studioPrinciples = [
-  {
-    number: "01",
-    title: "Claridad antes que efecto",
-    description: "Cada recurso debe explicar, ordenar o mejorar el proyecto."
-  },
-  {
-    number: "02",
-    title: "Diseño con información",
-    description: "Las decisiones se apoyan en condiciones reales y se verifican durante el desarrollo."
-  },
-  {
-    number: "03",
-    title: "Coordinación temprana",
-    description: "Anticipamos encuentros, incompatibilidades y cambios antes de que lleguen a obra."
-  }
-];
-
-function studioHero() {
+function studioHero(heroImage) {
   return `
   <header class="studio-hero" aria-labelledby="studio-title">
-    <div class="studio-shell studio-hero__grid">
-      <p class="eyebrow">Estudio</p>
+    <div class="studio-shell studio-hero__inner">
       <div class="studio-hero__content">
+        <p class="eyebrow">ESTUDIO</p>
         <h1 id="studio-title">
           <span>Una oficina pequeña.</span>
-          <span>Una forma integral de resolver arquitectura.</span>
+          <span>Una forma integral de</span>
+          <span>resolver arquitectura.</span>
         </h1>
-        <p>EEAD es un estudio de arquitectura con base en Temuco. Diseñamos, coordinamos y documentamos proyectos residenciales y de hospitalidad para reducir errores, improvisación e incertidumbre antes de construir.</p>
+        <p>EEAD es un estudio de arquitectura con base en Temuco. Diseñamos, visualizamos y desarrollamos proyectos con una mirada integral para transformar ideas en decisiones claras, precisas y construibles.</p>
       </div>
     </div>
+    <figure class="studio-hero__media">
+      ${image(heroImage, "Mesa de trabajo con planos de arquitectura, lámpara, anteojos y material de proyecto.", {
+        className: "studio-hero__image",
+        eager: true,
+        sizes: "100vw"
+      })}
+    </figure>
   </header>`;
 }
 
-function studioApproach() {
+function studioOverview() {
   return `
-  <section class="studio-approach" aria-labelledby="studio-approach-title">
-    <div class="studio-shell studio-approach__grid">
-      <div class="studio-approach__intro">
-        <p class="eyebrow">Enfoque</p>
-        <h2 id="studio-approach-title">La arquitectura se vuelve simple cuando las decisiones están resueltas.</h2>
-      </div>
-      <div class="studio-approach__detail">
-        <p>Trabajamos cada proyecto como un sistema continuo de diseño, visualización, coordinación BIM y documentación. Cada etapa confirma la anterior y prepara la siguiente, para que la obra avance con mayor claridad y menos improvisación.</p>
-        <ul aria-label="Ámbitos de trabajo">
-          <li>Arquitectura residencial</li>
-          <li>Hospitality y turismo</li>
-          <li>BIM y documentación</li>
-          <li>Interiorismo y visualización</li>
-        </ul>
-      </div>
+  <section class="studio-overview" aria-labelledby="studio-overview-title">
+    <div class="studio-shell studio-overview__grid">
+      <h2 id="studio-overview-title">
+        <span>Diseño, visualización</span>
+        <span>y desarrollo técnico</span>
+        <span>como parte de un</span>
+        <span>mismo proceso.</span>
+      </h2>
+      <p>Trabajamos proyectos residenciales, interiores y encargos de hospitalidad desde una lógica de continuidad. Cada decisión se apoya en información clara, representación precisa y desarrollo técnico suficiente para avanzar con seguridad.</p>
     </div>
   </section>`;
 }
 
-function studioDirection() {
-  const principles = studioPrinciples.map((principle) => `
-          <article>
-            <span aria-hidden="true">${principle.number}</span>
-            <h3>${principle.title}</h3>
-            <p>${principle.description}</p>
-          </article>`).join("");
-
+function studioDirector(profileImage) {
   return `
-  <section class="studio-direction" aria-labelledby="studio-direction-title">
-    <div class="studio-shell">
-      <div class="studio-direction__grid">
-        <div class="studio-direction__identity">
-          <p class="eyebrow">Dirección</p>
-          <h2 id="studio-direction-title">Emir Esparza</h2>
-          <p class="studio-direction__role">Fundador y director</p>
-        </div>
-        <p class="studio-direction__bio">Arquitecto especializado en diseño, visualización y coordinación BIM. Dirige EEAD desde Temuco y articula equipos según la escala de cada proyecto, manteniendo una misma lógica de trabajo: decisiones claras, información útil y documentación construible.</p>
+  <section class="studio-director" aria-labelledby="studio-director-title">
+    <div class="studio-shell studio-director__grid">
+      <div class="studio-director__identity">
+        <h2 id="studio-director-title">Emir Esparza</h2>
+        <p class="studio-director__credentials">
+          <span>Arquitecto UM</span>
+          <span>Mg (c) Tec. Aplicadas a la Construcción</span>
+          <span>Director EEAD</span>
+        </p>
       </div>
-      <div class="studio-principles" aria-labelledby="studio-principles-title">
-        <div class="studio-principles__heading">
-          <p class="eyebrow">Principios</p>
-          <h2 id="studio-principles-title">Cómo trabajamos</h2>
-        </div>
-        <div class="studio-principles__grid">${principles}
-        </div>
-      </div>
+      <figure class="studio-director__portrait">
+        ${image(profileImage, "Retrato de Emir Esparza, arquitecto y director de EEAD.", {
+          className: "studio-director__image",
+          sizes: "(max-width: 760px) 144px, (max-width: 1100px) 140px, 176px"
+        })}
+      </figure>
+      <p class="studio-director__bio">Arquitecto e interiorista. Dirige EEAD desde Temuco, integrando diseño, visualización y desarrollo técnico en proyectos de distintas escalas. Su enfoque prioriza claridad, criterio y soluciones bien resueltas antes de construir.</p>
     </div>
   </section>`;
 }
@@ -981,30 +998,32 @@ function studioCta() {
   return `
   <section class="studio-cta" aria-labelledby="studio-cta-title">
     <div class="studio-shell studio-cta__grid">
-      <p class="eyebrow">Temuco · Chile</p>
-      <div class="studio-cta__message">
-        <h2 id="studio-cta-title">Conversemos sobre lo que necesita resolver.</h2>
-        <p>Proyecto nuevo, ampliación o desarrollo técnico.</p>
-      </div>
-      <a class="button button--light" href="/contacto/">Iniciar conversación</a>
+      <h2 id="studio-cta-title">
+        <span>Conversemos sobre lo que</span>
+        <span>tu proyecto necesita resolver.</span>
+      </h2>
+      <a class="button button--primary" href="/contacto/">Iniciar conversación</a>
     </div>
   </section>`;
 }
 
 function studioPage() {
-  const body = `${studioHero()}
-${studioApproach()}
-${studioDirection()}
+  const heroImage = "/assets/img/estudio/estudio-eead-hero.jpg";
+  const profileImage = "/assets/img/estudio/emir-esparza-perfil.png";
+  const body = `${studioHero(heroImage)}
+${studioOverview()}
+${studioDirector(profileImage)}
 ${studioCta()}`;
 
   return page({
     title: "Estudio de arquitectura en Temuco — EEAD",
-    description: "EEAD es un estudio de arquitectura en Temuco que integra diseño, visualización, coordinación BIM y documentación antes de construir.",
+    description: "EEAD es un estudio de arquitectura en Temuco que integra diseño, visualización y desarrollo técnico para transformar ideas en decisiones claras y construibles.",
     pathname: "/estudio/",
     current: "estudio",
     body,
     bodyClass: "page-studio",
-    ogImage: projects[0].cover,
+    preloadImage: heroImage,
+    ogImage: heroImage,
     jsonLd: {
       "@context": "https://schema.org",
       "@type": "AboutPage",
@@ -1016,7 +1035,7 @@ ${studioCta()}`;
         founder: {
           "@type": "Person",
           name: "Emir Esparza",
-          jobTitle: "Fundador y director"
+          jobTitle: "Director EEAD"
         }
       }
     }
@@ -1027,24 +1046,31 @@ function contactPage() {
   const body = `
   <section class="contact-page" aria-labelledby="contact-title">
     <div class="contact-page__grid">
-      <header class="contact-page__intro">
-        <p class="eyebrow">CONTACTO</p>
-        <h1 id="contact-title">Conversemos sobre su proyecto.</h1>
-        <p>Cuéntenos brevemente qué necesita resolver, dónde se ubica el proyecto y en qué etapa se encuentra. Con esa información podremos orientar los próximos pasos.</p>
-        <div class="contact-channels">
+      <div class="contact-page__intro">
+        <header class="contact-page__heading">
+          <p class="eyebrow">CONTACTO</p>
+          <h1 id="contact-title">Conversemos sobre tu proyecto.</h1>
+          <p>Cuéntanos qué necesitas resolver, dónde se ubica el proyecto y en qué etapa se encuentra. Con esa información podremos orientarte sobre los próximos pasos.</p>
+        </header>
+        <section class="contact-channels" aria-labelledby="contact-channels-title">
+          <h2 id="contact-channels-title">CANALES DIRECTOS</h2>
           <a href="mailto:emiresparza@gmail.com">
-            <span>CORREO</span>
-            <strong>emiresparza@gmail.com</strong>
+            <span class="contact-channel__label">CORREO</span>
+            <strong class="contact-channel__value">emiresparza@gmail.com</strong>
+            <span class="contact-channel__arrow" aria-hidden="true">↗</span>
           </a>
           <a href="https://wa.me/56987283154" target="_blank" rel="noopener noreferrer" aria-label="Abrir WhatsApp de EEAD en una nueva pestaña">
-            <span>WHATSAPP</span>
-            <strong>+56 9 8728 3154</strong>
+            <span class="contact-channel__label">WHATSAPP</span>
+            <strong class="contact-channel__value">+56 9 8728 3154</strong>
+            <span class="contact-channel__arrow" aria-hidden="true">↗</span>
           </a>
-        </div>
-      </header>
+        </section>
+      </div>
 
-      <form class="contact-form" id="contact-form" action="https://formsubmit.co/ajax/emiresparza@gmail.com" method="post" novalidate>
-        <div class="form-grid">
+      <div class="contact-page__form-area">
+        <h2 id="contact-form-title">CUÉNTANOS TU ENCARGO</h2>
+        <form class="contact-form" id="contact-form" action="https://formsubmit.co/ajax/emiresparza@gmail.com" method="post" aria-labelledby="contact-form-title" novalidate>
+          <div class="form-grid">
           <div class="field">
             <label for="nombre">Nombre</label>
             <input id="nombre" name="nombre" type="text" autocomplete="name" required aria-describedby="error-nombre">
@@ -1076,21 +1102,23 @@ function contactPage() {
             <textarea id="mensaje" name="mensaje" rows="5" placeholder="Describa brevemente el proyecto, su etapa actual y cualquier plazo o condición relevante." required aria-describedby="error-mensaje"></textarea>
             <p class="field-error" id="error-mensaje" aria-live="polite"></p>
           </div>
-        </div>
+          </div>
 
-        <input type="text" name="_honey" class="form-honey" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <input type="hidden" name="_subject" value="Nuevo contacto desde eead.cl">
-        <input type="hidden" name="_template" value="table">
-        <input type="hidden" name="_captcha" value="false">
+          <input type="text" name="_honey" class="form-honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <input type="hidden" name="_subject" value="Nuevo contacto desde eead.cl">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_captcha" value="false">
 
-        <div class="form-submit">
-          <button class="button button--primary" type="submit" data-submit>
-            <span data-submit-label>ENVIAR CONSULTA</span>
-          </button>
-          <p>Al enviar esta consulta, acepta el uso de sus datos exclusivamente para responder su mensaje. Consulte la <a href="/privacidad/">política de privacidad</a>.</p>
-        </div>
-        <div class="form-status" data-form-status role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></div>
-      </form>
+          <div class="form-submit">
+            <button class="button button--primary" type="submit" data-submit>
+              <span data-submit-label>ENVIAR CONSULTA</span>
+              <span class="button__arrow" aria-hidden="true">→</span>
+            </button>
+            <p>Al enviar esta consulta, acepta el uso de sus datos exclusivamente para responder su mensaje. Consulte la <a href="/privacidad/">política de privacidad</a>.</p>
+          </div>
+          <div class="form-status" data-form-status role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></div>
+        </form>
+      </div>
     </div>
   </section>`;
 

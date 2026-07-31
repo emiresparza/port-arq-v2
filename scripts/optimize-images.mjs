@@ -28,10 +28,15 @@ await sharp(brandSymbolSource)
   .toFile(faviconPath);
 
 const sources = new Set(
-  projects.flatMap((project) => [
-    project.cover,
-    ...project.images.map(([src]) => src)
-  ])
+  [
+    "/assets/img/oficina-tecnica/hero-oficina-tecnica.png",
+    "/assets/img/estudio/estudio-eead-hero.jpg",
+    "/assets/img/estudio/emir-esparza-perfil.png",
+    ...projects.flatMap((project) => [
+      project.cover,
+      ...project.images.map(([src]) => src)
+    ])
+  ]
 );
 
 const targetWidths = (sourceWidth) => {

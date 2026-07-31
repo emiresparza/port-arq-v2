@@ -103,50 +103,106 @@ test("la oficina técnica conserva una estructura editorial compacta y responsiv
   const html = fs.readFileSync(path.join(root, "oficina-tecnica/index.html"), "utf8");
   const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
   const standardFooter = html.slice(html.indexOf('<footer class="site-footer">'));
+  const deliverablesTable = html.match(/<table>[\s\S]*?<\/table>/)?.[0] || "";
 
   assert.match(html, /<body class="page-technical">/);
   assert.equal((html.match(/<h1(?:\s|>)/g) || []).length, 1);
-  assert.match(html, /Capacidad técnica externa, integrada a tu equipo\./);
-  assert.match(html, /Orden técnico para proyectos en desarrollo\./);
-  assert.match(html, /Cada entrega debe tener fuente, revisión y salida\./);
-  assert.equal((html.match(/<tbody>[\s\S]*?<\/tbody>/)?.[0].match(/<tr>/g) || []).length, 4);
+  assert.match(html, /Capacidad técnica, integrada a tu equipo\./);
+  assert.match(html, /Del criterio de diseño a una documentación coherente\./);
+  assert.match(html, /<h3>Modelo arquitectónico<\/h3>[\s\S]*?<h3>Desarrollo<\/h3>[\s\S]*?<h3>Documentación<\/h3>/);
+  assert.match(html, /Cada entrega debe conservar la lógica del proyecto\./);
+  assert.equal((deliverablesTable.match(/<thead>[\s\S]*?<\/thead>/)?.[0].match(/scope="col"/g) || []).length, 3);
+  assert.equal((deliverablesTable.match(/<tbody>[\s\S]*?<\/tbody>/)?.[0].match(/<tr>/g) || []).length, 5);
+  assert.doesNotMatch(deliverablesTable, /Salida/);
+  assert.ok(html.indexOf("Desarrollo arquitectónico") < html.indexOf("modelado BIM"));
   assert.ok(html.indexOf('class="technical-hero"') < html.indexOf('class="technical-method"'));
   assert.ok(html.indexOf('class="technical-method"') < html.indexOf('class="technical-deliverables"'));
   assert.ok(html.indexOf('class="technical-deliverables"') < html.indexOf('class="technical-case-study"'));
   assert.doesNotMatch(html, /technical-intro|technical-pillars|class="deliverables"|class="technical-case"/);
-  assert.match(standardFooter, /Proyectos claros, precisos y construibles\./);
+  assert.match(standardFooter, /ARQUITECTURA CLARA\. DECISIONES CONSTRUIBLES\./);
   assert.match(standardFooter, />Privacidad</);
-  assert.match(css, /\.page-technical \.technical-hero\s*\{[\s\S]*?72vh/);
+  assert.match(css, /\.page-technical \.technical-hero\s*\{[\s\S]*?100svh/);
+  assert.match(css, /\.page-technical \.technical-hero__media\s*\{[\s\S]*?position:\s*absolute/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*?technical-deliverables tbody td[\s\S]*?display:\s*grid/);
 });
 
-test("Estudio usa una narrativa editorial compacta sobre la retícula compartida", () => {
+test("Servicios presenta cuatro áreas en el orden y las rutas acordadas", () => {
+  const html = fs.readFileSync(path.join(root, "servicios/index.html"), "utf8");
+  const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+  const main = html.match(/<main[\s\S]*?<\/main>/)?.[0] || "";
+  const serviceTitles = [...main.matchAll(/<article class="service-row"[\s\S]*?<h3>([^<]+)<\/h3>/g)]
+    .map((match) => match[1]);
+
+  assert.deepEqual(serviceTitles, [
+    "Arquitectura + interiores",
+    "Workspaces",
+    "Visualización + render",
+    "Oficina técnica externa"
+  ]);
+  assert.match(main, /class="services-hero__media"/);
+  assert.match(main, /ChatGPT%20Image%2027%20may%202026%2C%2011_34_21%20p\.m\.-1671\.avif/);
+  assert.match(main, /Resolver el proyecto<br>antes de construir\./);
+  assert.match(main, /Arquitectura, documentación BIM y visualización integradas en un mismo proceso para coordinar decisiones, reducir errores y llegar a obra con mayor claridad\./);
+  assert.doesNotMatch(main, /Ver capacidades/);
+  assert.match(main, /class="button button--primary" href="\/contacto\/">Conversar sobre un proyecto<\/a>/);
+  assert.match(main, /id="capacidades"/);
+  assert.doesNotMatch(main, /Tres capacidades/);
+  assert.doesNotMatch(main, /ÁREAS DE TRABAJO|ALCANCE HABITUAL|technical-support|Capacidad técnica sin ampliar/);
+  assert.match(main, /<span>Cuatro áreas\.<\/span>[\s\S]*?<span>Una misma<\/span>[\s\S]*?<span>forma de trabajar\.<\/span>/);
+  assert.match(main, /class="button service-row__link" href="\/proyectos\/">Ver arquitectura e interiores<\/a>/);
+  assert.match(main, /class="button service-row__link" href="\/contacto\/">Ver workspaces<\/a>/);
+  assert.match(main, /class="button service-row__link" href="\/proyectos\/render-pocuro\/">Ver visualización<\/a>/);
+  assert.match(main, /class="button service-row__link" href="\/oficina-tecnica\/">Conocer oficina técnica<\/a>/);
+  assert.match(main, /class="project-cta"[\s\S]*?class="button button--primary" href="\/contacto\/">Solicitar una conversación<\/a>[\s\S]*?class="button button--primary" href="\/proyectos\/">Ver proyectos<\/a>/);
+  assert.match(main, /<span>Definamos qué<\/span>[\s\S]*?<span>necesita resolver<\/span>[\s\S]*?<span>tu proyecto\.<\/span>/);
+  assert.equal((main.match(/<figure class="service-row__media">/g) || []).length, 4);
+  assert.match(main, /project-details\/antu\/img-0-[0-9]+\.avif/);
+  assert.match(main, /Homeoffice%20CG\/Renders\/A3-[0-9]+\.avif/);
+  assert.match(main, /Render%20Pocuro\/PNG%20_%20Sala%20Multiuso\/SA3-[0-9]+\.avif/);
+  assert.match(main, /project-details\/Zenteno\/Render\/E-[0-9]+\.avif/);
+  assert.match(css, /\.page-services \.services-matrix__rows\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2/);
+  assert.match(css, /\.page-services \.service-row:nth-child\(even\)\s*\{[\s\S]*?border-left:\s*2px solid var\(--line\)/);
+  assert.match(css, /\.page-services \.service-row__content\s*\{[\s\S]*?align-self:\s*stretch[\s\S]*?justify-content:\s*space-between/);
+  assert.match(css, /\.page-services \.project-cta__inner\s*\{[\s\S]*?align-items:\s*center/);
+  assert.match(css, /@media \(max-width: 900px\)[\s\S]*?\.page-services \.services-matrix__rows\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)[\s\S]*?border-left:\s*0/);
+});
+
+test("Estudio reproduce la composición editorial breve del mockup", () => {
   const html = fs.readFileSync(path.join(root, "estudio/index.html"), "utf8");
   const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
   const main = html.match(/<main[\s\S]*?<\/main>/)?.[0] || "";
-  const principles = html.match(/<div class="studio-principles__grid">([\s\S]*?)<\/div>/)?.[1] || "";
 
   assert.match(html, /<html lang="es-CL">/);
   assert.match(html, /<body class="page-studio">/);
   assert.match(html, /<a href="\/estudio\/" aria-current="page">Estudio<\/a>/);
   assert.equal((main.match(/<h1(?:\s|>)/g) || []).length, 1);
   assert.equal((main.match(/<section\b/g) || []).length, 3);
-  assert.equal((principles.match(/<article>/g) || []).length, 3);
-  assert.match(main, /Una oficina pequeña\./);
-  assert.match(main, /Una forma integral de resolver arquitectura\./);
-  assert.match(main, /La arquitectura se vuelve simple cuando las decisiones están resueltas\./);
-  assert.match(main, /Arquitecto especializado en diseño, visualización y coordinación BIM\./);
-  assert.match(main, /Conversemos sobre lo que necesita resolver\./);
-  assert.match(main, /href="\/contacto\/">Iniciar conversación<\/a>/);
-  assert.ok(main.indexOf('class="studio-hero"') < main.indexOf('class="studio-approach"'));
-  assert.ok(main.indexOf('class="studio-approach"') < main.indexOf('class="studio-direction"'));
-  assert.ok(main.indexOf('class="studio-direction"') < main.indexOf('class="studio-cta"'));
-  assert.doesNotMatch(main, /studio-statement|studio-director|studio-values|contact-band|manifesto/);
-  assert.match(css, /\.page-studio \.studio-hero__grid,[\s\S]*?grid-template-columns:\s*repeat\(12/);
-  assert.match(css, /@media \(max-width: 1100px\)[\s\S]*?\.page-studio \.studio-hero__grid,[\s\S]*?repeat\(8/);
-  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-studio \.studio-hero__grid,[\s\S]*?repeat\(4/);
-  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-studio \.studio-principles__grid\s*\{[\s\S]*?grid-template-columns:\s*1fr/);
-  assert.doesNotMatch(css, /\.page-studio[\s\S]*?min-height:\s*100(?:s?vh|%)/);
+  assert.equal((main.match(/>ESTUDIO<\/p>/g) || []).length, 1);
+  assert.doesNotMatch(main, />EQUIPO<\/p>/);
+  assert.match(main, /<span>Una oficina pequeña\.<\/span>[\s\S]*?<span>Una forma integral de<\/span>[\s\S]*?<span>resolver arquitectura\.<\/span>/);
+  assert.match(main, /EEAD es un estudio de arquitectura con base en Temuco\. Diseñamos, visualizamos y desarrollamos proyectos con una mirada integral para transformar ideas en decisiones claras, precisas y construibles\./);
+  assert.match(main, /Diseño, visualización[\s\S]*?y desarrollo técnico[\s\S]*?como parte de un[\s\S]*?mismo proceso\./);
+  assert.match(main, /Trabajamos proyectos residenciales, interiores y encargos de hospitalidad desde una lógica de continuidad\./);
+  assert.match(main, /<h2 id="studio-director-title">Emir Esparza<\/h2>/);
+  assert.match(main, /Arquitecto UM[\s\S]*?Mg \(c\) Tec\. Aplicadas a la Construcción[\s\S]*?Director EEAD/);
+  assert.match(main, /Arquitecto e interiorista\. Dirige EEAD desde Temuco, integrando diseño, visualización y desarrollo técnico/);
+  assert.match(main, /alt="Mesa de trabajo con planos de arquitectura, lámpara, anteojos y material de proyecto\."/);
+  assert.match(main, /alt="Retrato de Emir Esparza, arquitecto y director de EEAD\."/);
+  assert.match(main, /<span>Conversemos sobre lo que<\/span>[\s\S]*?<span>tu proyecto necesita resolver\.<\/span>/);
+  assert.match(main, /class="button button--primary" href="\/contacto\/">Iniciar conversación<\/a>/);
+  assert.ok(main.indexOf('class="studio-hero"') < main.indexOf('class="studio-overview"'));
+  assert.ok(main.indexOf('class="studio-overview"') < main.indexOf('class="studio-director"'));
+  assert.ok(main.indexOf('class="studio-director"') < main.indexOf('class="studio-cta"'));
+  assert.doesNotMatch(main, /Enfoque|Principios|Cómo trabajamos|studio-approach|studio-direction|studio-principles/);
+  assert.match(css, /\.page-studio \.studio-hero\s*\{[\s\S]*?height:\s*78svh/);
+  assert.match(css, /studio-hero-contrast:start[\s\S]*?linear-gradient/);
+  assert.match(css, /\.page-studio \.studio-hero__image\s*\{[\s\S]*?object-fit:\s*cover[\s\S]*?object-position:\s*50% 58%/);
+  assert.match(css, /\.page-studio \.studio-overview > \.studio-shell > p\s*\{[\s\S]*?border-left:\s*1px solid/);
+  assert.match(css, /\.page-studio \.studio-director__portrait\s*\{[\s\S]*?aspect-ratio:\s*1 \/ 1[\s\S]*?border-radius:\s*50%/);
+  assert.match(css, /\.page-studio \.studio-director__image\s*\{[\s\S]*?object-fit:\s*cover/);
+  assert.match(css, /\.page-studio \.studio-cta \.button\s*\{[\s\S]*?background:\s*var\(--accent\)/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-studio \.studio-director__portrait\s*\{[\s\S]*?order:\s*1/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-studio \.studio-overview > \.studio-shell > p\s*\{[\s\S]*?border-left:\s*0/);
 });
 
 test("la home conserva SEO y aplica la composición editorial de referencia", () => {
@@ -251,7 +307,7 @@ test("el hero incorpora movimiento limitado, dither fijo y ticker accesible", ()
   assert.match(javascript, /targetScrollY = viewportHeight \* \(-0\.015 \+ \(progress \* 0\.05\)\)/);
 });
 
-test("todas las páginas comparten el footer editorial original", () => {
+test("todas las páginas comparten el footer editorial actualizado", () => {
   const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
   const files = [
     "index.html",
@@ -268,7 +324,7 @@ test("todas las páginas comparten el footer editorial original", () => {
     const html = fs.readFileSync(path.join(root, file), "utf8");
     const footer = html.match(/<footer class="site-footer">[\s\S]*?<\/footer>/)?.[0];
     assert.ok(footer, file);
-    assert.match(footer, /Proyectos claros, precisos y construibles\./);
+    assert.match(footer, /ARQUITECTURA CLARA\. DECISIONES CONSTRUIBLES\./);
     assert.match(footer, />Privacidad</);
     return footer;
   });
@@ -371,7 +427,10 @@ test("Contacto usa una sección compacta y un formulario accesible de cinco camp
     '<body class="page-contact">',
     "<title>Contacto — EEAD Arquitectura e interiorismo</title>",
     "<p class=\"eyebrow\">CONTACTO</p>",
-    "Conversemos sobre su proyecto.",
+    "Conversemos sobre tu proyecto.",
+    "Cuéntanos qué necesitas resolver, dónde se ubica el proyecto y en qué etapa se encuentra. Con esa información podremos orientarte sobre los próximos pasos.",
+    'id="contact-channels-title">CANALES DIRECTOS</h2>',
+    'id="contact-form-title">CUÉNTANOS TU ENCARGO</h2>',
     'action="https://formsubmit.co/ajax/emiresparza@gmail.com"',
     "Arquitectura e interiorismo",
     "Oficina técnica / BIM",
@@ -381,6 +440,7 @@ test("Contacto usa una sección compacta y un formulario accesible de cinco camp
     'placeholder="Describa brevemente el proyecto, su etapa actual y cualquier plazo o condición relevante."',
     'href="mailto:emiresparza@gmail.com"',
     'href="https://wa.me/56987283154"',
+    'class="contact-channel__arrow" aria-hidden="true">↗</span>',
     'href="/privacidad/"',
     'name="_honey"',
     'data-submit-label>ENVIAR CONSULTA</span>',
@@ -406,10 +466,11 @@ test("Contacto usa una sección compacta y un formulario accesible de cinco camp
 
   assert.match(css, /\.contact-page__grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(12/);
   assert.match(css, /\.contact-page__intro\s*\{[\s\S]*?grid-column:\s*1 \/ span 5/);
-  assert.match(css, /\.page-contact \.contact-form\s*\{[\s\S]*?grid-column:\s*7 \/ 13/);
+  assert.match(css, /\.contact-page__form-area\s*\{[\s\S]*?grid-column:\s*7 \/ 13/);
   assert.match(css, /\.page-contact \.field input,[\s\S]*?background:\s*transparent/);
   assert.match(css, /\.page-contact \.field input:focus-visible,[\s\S]*?var\(--accent\)/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-contact \.form-grid,[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
+  assert.match(css, /@media \(min-width: 1101px\)[\s\S]*?\.contact-page__intro\s*\{[\s\S]*?position:\s*sticky/);
   assert.doesNotMatch(css, /\.contact-page\s*\{[\s\S]*?min-height:\s*100/);
 
   assert.match(javascript, /let isSubmitting = false/);

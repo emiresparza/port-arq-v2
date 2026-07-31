@@ -43,6 +43,18 @@ const authorizedVisualBlocks = [
   {
     name: "hero-dither",
     validates: (block) => /radial-gradient/.test(block) && /mask-image:\s*linear-gradient/.test(block)
+  },
+  {
+    name: "services-hero-contrast",
+    validates: (block) => (block.match(/linear-gradient/g) || []).length === 1 && /rgba\(15,\s*15,\s*15/.test(block)
+  },
+  {
+    name: "services-hero-mobile-contrast",
+    validates: (block) => (block.match(/linear-gradient/g) || []).length === 1 && /rgba\(15,\s*15,\s*15/.test(block)
+  },
+  {
+    name: "studio-hero-contrast",
+    validates: (block) => (block.match(/linear-gradient/g) || []).length === 2 && /rgba\(15,\s*15,\s*15/.test(block)
   }
 ];
 

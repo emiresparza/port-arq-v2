@@ -51,24 +51,31 @@
 
   <section class="contact-page" aria-labelledby="contact-title">
     <div class="contact-page__grid">
-      <header class="contact-page__intro">
-        <p class="eyebrow">CONTACTO</p>
-        <h1 id="contact-title">Conversemos sobre su proyecto.</h1>
-        <p>Cuéntenos brevemente qué necesita resolver, dónde se ubica el proyecto y en qué etapa se encuentra. Con esa información podremos orientar los próximos pasos.</p>
-        <div class="contact-channels">
+      <div class="contact-page__intro">
+        <header class="contact-page__heading">
+          <p class="eyebrow">CONTACTO</p>
+          <h1 id="contact-title">Conversemos sobre tu proyecto.</h1>
+          <p>Cuéntanos qué necesitas resolver, dónde se ubica el proyecto y en qué etapa se encuentra. Con esa información podremos orientarte sobre los próximos pasos.</p>
+        </header>
+        <section class="contact-channels" aria-labelledby="contact-channels-title">
+          <h2 id="contact-channels-title">CANALES DIRECTOS</h2>
           <a href="mailto:emiresparza@gmail.com">
-            <span>CORREO</span>
-            <strong>emiresparza@gmail.com</strong>
+            <span class="contact-channel__label">CORREO</span>
+            <strong class="contact-channel__value">emiresparza@gmail.com</strong>
+            <span class="contact-channel__arrow" aria-hidden="true">↗</span>
           </a>
           <a href="https://wa.me/56987283154" target="_blank" rel="noopener noreferrer" aria-label="Abrir WhatsApp de EEAD en una nueva pestaña">
-            <span>WHATSAPP</span>
-            <strong>+56 9 8728 3154</strong>
+            <span class="contact-channel__label">WHATSAPP</span>
+            <strong class="contact-channel__value">+56 9 8728 3154</strong>
+            <span class="contact-channel__arrow" aria-hidden="true">↗</span>
           </a>
-        </div>
-      </header>
+        </section>
+      </div>
 
-      <form class="contact-form" id="contact-form" action="https://formsubmit.co/ajax/emiresparza@gmail.com" method="post" novalidate>
-        <div class="form-grid">
+      <div class="contact-page__form-area">
+        <h2 id="contact-form-title">CUÉNTANOS TU ENCARGO</h2>
+        <form class="contact-form" id="contact-form" action="https://formsubmit.co/ajax/emiresparza@gmail.com" method="post" aria-labelledby="contact-form-title" novalidate>
+          <div class="form-grid">
           <div class="field">
             <label for="nombre">Nombre</label>
             <input id="nombre" name="nombre" type="text" autocomplete="name" required aria-describedby="error-nombre">
@@ -100,21 +107,23 @@
             <textarea id="mensaje" name="mensaje" rows="5" placeholder="Describa brevemente el proyecto, su etapa actual y cualquier plazo o condición relevante." required aria-describedby="error-mensaje"></textarea>
             <p class="field-error" id="error-mensaje" aria-live="polite"></p>
           </div>
-        </div>
+          </div>
 
-        <input type="text" name="_honey" class="form-honey" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <input type="hidden" name="_subject" value="Nuevo contacto desde eead.cl">
-        <input type="hidden" name="_template" value="table">
-        <input type="hidden" name="_captcha" value="false">
+          <input type="text" name="_honey" class="form-honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <input type="hidden" name="_subject" value="Nuevo contacto desde eead.cl">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_captcha" value="false">
 
-        <div class="form-submit">
-          <button class="button button--primary" type="submit" data-submit>
-            <span data-submit-label>ENVIAR CONSULTA</span>
-          </button>
-          <p>Al enviar esta consulta, acepta el uso de sus datos exclusivamente para responder su mensaje. Consulte la <a href="/privacidad/">política de privacidad</a>.</p>
-        </div>
-        <div class="form-status" data-form-status role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></div>
-      </form>
+          <div class="form-submit">
+            <button class="button button--primary" type="submit" data-submit>
+              <span data-submit-label>ENVIAR CONSULTA</span>
+              <span class="button__arrow" aria-hidden="true">→</span>
+            </button>
+            <p>Al enviar esta consulta, acepta el uso de sus datos exclusivamente para responder su mensaje. Consulte la <a href="/privacidad/">política de privacidad</a>.</p>
+          </div>
+          <div class="form-status" data-form-status role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></div>
+        </form>
+      </div>
     </div>
   </section>
 </main>
@@ -141,7 +150,7 @@
     </div>
     <div class="site-footer__bottom">
       <p>© 2026 EEAD</p>
-      <p>Proyectos claros, precisos y construibles.</p>
+      <p>ARQUITECTURA CLARA. DECISIONES CONSTRUIBLES.</p>
     </div>
   </footer>
 </body>
