@@ -51,7 +51,18 @@ for (const relativePath of allHtmlFiles) {
     report(/<meta property="og:description" content="[^"]+">/.test(html), `${relativePath}: falta og:description`);
     report(/<meta property="og:image" content="https:\/\/eead\.cl\/[^"]+">/.test(html), `${relativePath}: falta og:image`);
     report(/<script type="application\/ld\+json">.+<\/script>/.test(html), `${relativePath}: falta JSON-LD`);
-    report(!/placeholder\s*=/.test(html), `${relativePath}: contiene placeholder`);
+  }
+
+  for (const match of html.matchAll(/<(?:input|textarea)\b([^>]*\bplaceholder="[^"]*"[^>]*)>/g)) {
+    const attributes = match[1];
+    const id = attributes.match(/\bid="([^"]+)"/)?.[1];
+    report(Boolean(id), `${relativePath}: campo con placeholder sin id`);
+    if (id) {
+      report(
+        new RegExp(`<label\\s+for="${id}"`).test(html),
+        `${relativePath}: el placeholder de #${id} no tiene un label visible asociado`
+      );
+    }
   }
 
   for (const match of html.matchAll(/<img\b([^>]+)>/g)) {

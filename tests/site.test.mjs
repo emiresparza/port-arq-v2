@@ -239,6 +239,31 @@ test("todas las páginas comparten el footer editorial original", () => {
   assert.match(css, /\.site-footer\s*\{[\s\S]*?text-transform:\s*uppercase/);
 });
 
+test("todos los navbar blancos usan la variante tipográfica en mayúsculas", () => {
+  const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+  const whitePages = [
+    "proyectos/index.html",
+    ...projects.map((project) => `proyectos/${project.slug}/index.html`),
+    "servicios/index.html",
+    "oficina-tecnica/index.html",
+    "estudio/index.html",
+    "contacto/index.html",
+    "privacidad/index.html",
+    "404.html"
+  ];
+
+  assert.match(
+    css,
+    /body:not\(\.page-home\) \.site-nav a,\s*body:not\(\.page-home\) \.menu-toggle\s*\{[\s\S]*?text-transform:\s*uppercase/
+  );
+
+  whitePages.forEach((file) => {
+    const html = fs.readFileSync(path.join(root, file), "utf8");
+    assert.match(html, /<nav class="site-nav"/, file);
+    assert.doesNotMatch(html, /<body class="page-home">/, file);
+  });
+});
+
 test("el carrusel usa controles nativos accesibles sin autoplay ni dependencias", () => {
   const javascript = fs.readFileSync(path.join(root, "main.js"), "utf8");
   const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
@@ -286,23 +311,71 @@ test("cada página indexable tiene un title y canonical únicos", () => {
   });
 });
 
-test("el formulario incluye campos, estados accesibles y dos motivos", () => {
+test("Contacto usa una sección compacta y un formulario accesible de cinco campos", () => {
   const html = fs.readFileSync(path.join(root, "contacto/index.html"), "utf8");
+  const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+  const javascript = fs.readFileSync(path.join(root, "main.js"), "utf8");
+  const form = html.match(/<form class="contact-form"[\s\S]*?<\/form>/)?.[0] || "";
+  const submittedNames = [...form.matchAll(/<(?:input|select|textarea)\b[^>]*\bname="([^"]+)"/g)]
+    .map((match) => match[1])
+    .filter((name) => !name.startsWith("_"));
+
+  assert.deepEqual(submittedNames, [
+    "nombre",
+    "correo",
+    "tipo_encargo",
+    "ubicacion",
+    "mensaje"
+  ]);
+
   [
-    'name="nombre"',
-    'name="correo"',
-    'name="telefono"',
-    'name="tipo_encargo"',
-    'name="ubicacion"',
-    'name="etapa_actual"',
-    'name="mensaje"',
-    "Quiero desarrollar un proyecto",
-    "Necesito apoyo técnico",
+    '<body class="page-contact">',
+    "<title>Contacto — EEAD Arquitectura e interiorismo</title>",
+    "<p class=\"eyebrow\">CONTACTO</p>",
+    "Conversemos sobre su proyecto.",
+    'action="https://formsubmit.co/ajax/emiresparza@gmail.com"',
+    "Arquitectura e interiorismo",
+    "Oficina técnica / BIM",
+    "Visualización arquitectónica",
+    "<option>Otro</option>",
+    'placeholder="Comuna, ciudad o región"',
+    'placeholder="Describa brevemente el proyecto, su etapa actual y cualquier plazo o condición relevante."',
     'href="mailto:emiresparza@gmail.com"',
     'href="https://wa.me/56987283154"',
     'href="/privacidad/"',
-    'aria-live="polite"'
+    'name="_honey"',
+    'data-submit-label>ENVIAR CONSULTA</span>',
+    'aria-live="polite"',
+    'aria-atomic="true"'
   ].forEach((value) => assert.ok(html.includes(value), value));
+
+  [
+    "Antes de enviar",
+    "Base</dt>",
+    "Cobertura</dt>",
+    "Respuesta</dt>",
+    "¿Cómo podemos ayudarle?",
+    'name="motivo"',
+    'name="telefono"',
+    'name="etapa_actual"'
+  ].forEach((value) => assert.ok(!html.includes(value), value));
+
+  ["nombre", "correo", "tipo-encargo", "ubicacion", "mensaje"].forEach((id) => {
+    assert.match(form, new RegExp(`<label for="${id}">`));
+    assert.match(form, new RegExp(`id="${id}"`));
+  });
+
+  assert.match(css, /\.contact-page__grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(12/);
+  assert.match(css, /\.contact-page__intro\s*\{[\s\S]*?grid-column:\s*1 \/ span 5/);
+  assert.match(css, /\.page-contact \.contact-form\s*\{[\s\S]*?grid-column:\s*7 \/ 13/);
+  assert.match(css, /\.page-contact \.field input,[\s\S]*?background:\s*transparent/);
+  assert.match(css, /\.page-contact \.field input:focus-visible,[\s\S]*?var\(--accent\)/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-contact \.form-grid,[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
+  assert.doesNotMatch(css, /\.contact-page\s*\{[\s\S]*?min-height:\s*100/);
+
+  assert.match(javascript, /let isSubmitting = false/);
+  assert.match(javascript, /if \(isSubmitting\) return/);
+  assert.match(javascript, /new AbortController\(\)/);
 });
 
 test("las páginas HTML legacy ya no se publican", () => {

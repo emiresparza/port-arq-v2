@@ -1021,123 +1021,82 @@ ${studioCta()}`;
 
 function contactPage() {
   const body = `
-  <header class="page-intro page-intro--contact">
-    <p class="eyebrow">Contacto</p>
-    <h1>Hablemos de su proyecto.</h1>
-    <p>Comparta el contexto, la etapa y lo que necesita resolver. EEAD responderá con los próximos pasos y la información necesaria para definir un alcance.</p>
-  </header>
-
-  <section class="contact-layout">
-    <aside>
-      <p class="eyebrow">Antes de enviar</p>
-      <p>No necesita tener todo definido. Una ubicación, una etapa aproximada y el objetivo principal son suficientes para comenzar.</p>
-      <div class="contact-channels">
-        <a href="mailto:emiresparza@gmail.com">
-          <span>Correo</span>
-          <strong>emiresparza@gmail.com</strong>
-        </a>
-        <a href="https://wa.me/56987283154" target="_blank" rel="noopener" aria-label="Abrir WhatsApp de EEAD en una nueva pestaña">
-          <span>WhatsApp</span>
-          <strong>+56 9 8728 3154</strong>
-        </a>
-      </div>
-      <dl>
-        <div><dt>Base</dt><dd>Temuco, Chile</dd></div>
-        <div><dt>Cobertura</dt><dd>Proyectos en Chile y apoyo técnico remoto</dd></div>
-        <div><dt>Respuesta</dt><dd>Dentro de 2 días hábiles</dd></div>
-      </dl>
-    </aside>
-
-    <form class="contact-form" id="contact-form" action="https://formsubmit.co/ajax/emiresparza@gmail.com" method="post" novalidate>
-      <fieldset>
-        <legend>¿Cómo podemos ayudarle?</legend>
-        <label class="choice">
-          <input type="radio" name="motivo" value="Quiero desarrollar un proyecto" required checked>
-          <span>Quiero desarrollar un proyecto</span>
-        </label>
-        <label class="choice">
-          <input type="radio" name="motivo" value="Necesito apoyo técnico" required>
-          <span>Necesito apoyo técnico</span>
-        </label>
-      </fieldset>
-
-      <div class="form-grid">
-        <div class="field">
-          <label for="nombre">Nombre</label>
-          <input id="nombre" name="nombre" type="text" autocomplete="name" required aria-describedby="error-nombre">
-          <p class="field-error" id="error-nombre"></p>
+  <section class="contact-page" aria-labelledby="contact-title">
+    <div class="contact-page__grid">
+      <header class="contact-page__intro">
+        <p class="eyebrow">CONTACTO</p>
+        <h1 id="contact-title">Conversemos sobre su proyecto.</h1>
+        <p>Cuéntenos brevemente qué necesita resolver, dónde se ubica el proyecto y en qué etapa se encuentra. Con esa información podremos orientar los próximos pasos.</p>
+        <div class="contact-channels">
+          <a href="mailto:emiresparza@gmail.com">
+            <span>CORREO</span>
+            <strong>emiresparza@gmail.com</strong>
+          </a>
+          <a href="https://wa.me/56987283154" target="_blank" rel="noopener noreferrer" aria-label="Abrir WhatsApp de EEAD en una nueva pestaña">
+            <span>WHATSAPP</span>
+            <strong>+56 9 8728 3154</strong>
+          </a>
         </div>
-        <div class="field">
-          <label for="correo">Correo</label>
-          <input id="correo" name="correo" type="email" autocomplete="email" required aria-describedby="error-correo">
-          <p class="field-error" id="error-correo"></p>
-        </div>
-        <div class="field">
-          <label for="telefono">Teléfono <span>(opcional)</span></label>
-          <input id="telefono" name="telefono" type="tel" autocomplete="tel" aria-describedby="error-telefono">
-          <p class="field-error" id="error-telefono"></p>
-        </div>
-        <div class="field">
-          <label for="tipo-encargo">Tipo de encargo</label>
-          <select id="tipo-encargo" name="tipo_encargo" required aria-describedby="error-tipo-encargo">
-            <option value="">Seleccione una opción</option>
-            <option>Vivienda nueva</option>
-            <option>Remodelación o interiorismo</option>
-            <option>Proyecto comercial o institucional</option>
-            <option>Oficina técnica y coordinación</option>
-            <option>Visualización arquitectónica</option>
-            <option>Otro encargo</option>
-          </select>
-          <p class="field-error" id="error-tipo-encargo"></p>
-        </div>
-        <div class="field">
-          <label for="ubicacion">Ubicación</label>
-          <input id="ubicacion" name="ubicacion" type="text" autocomplete="address-level2" required aria-describedby="error-ubicacion">
-          <p class="field-error" id="error-ubicacion"></p>
-        </div>
-        <div class="field">
-          <label for="etapa">Etapa actual</label>
-          <select id="etapa" name="etapa_actual" required aria-describedby="error-etapa">
-            <option value="">Seleccione una opción</option>
-            <option>Idea inicial</option>
-            <option>Buscando terreno o propiedad</option>
-            <option>Anteproyecto</option>
-            <option>Desarrollo técnico</option>
-            <option>Permisos o licitación</option>
-            <option>En construcción</option>
-          </select>
-          <p class="field-error" id="error-etapa"></p>
-        </div>
-      </div>
+      </header>
 
-      <div class="field">
-        <label for="mensaje">Mensaje</label>
-        <textarea id="mensaje" name="mensaje" rows="7" required aria-describedby="ayuda-mensaje error-mensaje"></textarea>
-        <p class="field-help" id="ayuda-mensaje">Incluya objetivos, plazos o restricciones que considere importantes.</p>
-        <p class="field-error" id="error-mensaje"></p>
-      </div>
+      <form class="contact-form" id="contact-form" action="https://formsubmit.co/ajax/emiresparza@gmail.com" method="post" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" name="nombre" type="text" autocomplete="name" required aria-describedby="error-nombre">
+            <p class="field-error" id="error-nombre" aria-live="polite"></p>
+          </div>
+          <div class="field">
+            <label for="correo">Correo</label>
+            <input id="correo" name="correo" type="email" autocomplete="email" required aria-describedby="error-correo">
+            <p class="field-error" id="error-correo" aria-live="polite"></p>
+          </div>
+          <div class="field">
+            <label for="tipo-encargo">Tipo de encargo</label>
+            <select id="tipo-encargo" name="tipo_encargo" required aria-describedby="error-tipo-encargo">
+              <option value="">Seleccione una opción</option>
+              <option>Arquitectura e interiorismo</option>
+              <option>Oficina técnica / BIM</option>
+              <option>Visualización arquitectónica</option>
+              <option>Otro</option>
+            </select>
+            <p class="field-error" id="error-tipo-encargo" aria-live="polite"></p>
+          </div>
+          <div class="field">
+            <label for="ubicacion">Ubicación del proyecto</label>
+            <input id="ubicacion" name="ubicacion" type="text" autocomplete="address-level2" placeholder="Comuna, ciudad o región" required aria-describedby="error-ubicacion">
+            <p class="field-error" id="error-ubicacion" aria-live="polite"></p>
+          </div>
+          <div class="field field--message">
+            <label for="mensaje">Mensaje</label>
+            <textarea id="mensaje" name="mensaje" rows="5" placeholder="Describa brevemente el proyecto, su etapa actual y cualquier plazo o condición relevante." required aria-describedby="error-mensaje"></textarea>
+            <p class="field-error" id="error-mensaje" aria-live="polite"></p>
+          </div>
+        </div>
 
-      <input type="text" name="_honey" class="form-honey" tabindex="-1" autocomplete="off" aria-hidden="true">
-      <input type="hidden" name="_subject" value="Nuevo contacto desde eead.cl">
-      <input type="hidden" name="_template" value="table">
-      <input type="hidden" name="_captcha" value="false">
+        <input type="text" name="_honey" class="form-honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="hidden" name="_subject" value="Nuevo contacto desde eead.cl">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
 
-      <div class="form-submit">
-        <button class="button button--primary" type="submit" data-submit>
-          <span data-submit-label>Enviar consulta</span>
-        </button>
-        <p>Al enviar, acepta que EEAD use estos datos únicamente para responder su consulta. Consulte la <a href="/privacidad/">política de privacidad</a>.</p>
-      </div>
-      <div class="form-status" data-form-status role="status" aria-live="polite" tabindex="-1"></div>
-    </form>
+        <div class="form-submit">
+          <button class="button button--primary" type="submit" data-submit>
+            <span data-submit-label>ENVIAR CONSULTA</span>
+          </button>
+          <p>Al enviar esta consulta, acepta el uso de sus datos exclusivamente para responder su mensaje. Consulte la <a href="/privacidad/">política de privacidad</a>.</p>
+        </div>
+        <div class="form-status" data-form-status role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></div>
+      </form>
+    </div>
   </section>`;
 
   return page({
-    title: "Contacto — EEAD",
-    description: "Contacta a EEAD para desarrollar un proyecto de arquitectura e interiorismo o solicitar apoyo técnico, modelación y coordinación.",
+    title: "Contacto — EEAD Arquitectura e interiorismo",
+    description: "Contacte a EEAD para conversar sobre un proyecto de arquitectura, interiorismo, oficina técnica BIM o visualización arquitectónica.",
     pathname: "/contacto/",
     current: "contacto",
     body,
+    bodyClass: "page-contact",
     ogImage: projects[1].cover,
     jsonLd: {
       "@context": "https://schema.org",

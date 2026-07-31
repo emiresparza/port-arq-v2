@@ -344,9 +344,9 @@
       correo: "Escriba un correo válido.",
       tipo_encargo: "Seleccione el tipo de encargo.",
       ubicacion: "Indique la ubicación del proyecto.",
-      etapa_actual: "Seleccione la etapa actual.",
-      mensaje: "Cuéntenos brevemente qué necesita resolver."
+      mensaje: "Describa brevemente el proyecto y su etapa actual."
     };
+    let isSubmitting = false;
 
     const errorElement = (control) => {
       const describedBy = (control.getAttribute("aria-describedby") || "").split(" ");
@@ -379,14 +379,10 @@
       });
     });
 
-    const requestedReason = new URLSearchParams(window.location.search).get("motivo");
-    if (requestedReason === "apoyo-tecnico") {
-      const technicalOption = form.querySelector("input[name='motivo'][value='Necesito apoyo técnico']");
-      if (technicalOption) technicalOption.checked = true;
-    }
-
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
+      if (isSubmitting) return;
+
       status.className = "form-status";
       status.textContent = "";
 
@@ -398,16 +394,20 @@
         return;
       }
 
+      isSubmitting = true;
       submitButton.disabled = true;
       submitButton.setAttribute("aria-busy", "true");
-      submitLabel.textContent = "Enviando…";
+      submitLabel.textContent = "ENVIANDO…";
       status.textContent = "Enviando su consulta.";
+      const controller = new AbortController();
+      const requestTimeout = window.setTimeout(() => controller.abort(), 15000);
 
       try {
         const response = await fetch(form.action, {
           method: "POST",
           body: new FormData(form),
-          headers: { Accept: "application/json" }
+          headers: { Accept: "application/json" },
+          signal: controller.signal
         });
         const result = await response.json().catch(() => null);
         const delivered = result?.success === true || result?.success === "true";
@@ -416,16 +416,18 @@
 
         form.reset();
         status.classList.add("is-success");
-        status.textContent = "Gracias. Su consulta fue enviada correctamente; EEAD responderá dentro de 2 días hábiles.";
+        status.textContent = "Gracias. Su consulta fue enviada correctamente.";
         status.focus();
       } catch (error) {
         status.classList.add("is-error");
         status.textContent = "No pudimos enviar la consulta. Revise su conexión e inténtelo nuevamente.";
         status.focus();
       } finally {
+        window.clearTimeout(requestTimeout);
+        isSubmitting = false;
         submitButton.disabled = false;
         submitButton.removeAttribute("aria-busy");
-        submitLabel.textContent = "Enviar consulta";
+        submitLabel.textContent = "ENVIAR CONSULTA";
       }
     });
   }
