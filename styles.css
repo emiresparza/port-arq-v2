@@ -5388,3 +5388,80 @@ h2 {
     transition: none;
   }
 }
+
+/* Primary pages — shared navbar geometry from Contact */
+
+.page-projects,
+.page-services,
+.page-technical,
+.page-studio {
+  --header-height: 72px;
+  --primary-nav-edge: max(
+    clamp(24px, 7.8vw, 120px),
+    calc((100vw - 1600px) / 2)
+  );
+}
+
+.page-projects .site-header,
+.page-services .site-header,
+.page-technical .site-header,
+.page-studio .site-header {
+  height: var(--header-height);
+  min-height: var(--header-height);
+  padding-inline: var(--primary-nav-edge);
+}
+
+.page-projects .site-header .brand__symbol,
+.page-services .site-header .brand__symbol,
+.page-technical .site-header .brand__symbol,
+.page-studio .site-header .brand__symbol {
+  width: 32px;
+  height: 32px;
+  filter: none !important;
+}
+
+.page-projects .site-nav,
+.page-services .site-nav,
+.page-technical .site-nav,
+.page-studio .site-nav {
+  gap: clamp(18px, 2.1vw, 36px);
+}
+
+@media (min-width: 961px) {
+  .page-projects .site-nav,
+  .page-services .site-nav,
+  .page-technical .site-nav,
+  .page-studio .site-nav {
+    min-height: var(--header-height);
+    align-self: stretch;
+  }
+
+  .page-projects .site-nav a,
+  .page-services .site-nav a,
+  .page-technical .site-nav a,
+  .page-studio .site-nav a {
+    display: inline-flex;
+    min-height: var(--header-height);
+    align-items: center;
+    line-height: 1;
+  }
+}
+
+@media (max-width: 960px) {
+  .page-projects .site-nav,
+  .page-services .site-nav,
+  .page-technical .site-nav,
+  .page-studio .site-nav {
+    padding-inline: var(--primary-nav-edge);
+  }
+}
+
+@media (max-width: 760px) {
+  .page-projects,
+  .page-services,
+  .page-technical,
+  .page-studio {
+    --header-height: 70px;
+    --primary-nav-edge: clamp(20px, 6vw, 24px);
+  }
+}
