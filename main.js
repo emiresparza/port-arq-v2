@@ -213,16 +213,23 @@
 
   const filterButtons = Array.from(document.querySelectorAll("[data-filter]"));
   const projectCards = Array.from(document.querySelectorAll("[data-project-card]"));
+  const filterStatus = document.querySelector("[data-filter-status]");
 
   filterButtons.forEach((button) => {
     button.addEventListener("click", () => {
       const filter = button.dataset.filter;
 
       filterButtons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+      let visibleProjects = 0;
       projectCards.forEach((card) => {
-        const matches = filter === "Todos" || card.dataset.category === filter;
+        const categories = (card.dataset.categories || "").split("|");
+        const matches = filter === "Todos" || categories.includes(filter);
         card.hidden = !matches;
+        if (matches) visibleProjects += 1;
       });
+      if (filterStatus) {
+        filterStatus.textContent = `${visibleProjects} ${visibleProjects === 1 ? "proyecto" : "proyectos"} en ${button.textContent.trim()}`;
+      }
     });
   });
 

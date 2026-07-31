@@ -122,11 +122,11 @@ report(!publicHtml.includes(">Blog<"), "Blog todavía aparece en la navegación 
 
 const studio = fs.readFileSync(path.join(root, "estudio/index.html"), "utf8");
 const pagesOutsideStudio = indexableFiles
-  .filter((file) => file !== "estudio/index.html")
+  .filter((file) => !["estudio/index.html", "proyectos/big-dreams/index.html"].includes(file))
   .map((file) => fs.readFileSync(path.join(root, file), "utf8"))
   .join("\n");
 report(studio.includes(directorName), "Estudio debe identificar al fundador y director");
-report(!pagesOutsideStudio.includes(directorName), "El nombre del director solo debe aparecer en Estudio");
+report(!pagesOutsideStudio.includes(directorName), "El nombre del director solo debe aparecer en Estudio y en los créditos autorizados");
 
 if (errors.length) {
   console.error(`Validación fallida (${errors.length}):`);

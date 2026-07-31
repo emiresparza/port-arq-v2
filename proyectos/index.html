@@ -50,18 +50,16 @@
 <main id="contenido" tabindex="-1">
 
   <header class="page-intro">
-    <p class="eyebrow">Archivo seleccionado</p>
     <h1>Proyectos</h1>
-    <p>Arquitectura, interiorismo, desarrollo técnico y visualización entendidos como partes de un mismo proceso de proyecto.</p>
   </header>
-  <section class="project-index" aria-labelledby="lista-proyectos">
-    <h2 class="sr-only" id="lista-proyectos">Listado de proyectos</h2>
+  <section class="project-index" aria-label="Proyectos de EEAD">
     <div class="filters" role="group" aria-label="Filtrar proyectos por categoría">
-      <button type="button" data-filter="Todos" aria-pressed="true">Todos</button><button type="button" data-filter="Arquitectura" aria-pressed="false">Arquitectura</button><button type="button" data-filter="Interiorismo" aria-pressed="false">Interiorismo</button><button type="button" data-filter="Visualización" aria-pressed="false">Visualización</button>
+      <button type="button" data-filter="Todos" aria-controls="project-grid" aria-pressed="true">TODOS</button><button type="button" data-filter="Arquitectura" aria-controls="project-grid" aria-pressed="false">ARQUITECTURA</button><button type="button" data-filter="Interiorismo" aria-controls="project-grid" aria-pressed="false">INTERIORISMO</button><button type="button" data-filter="Visualización" aria-controls="project-grid" aria-pressed="false">VISUALIZACIÓN</button><button type="button" data-filter="Workspaces" aria-controls="project-grid" aria-pressed="false">WORKSPACES</button><button type="button" data-filter="Oficina Técnica" aria-controls="project-grid" aria-pressed="false">OFICINA TÉCNICA</button>
     </div>
-    <div class="project-grid">
+    <p class="sr-only" data-filter-status aria-live="polite"></p>
+    <div class="project-grid" id="project-grid">
       
-    <article class="project-card" data-project-card data-category="Arquitectura">
+    <article class="project-card" data-project-card data-categories="Arquitectura|Oficina Técnica">
       <a href="/proyectos/antu/">
         <div class="project-card__media">
           <picture class="responsive-media">
@@ -76,7 +74,7 @@
         </div>
       </a>
     </article>
-    <article class="project-card" data-project-card data-category="Interiorismo">
+    <article class="project-card" data-project-card data-categories="Interiorismo|Visualización">
       <a href="/proyectos/big-dreams/">
         <div class="project-card__media">
           <picture class="responsive-media">
@@ -91,7 +89,7 @@
         </div>
       </a>
     </article>
-    <article class="project-card" data-project-card data-category="Arquitectura">
+    <article class="project-card" data-project-card data-categories="Arquitectura|Visualización">
       <a href="/proyectos/casa-alicia/">
         <div class="project-card__media">
           <picture class="responsive-media">
@@ -106,7 +104,7 @@
         </div>
       </a>
     </article>
-    <article class="project-card" data-project-card data-category="Arquitectura">
+    <article class="project-card" data-project-card data-categories="Arquitectura|Oficina Técnica">
       <a href="/proyectos/casa-bv/">
         <div class="project-card__media">
           <picture class="responsive-media">
@@ -121,7 +119,7 @@
         </div>
       </a>
     </article>
-    <article class="project-card" data-project-card data-category="Arquitectura">
+    <article class="project-card" data-project-card data-categories="Arquitectura|Visualización|Oficina Técnica">
       <a href="/proyectos/casa-cg/">
         <div class="project-card__media">
           <picture class="responsive-media">
@@ -136,7 +134,7 @@
         </div>
       </a>
     </article>
-    <article class="project-card" data-project-card data-category="Interiorismo">
+    <article class="project-card" data-project-card data-categories="Interiorismo|Visualización">
       <a href="/proyectos/cdl/">
         <div class="project-card__media">
           <picture class="responsive-media">
@@ -151,7 +149,7 @@
         </div>
       </a>
     </article>
-    <article class="project-card" data-project-card data-category="Interiorismo">
+    <article class="project-card" data-project-card data-categories="Interiorismo|Workspaces">
       <a href="/proyectos/homeoffice-cg/">
         <div class="project-card__media">
           <picture class="responsive-media">
@@ -166,7 +164,7 @@
         </div>
       </a>
     </article>
-    <article class="project-card" data-project-card data-category="Interiorismo">
+    <article class="project-card" data-project-card data-categories="Interiorismo|Visualización|Workspaces">
       <a href="/proyectos/oficina-gl/">
         <div class="project-card__media">
           <picture class="responsive-media">
@@ -181,7 +179,7 @@
         </div>
       </a>
     </article>
-    <article class="project-card" data-project-card data-category="Interiorismo">
+    <article class="project-card" data-project-card data-categories="Interiorismo|Visualización">
       <a href="/proyectos/quincho-ss/">
         <div class="project-card__media">
           <picture class="responsive-media">
@@ -196,7 +194,7 @@
         </div>
       </a>
     </article>
-    <article class="project-card" data-project-card data-category="Visualización">
+    <article class="project-card" data-project-card data-categories="Visualización">
       <a href="/proyectos/render-pocuro/">
         <div class="project-card__media">
           <picture class="responsive-media">
@@ -211,7 +209,7 @@
         </div>
       </a>
     </article>
-    <article class="project-card" data-project-card data-category="Arquitectura">
+    <article class="project-card" data-project-card data-categories="Arquitectura|Visualización">
       <a href="/proyectos/zenteno/">
         <div class="project-card__media">
           <picture class="responsive-media">

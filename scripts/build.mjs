@@ -282,7 +282,7 @@ ${floatingControls()}
 `;
 }
 
-function projectCard(project, { headingLevel = "h2" } = {}) {
+function projectCard(project, { headingLevel = "h2", filterCategories = null } = {}) {
   const Heading = headingLevel === "h3" ? "h3" : "h2";
   const metadata = [
     project.scope?.split(",")[0]?.trim() || project.category,
@@ -291,7 +291,9 @@ function projectCard(project, { headingLevel = "h2" } = {}) {
   ].filter(Boolean);
 
   return `
-    <article class="project-card" data-project-card data-category="${project.category}">
+    <article class="project-card" data-project-card ${filterCategories
+      ? `data-categories="${filterCategories.map(escapeHtml).join("|")}"`
+      : `data-category="${escapeHtml(project.category)}"`}>
       <a href="/proyectos/${project.slug}/">
         <div class="project-card__media">
           ${image(project.cover, `${project.title}: ${project.description}`, {
@@ -306,7 +308,7 @@ function projectCard(project, { headingLevel = "h2" } = {}) {
     </article>`;
 }
 
-function homeCarouselSlide(project, index, activeIndex) {
+function projectCarouselSlide(project, index, activeIndex) {
   return `
       <article class="project-carousel__slide" data-carousel-slide data-project-slug="${project.slug}" data-title="${escapeHtml(project.title)}"${index === activeIndex ? " data-active" : ""}>
         <a href="/proyectos/${project.slug}/"${index === activeIndex ? ' aria-current="true"' : ""} aria-label="Ver proyecto ${escapeHtml(project.title)}">
@@ -316,6 +318,34 @@ function homeCarouselSlide(project, index, activeIndex) {
           <span class="sr-only">${escapeHtml(project.title)}</span>
         </a>
       </article>`;
+}
+
+function featuredCarouselData() {
+  const prioritySlugs = ["zenteno", "casa-alicia", "antu", "quincho-ss"];
+  const prioritySlugSet = new Set(prioritySlugs);
+  const carouselProjects = [
+    ...prioritySlugs.map((slug) => projectBySlug.get(slug)).filter(Boolean),
+    ...projects.filter((project) => !prioritySlugSet.has(project.slug))
+  ];
+  const activeProjectIndex = carouselProjects.findIndex((project) => project.slug === "casa-alicia");
+
+  return { carouselProjects, activeProjectIndex, activeProject: carouselProjects[activeProjectIndex] };
+}
+
+function projectCarousel({ carouselProjects, activeProjectIndex, activeProject, label = "Todos los proyectos" }) {
+  return `
+    <div class="project-carousel" data-carousel data-carousel-current="${activeProjectIndex}" tabindex="0" role="region" aria-roledescription="carrusel" aria-label="${escapeHtml(label)}">
+      <button class="project-carousel__button project-carousel__button--previous" type="button" data-carousel-previous aria-label="Proyecto anterior">
+        <span aria-hidden="true">←</span>
+      </button>
+      <div class="project-carousel__viewport" data-carousel-viewport>${carouselProjects.map((project, index) => projectCarouselSlide(project, index, activeProjectIndex)).join("")}</div>
+      <button class="project-carousel__button project-carousel__button--next" type="button" data-carousel-next aria-label="Proyecto siguiente">
+        <span aria-hidden="true">→</span>
+      </button>
+      <div class="project-carousel__caption" aria-live="polite" aria-atomic="true">
+        <strong data-carousel-title>${escapeHtml(activeProject.title)}</strong>
+      </div>
+    </div>`;
 }
 
 const homeTickerPhrases = [
@@ -338,14 +368,7 @@ function homeTickerTrack() {
 }
 
 function homePage() {
-  const prioritySlugs = ["zenteno", "casa-alicia", "antu", "quincho-ss"];
-  const prioritySlugSet = new Set(prioritySlugs);
-  const carouselProjects = [
-    ...prioritySlugs.map((slug) => projectBySlug.get(slug)).filter(Boolean),
-    ...projects.filter((project) => !prioritySlugSet.has(project.slug))
-  ];
-  const activeProjectIndex = carouselProjects.findIndex((project) => project.slug === "casa-alicia");
-  const activeProject = carouselProjects[activeProjectIndex];
+  const carouselData = featuredCarouselData();
   const body = `
   <div class="home-hero-shell">
 ${sharedHero({
@@ -391,18 +414,7 @@ ${sharedHero({
       <h2 id="proyectos-destacados">Trabajo reciente</h2>
       <a class="button button--primary button--compact home-projects__cta" href="/proyectos/">Ver todos los proyectos</a>
     </div>
-    <div class="project-carousel" data-carousel data-carousel-current="${activeProjectIndex}" tabindex="0" role="region" aria-roledescription="carrusel" aria-label="Todos los proyectos">
-      <button class="project-carousel__button project-carousel__button--previous" type="button" data-carousel-previous aria-label="Proyecto anterior">
-        <span aria-hidden="true">←</span>
-      </button>
-      <div class="project-carousel__viewport" data-carousel-viewport>${carouselProjects.map((project, index) => homeCarouselSlide(project, index, activeProjectIndex)).join("")}</div>
-      <button class="project-carousel__button project-carousel__button--next" type="button" data-carousel-next aria-label="Proyecto siguiente">
-        <span aria-hidden="true">→</span>
-      </button>
-      <div class="project-carousel__caption" aria-live="polite" aria-atomic="true">
-        <strong data-carousel-title>${escapeHtml(activeProject.title)}</strong>
-      </div>
-    </div>
+${projectCarousel(carouselData)}
   </section>
 
   <section class="home-services" aria-labelledby="servicios-inicio">
@@ -489,20 +501,36 @@ ${sharedHero({
 }
 
 function projectsPage() {
-  const categories = ["Todos", ...new Set(projects.map((project) => project.category))];
+  const categories = [
+    { label: "TODOS", value: "Todos" },
+    { label: "ARQUITECTURA", value: "Arquitectura" },
+    { label: "INTERIORISMO", value: "Interiorismo" },
+    { label: "VISUALIZACIÓN", value: "Visualización" },
+    { label: "WORKSPACES", value: "Workspaces" },
+    { label: "OFICINA TÉCNICA", value: "Oficina Técnica" }
+  ];
+  const workspaceSlugs = new Set(["homeoffice-cg", "oficina-gl"]);
+  const projectCategories = (project) => {
+    const taxonomy = new Set([project.category]);
+    const scope = project.scope?.toLocaleLowerCase("es") || "";
+
+    if (scope.includes("visualización")) taxonomy.add("Visualización");
+    if (workspaceSlugs.has(project.slug)) taxonomy.add("Workspaces");
+    if (/desarrollo técnico|documentación|coordinación/.test(scope)) taxonomy.add("Oficina Técnica");
+
+    return [...taxonomy];
+  };
   const body = `
   <header class="page-intro">
-    <p class="eyebrow">Archivo seleccionado</p>
     <h1>Proyectos</h1>
-    <p>Arquitectura, interiorismo, desarrollo técnico y visualización entendidos como partes de un mismo proceso de proyecto.</p>
   </header>
-  <section class="project-index" aria-labelledby="lista-proyectos">
-    <h2 class="sr-only" id="lista-proyectos">Listado de proyectos</h2>
+  <section class="project-index" aria-label="Proyectos de EEAD">
     <div class="filters" role="group" aria-label="Filtrar proyectos por categoría">
-      ${categories.map((category, index) => `<button type="button" data-filter="${category}" aria-pressed="${index === 0 ? "true" : "false"}">${category}</button>`).join("")}
+      ${categories.map((category, index) => `<button type="button" data-filter="${category.value}" aria-controls="project-grid" aria-pressed="${index === 0 ? "true" : "false"}">${category.label}</button>`).join("")}
     </div>
-    <div class="project-grid">
-      ${projects.map((project) => projectCard(project)).join("")}
+    <p class="sr-only" data-filter-status aria-live="polite"></p>
+    <div class="project-grid" id="project-grid">
+      ${projects.map((project) => projectCard(project, { filterCategories: projectCategories(project) })).join("")}
     </div>
   </section>`;
 
@@ -530,7 +558,16 @@ function projectsPage() {
 }
 
 function projectPage(project) {
-  const related = project.related.map((slug) => projectBySlug.get(slug)).filter(Boolean).slice(0, 3);
+  const sharesCategory = (candidate) => candidate.category === project.category
+    || (project.category === "Visualización"
+      && candidate.scope?.toLocaleLowerCase("es").includes("visualización"));
+  const relatedCandidates = [
+    ...project.related.map((slug) => projectBySlug.get(slug)),
+    ...projects
+  ].filter(Boolean);
+  const related = [...new Map(relatedCandidates.map((candidate) => [candidate.slug, candidate])).values()]
+    .filter((candidate) => candidate.slug !== project.slug && sharesCategory(candidate))
+    .slice(0, 3);
   const projectIndex = projects.indexOf(project);
   const previous = projects[(projectIndex - 1 + projects.length) % projects.length];
   const next = projects[(projectIndex + 1) % projects.length];
@@ -538,18 +575,17 @@ function projectPage(project) {
   const description = limitWords(project.description, 200);
   const facts = [
     ["Ubicación", project.location],
-    ["Año", project.year],
-    ["Superficie", project.surface],
     ["Estado", project.status],
     ["Tipología", typology],
+    ["Desarrollo", project.developedBy],
+    ["Cliente", project.client],
     ["Alcance", project.scope]
-  ].filter(([, value]) => value).slice(0, 6);
+  ].filter(([, value]) => value);
   const selectedImages = project.gallerySelection
     ? project.gallerySelection.map((index) => project.images[index]).filter(Boolean)
     : project.images;
   const gallerySource = selectedImages
-    .filter(([src]) => src !== project.cover)
-    .slice(0, 4);
+    .filter(([src]) => src !== project.cover);
   const coverAlt = project.images.find(([src]) => src === project.cover)?.[1]
     || `Imagen principal del proyecto ${project.title}`;
   const body = `
@@ -557,6 +593,10 @@ function projectPage(project) {
     <header class="project-hero">
       <div class="project-container project-hero__grid">
         <div class="project-hero__content">
+          <a class="project-back" href="/proyectos/">
+            <span class="project-back__arrow" aria-hidden="true">←</span>
+            <span>Volver</span>
+          </a>
           <p class="project-kicker">${escapeHtml(project.category)}</p>
           <h1 class="project-title">${escapeHtml(project.title)}</h1>
           <p class="project-description">${escapeHtml(description)}</p>
@@ -574,14 +614,10 @@ function projectPage(project) {
       })}
     </figure>
 
-    ${gallerySource.length ? `<section class="project-gallery project-container" aria-labelledby="galeria-${project.slug}">
-      <div class="project-section-heading">
-        <p class="project-kicker">Galería</p>
-        <h2 id="galeria-${project.slug}">Secuencia visual</h2>
-      </div>
+    ${gallerySource.length ? `<section class="project-gallery project-container" aria-label="Imágenes del proyecto ${escapeHtml(project.title)}">
       <div class="project-gallery-grid">
         ${gallerySource.map(([src, alt], index) => {
-          const layout = index === 0 ? "is-main" : index === 3 ? "is-additional" : "is-secondary";
+          const layout = index === 0 ? "is-main" : "is-secondary";
           const sizes = layout === "is-secondary"
             ? "(max-width: 760px) calc(100vw - 48px), 620px"
             : "(max-width: 760px) calc(100vw - 48px), 1280px";
@@ -606,7 +642,7 @@ function projectPage(project) {
 
     <section class="project-related project-container" aria-labelledby="relacionados-${project.slug}">
       <div class="project-section-heading">
-        <p class="project-kicker">Continuar explorando</p>
+        <p class="project-kicker">CONTINUAR EXPLORANDO</p>
         <h2 id="relacionados-${project.slug}">Proyectos relacionados</h2>
       </div>
       <div class="related-grid">
@@ -822,8 +858,7 @@ function technicalHero(proofImage) {
     titleId: "technical-title",
     title: "<span>Capacidad técnica,</span> <span>integrada a tu equipo.</span>",
     copy: `<div class="hero__lead"><p>Colaboramos con arquitectos, constructoras, ingenierías e inmobiliarias para desarrollar, representar y documentar proyectos sin perder su intención arquitectónica.</p><p>Nos integramos al proceso para ordenar la información, profundizar decisiones y transformar antecedentes existentes en un proyecto claro, coherente y preparado para avanzar.</p></div>
-      <div class="hero__actions"><a class="button button--primary" href="/contacto/">Solicitar reunión</a><a class="button button--light" href="#caso-zenteno">Ver caso relacionado</a></div>
-      <p class="hero__metadata">Desarrollo arquitectónico · documentación · modelado BIM · detalles · visualización</p>`,
+      <div class="hero__actions"><a class="button button--primary" href="/contacto/">Solicitar reunión</a></div>`,
     heroImage: proofImage,
     imageAlt: "Escritorio de arquitectura con un monitor que muestra láminas de proyecto en Revit"
   });
@@ -831,16 +866,8 @@ function technicalHero(proofImage) {
 
 function technicalMethod() {
   return `
-  <section class="technical-method" aria-labelledby="technical-method-title">
+  <section class="technical-method" aria-label="Proceso de desarrollo técnico">
     <div class="technical-shell technical-method__grid">
-      <header class="technical-method__intro">
-        <p class="eyebrow">DESARROLLO DE PROYECTO</p>
-        <h2 id="technical-method-title">Del criterio de diseño a una documentación coherente.</h2>
-        <div class="technical-method__description">
-          <p>Trabajamos sobre anteproyectos, modelos, planos y definiciones existentes para llevar la arquitectura a un mayor nivel de desarrollo.</p>
-          <p>Cada decisión se revisa como parte de un sistema: distribución, geometría, materialidad, envolvente y encuentros constructivos deben responder a una misma lógica de proyecto.</p>
-        </div>
-      </header>
       <div class="technical-method__pillars">
         <article>
           <span>01</span>
@@ -892,29 +919,19 @@ function technicalDeliverables() {
   </section>`;
 }
 
-function technicalCaseStudy(caseStudy, proofImage) {
+function technicalRecentProjects() {
+  const carouselData = featuredCarouselData();
+
   return `
-  <section class="technical-case-study" id="caso-zenteno" aria-labelledby="technical-case-title">
-    <div class="technical-shell technical-case-study__grid">
-      <figure class="technical-case-study__media">
-        ${image(proofImage, "Axonometría general del proyecto Zenteno y su relación con el contexto", {
-          sizes: "(max-width: 760px) calc(100vw - 48px), (max-width: 1100px) 52vw, 48vw"
-        })}
-        <figcaption>Axonometría general del proyecto Zenteno utilizada para revisar su relación con el contexto, la envolvente y los principales encuentros arquitectónicos.</figcaption>
-      </figure>
-      <div class="technical-case-study__copy">
-        <p class="eyebrow">CASO RELACIONADO</p>
-        <h2 id="technical-case-title">${escapeHtml(caseStudy.title)}</h2>
-        <div class="technical-case-study__description">
-          <p>El desarrollo del modelo permitió revisar el proyecto desde distintas escalas: su relación con el entorno, la configuración de la envolvente y la resolución de encuentros específicos.</p>
-          <p>Esta lectura simultánea ayudó a mantener una misma lógica arquitectónica desde las decisiones generales hasta los detalles.</p>
-        </div>
-        <div class="technical-case-study__actions">
-          <a class="technical-action technical-action--primary" href="/proyectos/${caseStudy.slug}/">Ver caso de estudio</a>
-          <a class="technical-action" href="/contacto/">Solicitar apoyo técnico</a>
-        </div>
+  <section class="technical-projects" aria-labelledby="technical-projects-title">
+    <div class="technical-projects__header">
+      <div>
+        <p class="eyebrow">PROYECTOS</p>
+        <h2 id="technical-projects-title">Trabajo reciente</h2>
       </div>
+      <a class="button button--primary" href="/contacto/">Solicitar reunión</a>
     </div>
+${projectCarousel({ ...carouselData, label: "Trabajo reciente de EEAD" })}
   </section>`;
 }
 
@@ -928,7 +945,7 @@ ${technicalMethod()}
 
 ${technicalDeliverables()}
 
-${technicalCaseStudy(caseStudy, proofImage)}`;
+${technicalRecentProjects()}`;
 
   return page({
     title: "Oficina técnica externa y desarrollo arquitectónico — EEAD",
@@ -956,25 +973,11 @@ function studioHero(heroImage) {
     label: "ESTUDIO",
     titleId: "studio-title",
     title: "<span>Una oficina pequeña.</span> <span>Una forma integral de</span> <span>resolver arquitectura.</span>",
-    copy: '<p class="hero__lead">EEAD es un estudio de arquitectura con base en Temuco. Diseñamos, visualizamos y desarrollamos proyectos con una mirada integral para transformar ideas en decisiones claras, precisas y construibles.</p>',
+    copy: `<p class="hero__lead">EEAD es un estudio de arquitectura con base en Temuco. Diseñamos, visualizamos y desarrollamos proyectos con una mirada integral para transformar ideas en decisiones claras, precisas y construibles.</p>
+      <div class="hero__actions"><a class="button button--primary" href="/contacto/">Agenda una reunión</a></div>`,
     heroImage,
     imageAlt: "Mesa de trabajo con planos de arquitectura, lámpara, anteojos y material de proyecto."
   });
-}
-
-function studioOverview() {
-  return `
-  <section class="studio-overview" aria-labelledby="studio-overview-title">
-    <div class="studio-shell studio-overview__grid">
-      <h2 id="studio-overview-title">
-        <span>Diseño, visualización</span>
-        <span>y desarrollo técnico</span>
-        <span>como parte de un</span>
-        <span>mismo proceso.</span>
-      </h2>
-      <p>Trabajamos proyectos residenciales, interiores y encargos de hospitalidad desde una lógica de continuidad. Cada decisión se apoya en información clara, representación precisa y desarrollo técnico suficiente para avanzar con seguridad.</p>
-    </div>
-  </section>`;
 }
 
 function studioDirector(profileImage) {
@@ -1005,10 +1008,15 @@ function studioCta() {
   <section class="studio-cta" aria-labelledby="studio-cta-title">
     <div class="studio-shell studio-cta__grid">
       <h2 id="studio-cta-title">
-        <span>Conversemos sobre lo que</span>
-        <span>tu proyecto necesita resolver.</span>
+        <span>Conversemos</span>
+        <span>sobre lo que</span>
+        <span>tu proyecto</span>
+        <span>necesita resolver.</span>
       </h2>
-      <a class="button button--primary" href="/contacto/">Iniciar conversación</a>
+      <div class="studio-cta__actions">
+        <a class="button button--primary" href="/contacto/">Solicitar una conversación</a>
+        <a class="button button--primary" href="/proyectos/">Ver proyectos</a>
+      </div>
     </div>
   </section>`;
 }
@@ -1017,7 +1025,6 @@ function studioPage() {
   const heroImage = "/assets/img/estudio/estudio-eead-hero.jpg";
   const profileImage = "/assets/img/estudio/emir-esparza-perfil.png";
   const body = `${studioHero(heroImage)}
-${studioOverview()}
 ${studioDirector(profileImage)}
 ${studioCta()}`;
 

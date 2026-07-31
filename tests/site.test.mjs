@@ -47,30 +47,61 @@ test("cada proyecto usa una ficha editorial compacta y conserva su navegación",
     const description = html.match(/<p class="project-description">([\s\S]*?)<\/p>/)?.[1] || "";
     const facts = [...html.matchAll(/<dl class="project-meta">[\s\S]*?<\/dl>/g)]
       .flatMap((match) => [...match[0].matchAll(/<dt>/g)]);
+    const factLabels = [...html.matchAll(/<dt>([^<]+)<\/dt>/g)].map((match) => match[1]);
     const galleryItems = [...html.matchAll(/<figure class="project-gallery-item /g)];
-    const relatedCards = html.match(/<div class="related-grid">([\s\S]*?)<\/div>\s*<\/section>/)?.[1]
-      .match(/<article class="project-card"/g) || [];
+    const relatedMarkup = html.match(/<div class="related-grid">([\s\S]*?)<\/div>\s*<\/section>/)?.[1] || "";
+    const relatedCards = relatedMarkup.match(/<article class="project-card"/g) || [];
+    const relatedSlugs = [...relatedMarkup.matchAll(/href="\/proyectos\/([^/]+)\//g)].map((match) => match[1]);
 
     assert.match(html, new RegExp(`<h1 class="project-title">${project.title}</h1>`));
     assert.match(html, /<body class="page-project-detail">/);
+    assert.match(html, /<a class="project-back" href="\/proyectos\/">[\s\S]*?<span>Volver<\/span>[\s\S]*?<\/a>/);
     assert.ok(description.split(/\s+/).filter(Boolean).length <= 200, project.slug);
-    assert.ok(facts.length <= 6, project.slug);
-    assert.ok(galleryItems.length <= 4, project.slug);
-    assert.equal(relatedCards.length, Math.min(project.related.length, 3), project.slug);
+    assert.ok(facts.length >= 4 && facts.length <= 6, project.slug);
+    assert.deepEqual(factLabels, [
+      "Ubicación",
+      "Estado",
+      "Tipología",
+      ...(project.developedBy ? ["Desarrollo"] : []),
+      ...(project.client ? ["Cliente"] : []),
+      "Alcance"
+    ], project.slug);
+    assert.equal(galleryItems.length, (project.gallerySelection || project.images.map((_, index) => index))
+      .filter((index) => project.images[index]?.[0] !== project.cover).length, project.slug);
+    assert.equal(relatedCards.length, 3, project.slug);
+    assert.equal(new Set(relatedSlugs).size, 3, project.slug);
+    relatedSlugs.forEach((slug) => {
+      const related = projects.find((candidate) => candidate.slug === slug);
+      assert.notEqual(slug, project.slug);
+      assert.ok(related?.category === project.category
+        || (project.category === "Visualización" && related?.scope.toLowerCase().includes("visualización")), `${project.slug}: ${slug}`);
+    });
     assert.match(html, /<nav class="project-nav project-container"/);
     assert.match(html, /rel="prev"/);
     assert.match(html, /rel="next"/);
-    assert.match(html, /Secuencia visual/);
+    assert.doesNotMatch(html, />Galería<|Secuencia visual/);
+    assert.match(html, /class="project-cover project-container">[\s\S]*?loading="eager"[\s\S]*?fetchpriority="high"/);
+    assert.match(html, /<figure class="project-gallery-item is-main">/);
     assert.match(html, /Proyectos relacionados/);
     assert.doesNotMatch(html, /project-narrative|El problema|<figcaption>/);
   });
 
-  assert.match(css, /\.project-hero__grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(12/);
-  assert.match(css, /\.project-cover\s*\{[\s\S]*?max-height:\s*70svh;[\s\S]*?aspect-ratio:\s*2 \/ 1/);
+  assert.match(css, /\.project-hero__grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2/);
+  assert.doesNotMatch(css, /\.project-cover\s*\{[^}]*?(?:height|max-height|aspect-ratio)\s*:/);
   assert.match(css, /\.related-grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(3/);
-  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.project-cover\s*\{[\s\S]*?aspect-ratio:\s*4 \/ 3/);
-  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.project-nav\s*\{[\s\S]*?grid-template-columns:\s*1fr/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.project-gallery-grid\s*\{[\s\S]*?grid-template-columns:\s*1fr/);
   assert.doesNotMatch(css, /project-narrative|project-pagination|gallery-item--/);
+});
+
+test("Big Dreams muestra los créditos conocidos sin inventarlos en otras fichas", () => {
+  const bigDreams = fs.readFileSync(path.join(root, "proyectos/big-dreams/index.html"), "utf8");
+
+  assert.match(bigDreams, /<dt>Desarrollo<\/dt><dd>Emir Esparza<\/dd>/);
+  assert.match(bigDreams, /<dt>Cliente<\/dt><dd>Objeto de Diseño<\/dd>/);
+  projects.filter((project) => project.slug !== "big-dreams").forEach((project) => {
+    const html = fs.readFileSync(path.join(root, "proyectos", project.slug, "index.html"), "utf8");
+    assert.doesNotMatch(html, /<dt>Cliente<\/dt>/, project.slug);
+  });
 });
 
 test("el índice de proyectos conserva un orden curado y una grilla editorial regular", () => {
@@ -93,13 +124,22 @@ test("el índice de proyectos conserva un orden curado y una grilla editorial re
     "zenteno"
   ]);
   assert.match(html, /<body class="page-projects">/);
+  assert.doesNotMatch(html, /Archivo seleccionado|Listado de proyectos|Arquitectura, interiorismo, desarrollo técnico/);
+  assert.match(html, /<h1>Proyectos<\/h1>/);
+  assert.deepEqual(
+    [...html.matchAll(/data-filter="([^"]+)"/g)].map((match) => match[1]),
+    ["Todos", "Arquitectura", "Interiorismo", "Visualización", "Workspaces", "Oficina Técnica"]
+  );
+  assert.equal((html.match(/<article class="project-card"/g) || []).length, projects.length);
+  assert.match(html, /data-categories="Interiorismo\|Workspaces"/);
+  assert.match(html, /data-categories="Arquitectura\|Visualización\|Oficina Técnica"/);
   assert.match(css, /\.page-projects \.project-grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(3/);
   assert.match(css, /@media \(max-width: 1024px\)[\s\S]*?\.page-projects \.project-grid\s*\{[\s\S]*?repeat\(2/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-projects \.project-grid\s*\{[\s\S]*?grid-template-columns:\s*1fr/);
   assert.doesNotMatch(css, /project-grid--editorial|project-card--featured/);
 });
 
-test("la oficina técnica conserva una estructura editorial compacta y responsive", () => {
+test("la oficina técnica replica la composición editorial solicitada y reutiliza el carrusel", () => {
   const html = fs.readFileSync(path.join(root, "oficina-tecnica/index.html"), "utf8");
   const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
   const standardFooter = html.slice(html.indexOf('<footer class="site-footer">'));
@@ -108,22 +148,26 @@ test("la oficina técnica conserva una estructura editorial compacta y responsiv
   assert.match(html, /<body class="page-technical">/);
   assert.equal((html.match(/<h1(?:\s|>)/g) || []).length, 1);
   assert.match(html, /<span>Capacidad técnica,<\/span> <span>integrada a tu equipo\.<\/span>/);
-  assert.match(html, /Del criterio de diseño a una documentación coherente\./);
   assert.match(html, /<h3>Modelo arquitectónico<\/h3>[\s\S]*?<h3>Desarrollo<\/h3>[\s\S]*?<h3>Documentación<\/h3>/);
   assert.match(html, /Cada entrega debe conservar la lógica del proyecto\./);
   assert.equal((deliverablesTable.match(/<thead>[\s\S]*?<\/thead>/)?.[0].match(/scope="col"/g) || []).length, 3);
   assert.equal((deliverablesTable.match(/<tbody>[\s\S]*?<\/tbody>/)?.[0].match(/<tr>/g) || []).length, 5);
   assert.doesNotMatch(deliverablesTable, /Salida/);
-  assert.ok(html.indexOf("Desarrollo arquitectónico") < html.indexOf("modelado BIM"));
   assert.ok(html.indexOf('class="hero site-hero site-hero--technical"') < html.indexOf('class="technical-method"'));
   assert.ok(html.indexOf('class="technical-method"') < html.indexOf('class="technical-deliverables"'));
-  assert.ok(html.indexOf('class="technical-deliverables"') < html.indexOf('class="technical-case-study"'));
-  assert.doesNotMatch(html, /technical-intro|technical-pillars|class="deliverables"|class="technical-case"/);
+  assert.ok(html.indexOf('class="technical-deliverables"') < html.indexOf('class="technical-projects"'));
+  assert.match(html, /class="button button--primary" href="\/contacto\/">Solicitar reunión<\/a>/);
+  assert.match(html, /<p class="eyebrow">PROYECTOS<\/p>[\s\S]*?<h2 id="technical-projects-title">Trabajo reciente<\/h2>/);
+  assert.match(html, /class="project-carousel" data-carousel/);
+  assert.match(html, /data-carousel-title>Casa Alicia<\/strong>/);
+  assert.doesNotMatch(html, /Ver caso relacionado|DESARROLLO DE PROYECTO|Del criterio de diseño|CASO RELACIONADO|technical-case-study|Axonometría general/);
   assert.match(standardFooter, /Arquitectura simple\./);
   assert.match(standardFooter, />Privacidad</);
   assert.match(css, /--site-hero-height:\s*max\(720px, calc\(100svh - var\(--hero-ticker-height\)\)\)/);
   assert.match(css, /\.site-hero \.hero__media\s*\{[\s\S]*?position|\.site-hero \.hero__media,[\s\S]*?position:\s*absolute/);
-  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?technical-deliverables tbody td[\s\S]*?display:\s*grid/);
+  assert.match(css, /\.page-technical \.technical-method__pillars\s*\{[\s\S]*?grid-column:\s*1 \/ 13;[\s\S]*?repeat\(3/);
+  assert.match(css, /\.page-technical \.technical-deliverables__table\s*\{[\s\S]*?overflow-x:\s*auto/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-technical \.technical-method__pillars\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
 });
 
 test("Servicios presenta cuatro áreas en el orden y las rutas acordadas", () => {
@@ -166,6 +210,7 @@ test("Servicios presenta cuatro áreas en el orden y las rutas acordadas", () =>
   assert.match(css, /\.page-services \.services-matrix__rows\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2/);
   assert.match(css, /\.page-services \.service-row:nth-child\(even\)\s*\{[\s\S]*?border-left:\s*2px solid var\(--line\)/);
   assert.match(css, /\.page-services \.service-row__content\s*\{[\s\S]*?align-self:\s*stretch[\s\S]*?justify-content:\s*space-between/);
+  assert.match(css, /\.page-services \.button\.service-row__link\s*\{[\s\S]*?border:\s*0/);
   assert.match(css, /\.page-services \.project-cta__inner\s*\{[\s\S]*?align-items:\s*center/);
   assert.match(css, /@media \(max-width: 900px\)[\s\S]*?\.page-services \.services-matrix__rows\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)[\s\S]*?border-left:\s*0/);
 });
@@ -179,33 +224,38 @@ test("Estudio reproduce la composición editorial breve del mockup", () => {
   assert.match(html, /<body class="page-studio">/);
   assert.match(html, /<a href="\/estudio\/" aria-current="page">Estudio<\/a>/);
   assert.equal((main.match(/<h1(?:\s|>)/g) || []).length, 1);
-  assert.equal((main.match(/<section\b/g) || []).length, 3);
+  assert.equal((main.match(/<section\b/g) || []).length, 2);
   assert.equal((main.match(/>ESTUDIO<\/p>/g) || []).length, 1);
   assert.doesNotMatch(main, />EQUIPO<\/p>/);
   assert.match(main, /<span>Una oficina pequeña\.<\/span>[\s\S]*?<span>Una forma integral de<\/span>[\s\S]*?<span>resolver arquitectura\.<\/span>/);
   assert.match(main, /EEAD es un estudio de arquitectura con base en Temuco\. Diseñamos, visualizamos y desarrollamos proyectos con una mirada integral para transformar ideas en decisiones claras, precisas y construibles\./);
-  assert.match(main, /Diseño, visualización[\s\S]*?y desarrollo técnico[\s\S]*?como parte de un[\s\S]*?mismo proceso\./);
-  assert.match(main, /Trabajamos proyectos residenciales, interiores y encargos de hospitalidad desde una lógica de continuidad\./);
+  assert.match(main, /class="hero__actions"[\s\S]*?class="button button--primary" href="\/contacto\/">Agenda una reunión<\/a>/);
+  assert.doesNotMatch(main, /Diseño, visualización[\s\S]*?y desarrollo técnico[\s\S]*?como parte de un[\s\S]*?mismo proceso\./);
+  assert.doesNotMatch(main, /Trabajamos proyectos residenciales, interiores y encargos de hospitalidad desde una lógica de continuidad\./);
   assert.match(main, /<h2 id="studio-director-title">Emir Esparza<\/h2>/);
   assert.match(main, /Arquitecto UM[\s\S]*?Mg \(c\) Tec\. Aplicadas a la Construcción[\s\S]*?Director EEAD/);
   assert.match(main, /Arquitecto e interiorista\. Dirige EEAD desde Temuco, integrando diseño, visualización y desarrollo técnico/);
   assert.match(main, /alt="Mesa de trabajo con planos de arquitectura, lámpara, anteojos y material de proyecto\."/);
   assert.match(main, /alt="Retrato de Emir Esparza, arquitecto y director de EEAD\."/);
-  assert.match(main, /<span>Conversemos sobre lo que<\/span>[\s\S]*?<span>tu proyecto necesita resolver\.<\/span>/);
-  assert.match(main, /class="button button--primary" href="\/contacto\/">Iniciar conversación<\/a>/);
-  assert.ok(main.indexOf('class="studio-hero"') < main.indexOf('class="studio-overview"'));
-  assert.ok(main.indexOf('class="studio-overview"') < main.indexOf('class="studio-director"'));
+  assert.match(main, /<span>Conversemos<\/span>[\s\S]*?<span>sobre lo que<\/span>[\s\S]*?<span>tu proyecto<\/span>[\s\S]*?<span>necesita resolver\.<\/span>/);
+  assert.doesNotMatch(main, /Iniciar conversación/);
+  assert.match(main, /class="studio-cta__actions"[\s\S]*?href="\/contacto\/">Solicitar una conversación<\/a>[\s\S]*?href="\/proyectos\/">Ver proyectos<\/a>/);
+  assert.ok(main.indexOf('class="hero site-hero site-hero--studio"') < main.indexOf('class="studio-director"'));
   assert.ok(main.indexOf('class="studio-director"') < main.indexOf('class="studio-cta"'));
-  assert.doesNotMatch(main, /Enfoque|Principios|Cómo trabajamos|studio-approach|studio-direction|studio-principles/);
-  assert.match(css, /\.page-studio \.studio-hero\s*\{[\s\S]*?height:\s*78svh/);
-  assert.match(css, /studio-hero-contrast:start[\s\S]*?linear-gradient/);
-  assert.match(css, /\.page-studio \.studio-hero__image\s*\{[\s\S]*?object-fit:\s*cover[\s\S]*?object-position:\s*50% 58%/);
-  assert.match(css, /\.page-studio \.studio-overview > \.studio-shell > p\s*\{[\s\S]*?border-left:\s*1px solid/);
+  assert.doesNotMatch(main, /studio-overview|Enfoque|Principios|Cómo trabajamos|studio-approach|studio-direction|studio-principles/);
+  assert.match(css, /\.site-hero\s*\{[\s\S]*?height:\s*var\(--site-hero-height\)/);
+  assert.match(css, /\.site-hero \.hero__image\s*\{[\s\S]*?object-fit:\s*cover/);
+  assert.match(css, /\.page-studio \.site-hero--studio \.hero__image\s*\{[\s\S]*?object-position:\s*center bottom/);
+  assert.match(css, /\.page-studio \.studio-director__grid\s*\{[\s\S]*?justify-content:\s*center/);
+  assert.doesNotMatch(css, /\/\* Estudio — composición de la referencia \*\/[\s\S]*?\.page-studio \.studio-director__grid\s*\{[^}]*border-top/);
   assert.match(css, /\.page-studio \.studio-director__portrait\s*\{[\s\S]*?aspect-ratio:\s*1 \/ 1[\s\S]*?border-radius:\s*50%/);
   assert.match(css, /\.page-studio \.studio-director__image\s*\{[\s\S]*?object-fit:\s*cover/);
-  assert.match(css, /\.page-studio \.studio-cta \.button\s*\{[\s\S]*?background:\s*var\(--accent\)/);
-  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-studio \.studio-director__portrait\s*\{[\s\S]*?order:\s*1/);
-  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-studio \.studio-overview > \.studio-shell > p\s*\{[\s\S]*?border-left:\s*0/);
+  assert.match(css, /\.page-studio \.studio-cta\s*\{[\s\S]*?background:\s*#121212/);
+  assert.match(css, /\.page-studio \.studio-cta__grid\s*\{[\s\S]*?justify-content:\s*center/);
+  assert.match(css, /\.page-studio \.studio-cta__actions\s*\{[\s\S]*?grid-column:\s*2/);
+  assert.match(css, /\.page-studio \.studio-cta__actions \.button\s*\{[\s\S]*?background:\s*var\(--accent\)/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-studio \.studio-director__identity\s*\{[\s\S]*?order:\s*1/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-studio \.studio-director__portrait\s*\{[\s\S]*?order:\s*2/);
 });
 
 test("la home conserva SEO y aplica la composición editorial de referencia", () => {

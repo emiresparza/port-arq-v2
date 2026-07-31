@@ -40,6 +40,8 @@ export const projects = [
     year: "",
     status: "Proyecto desarrollado",
     surface: "",
+    developedBy: "Emir Esparza",
+    client: "Objeto de Diseño",
     scope: "Interiorismo, distribución, mobiliario y visualización",
     description: "Espacio infantil concebido como una secuencia continua de recepción, encuentro, aprendizaje y juego, con una identidad amable y reconocible.",
     problem: "Integrar actividades de distinta escala y nivel de concentración dentro de un espacio unitario, manteniendo visibilidad, orientación y seguridad.",
