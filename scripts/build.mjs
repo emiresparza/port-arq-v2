@@ -292,44 +292,46 @@ function homePage() {
   const activeProject = carouselProjects[activeProjectIndex];
   const technicalImage = projectBySlug.get("zenteno").images.at(-1)[0];
   const body = `
-  <section class="hero" data-hero-motion>
-    <div class="hero__media" data-hero-media>
-      <div class="hero__media-scroll" data-hero-scroll>
-        <div class="hero__media-pointer" data-hero-pointer>
-          ${image(defaultImage, "Vista interior del proyecto Antü, arquitectura de EEAD", {
-            className: "hero__image",
-            eager: true,
-            sizes: "100vw"
-          })}
-        </div>
-      </div>
-    </div>
-    <div class="hero__contrast" aria-hidden="true"></div>
-    <div class="hero__dither" aria-hidden="true"></div>
-    <div class="hero__content hero__grid">
-      <div class="hero__stack">
-        <h1><span>Arquitectura</span><span>diseñada para</span><span>construirse</span><span>mejor.</span></h1>
-        <p class="eyebrow">Arquitectura e interiorismo · Temuco, Chile</p>
-        <div class="hero__copy">
-          <p class="hero__lead">EEAD integra diseño, visualización y desarrollo técnico para convertir decisiones complejas en proyectos claros, precisos y construibles.</p>
-          <div class="hero__actions">
-            <a class="button button--light" href="/proyectos/">Proyectos</a>
-            <a class="button button--primary" href="/contacto/">Agenda una reunión</a>
+  <div class="home-hero-shell">
+    <section class="hero" data-hero-motion>
+      <div class="hero__media" data-hero-media>
+        <div class="hero__media-scroll" data-hero-scroll>
+          <div class="hero__media-pointer" data-hero-pointer>
+            ${image(defaultImage, "Vista interior del proyecto Antü, arquitectura de EEAD", {
+              className: "hero__image",
+              eager: true,
+              sizes: "100vw"
+            })}
           </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <section class="editorial-ticker" aria-label="Servicios y enfoque de EEAD">
-    <p class="sr-only">Arquitectura e interiorismo. Proyectos que se entienden antes de construir. Diseño, visualización y oficina técnica externa. Chile.</p>
-    <div class="editorial-ticker__viewport" aria-hidden="true">
-      <div class="editorial-ticker__track">
-        <div class="editorial-ticker__group" aria-hidden="true">${homeTickerGroup()}</div>
-        <div class="editorial-ticker__group" aria-hidden="true">${homeTickerGroup()}</div>
+      <div class="hero__contrast" aria-hidden="true"></div>
+      <div class="hero__dither" aria-hidden="true"></div>
+      <div class="hero__content hero__grid">
+        <div class="hero__stack">
+          <h1><span>Arquitectura</span><span>diseñada para</span><span>construirse</span><span>mejor.</span></h1>
+          <p class="eyebrow">Arquitectura e interiorismo · Temuco, Chile</p>
+          <div class="hero__copy">
+            <p class="hero__lead">EEAD integra diseño, visualización y desarrollo técnico para convertir decisiones complejas en proyectos claros, precisos y construibles.</p>
+            <div class="hero__actions">
+              <a class="button button--light" href="/proyectos/">Proyectos</a>
+              <a class="button button--primary" href="/contacto/">Agenda una reunión</a>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+
+    <section class="editorial-ticker" aria-label="Servicios y enfoque de EEAD">
+      <p class="sr-only">Arquitectura e interiorismo. Proyectos que se entienden antes de construir. Diseño, visualización y oficina técnica externa. Chile.</p>
+      <div class="editorial-ticker__viewport" aria-hidden="true">
+        <div class="editorial-ticker__track">
+          <div class="editorial-ticker__group" aria-hidden="true">${homeTickerGroup()}</div>
+          <div class="editorial-ticker__group" aria-hidden="true">${homeTickerGroup()}</div>
+        </div>
+      </div>
+    </section>
+  </div>
 
   <section class="manifesto" aria-labelledby="manifiesto-eead">
     <div class="manifesto__inner">

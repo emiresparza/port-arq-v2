@@ -1206,10 +1206,27 @@ body:not(.page-home) .menu-toggle {
   transform: translateX(3px);
 }
 
+.page-home .home-hero-shell {
+  position: relative;
+  display: flex;
+  min-height: 100vh;
+  min-height: 100svh;
+  flex-direction: column;
+}
+
+@supports (height: 100dvh) {
+  @media (min-width: 761px), (orientation: landscape) {
+    .page-home .home-hero-shell {
+      min-height: 100dvh;
+    }
+  }
+}
+
 .page-home .hero {
   position: relative;
   display: block;
-  min-height: clamp(660px, 54.5vw, 840px);
+  min-height: 0;
+  flex: 1 1 auto;
   overflow: hidden;
   padding: 0 var(--content-edge);
   background: var(--ink);
@@ -1226,6 +1243,8 @@ body:not(.page-home) .menu-toggle {
 
 .page-home .hero__media {
   z-index: 0;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   pointer-events: none;
 }
@@ -1313,7 +1332,7 @@ body:not(.page-home) .menu-toggle {
   z-index: 3;
   display: grid;
   width: 100%;
-  min-height: clamp(660px, 54.5vw, 840px);
+  min-height: 100%;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   align-items: center;
   gap: var(--grid-gap);
@@ -1386,6 +1405,7 @@ body:not(.page-home) .menu-toggle {
   position: relative;
   z-index: 4;
   height: 32px;
+  flex: 0 0 auto;
   overflow: hidden;
   background: var(--accent);
   color: #000;
@@ -2019,7 +2039,7 @@ body:not(.page-home) .menu-toggle {
   }
 
   .page-home .hero {
-    min-height: 100svh;
+    min-height: 0;
     padding-inline: var(--page-gutter);
   }
 
@@ -2043,7 +2063,7 @@ body:not(.page-home) .menu-toggle {
 
   .page-home .hero__grid {
     display: grid;
-    min-height: 100svh;
+    min-height: 100%;
     grid-template-columns: 1fr;
     align-items: center;
     padding-top: calc(var(--header-height) + 22px);
