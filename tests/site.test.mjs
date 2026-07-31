@@ -158,6 +158,12 @@ test("la home conserva SEO y aplica la composición editorial de referencia", ()
   assert.ok(html.includes(expectedH1));
   assert.equal((html.match(/<h1(?:\s|>)/g) || []).length, 1);
   assert.ok(!html.includes("Arquitectura e interiorismo · Temuco, Chile"));
+  assert.equal((html.match(/class="hero__emphasis"/g) || []).length, 12);
+  assert.ok(html.includes("Somos un estudio de <span class=\"hero__emphasis\">Arquitectura</span>"));
+  assert.ok(!html.includes('class="manifesto__label"'));
+  assert.ok(html.includes("<h2 id=\"manifiesto-eead\"><span>Diseño y Técnica,</span><span>juntos desde el inicio</span></h2>"));
+  assert.equal((html.match(/<div class="manifesto__copy">[\s\S]*?<\/div>/)?.[0].match(/<p>/g) || []).length, 3);
+  assert.ok(html.includes("Porque una buena arquitectura no solo debe verse bien. También debe estar bien resuelta."));
   assert.match(
     html,
     /<div class="home-hero-shell">[\s\S]*?<section class="hero"[\s\S]*?<section class="editorial-ticker"[\s\S]*?<\/div>\s*<section class="manifesto"/
