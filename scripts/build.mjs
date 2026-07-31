@@ -310,7 +310,6 @@ function homePage() {
       <div class="hero__content hero__grid">
         <div class="hero__stack">
           <h1><span>Arquitectura</span><span>diseñada para</span><span>construirse</span><span>mejor.</span></h1>
-          <p class="eyebrow">Arquitectura e interiorismo · Temuco, Chile</p>
           <div class="hero__copy">
             <p class="hero__lead">EEAD integra diseño, visualización y desarrollo técnico para convertir decisiones complejas en proyectos claros, precisos y construibles.</p>
             <div class="hero__actions">

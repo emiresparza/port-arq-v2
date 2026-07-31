@@ -157,6 +157,7 @@ test("la home conserva SEO y aplica la composición editorial de referencia", ()
 
   assert.ok(html.includes(expectedH1));
   assert.equal((html.match(/<h1(?:\s|>)/g) || []).length, 1);
+  assert.ok(!html.includes("Arquitectura e interiorismo · Temuco, Chile"));
   assert.match(
     html,
     /<div class="home-hero-shell">[\s\S]*?<section class="hero"[\s\S]*?<section class="editorial-ticker"[\s\S]*?<\/div>\s*<section class="manifesto"/
@@ -205,7 +206,8 @@ test("el hero incorpora movimiento limitado, dither fijo y ticker accesible", ()
   assert.match(css, /\/\* hero-dither:start \*\//);
   assert.match(css, /\.page-home \.home-hero-shell\s*\{[\s\S]*?min-height:\s*100svh;[\s\S]*?flex-direction:\s*column/);
   assert.match(css, /@supports \(height:\s*100dvh\)[\s\S]*?\.page-home \.home-hero-shell\s*\{[\s\S]*?min-height:\s*100dvh/);
-  assert.match(css, /\.page-home \.hero\s*\{[\s\S]*?min-height:\s*0;[\s\S]*?flex:\s*1 1 auto/);
+  assert.match(css, /\.page-home \.hero\s*\{[\s\S]*?display:\s*flex;[\s\S]*?min-height:\s*0;[\s\S]*?flex:\s*1 1 auto/);
+  assert.match(css, /\.page-home \.hero__grid\s*\{[\s\S]*?min-height:\s*0;[\s\S]*?flex:\s*1 0 auto;[\s\S]*?align-items:\s*center/);
   assert.match(css, /\.page-home \.editorial-ticker\s*\{[\s\S]*?flex:\s*0 0 auto/);
   assert.match(css, /@keyframes eead-ticker/);
   assert.match(css, /animation:\s*eead-ticker 28s linear infinite/);
