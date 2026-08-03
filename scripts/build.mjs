@@ -5,6 +5,7 @@ import { projects, projectBySlug } from "../content/projects.mjs";
 import { legacyStaticRedirects } from "../content/legacy-routes.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const SITE_NAME = "EEAD";
 const siteUrl = "https://eead.cl";
 const contactEmail = "hola@eead.cl";
 const whatsappNumber = "56987283154";
@@ -32,6 +33,26 @@ const limitWords = (value = "", maximum = 200) => {
   if (words.length <= maximum) return words.join(" ");
   return `${words.slice(0, maximum).join(" ").replace(/[,:;]$/, "")}…`;
 };
+
+const buildPageTitle = (content) => `${SITE_NAME} | ${content.trim()}`;
+
+const formatProjectTypology = (typology) => {
+  const normalized = typology.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return {
+    arquitectura: "Arquitectura",
+    interiorismo: "Interiorismo",
+    workspace: "Espacios de trabajo",
+    workspaces: "Espacios de trabajo",
+    "espacios de trabajo": "Espacios de trabajo",
+    visualizacion: "Visualización arquitectónica",
+    "visualizacion arquitectonica": "Visualización arquitectónica",
+    "oficina tecnica": "Oficina técnica externa",
+    "oficina tecnica externa": "Oficina técnica externa"
+  }[normalized] ?? typology.trim();
+};
+
+const buildProjectTitle = (project) =>
+  `${project.title.trim()} | ${formatProjectTypology(project.category)}`;
 
 const encodePublicPath = (publicPath) =>
   publicPath.split("/").map((segment) => encodeURIComponent(segment)).join("/");
@@ -285,7 +306,7 @@ ${floatingControls()}
 function projectCard(project, { headingLevel = "h2", filterCategories = null } = {}) {
   const Heading = headingLevel === "h3" ? "h3" : "h2";
   const metadata = [
-    project.scope?.split(",")[0]?.trim() || project.category,
+    project.category,
     project.year,
     project.location
   ].filter(Boolean);
@@ -295,26 +316,41 @@ function projectCard(project, { headingLevel = "h2", filterCategories = null } =
       ? `data-categories="${filterCategories.map(escapeHtml).join("|")}"`
       : `data-category="${escapeHtml(project.category)}"`}>
       <a href="/proyectos/${project.slug}/">
-        <div class="project-card__media">
-          ${image(project.cover, `${project.title}: ${project.description}`, {
+        <div class="project-card__media${project.cover ? "" : " project-card__media--empty"}">
+          ${project.cover ? image(project.cover, `${project.title}: ${project.description}`, {
             sizes: "(max-width: 760px) calc(100vw - 48px), (max-width: 1024px) calc(50vw - 56px), (max-width: 1440px) calc((100vw - 208px) / 3), 400px"
-          })}
+          }) : ""}${filterCategories ? `<${Heading} class="project-card__title">${escapeHtml(project.title)}</${Heading}>` : (!project.cover ? `<span>${escapeHtml(project.title)}</span>` : "")}
         </div>
         <div class="project-card__meta">
-          <${Heading}>${escapeHtml(project.title)}</${Heading}>
-          <p>${metadata.map(escapeHtml).join(' <span aria-hidden="true">·</span> ')}</p>
+          ${filterCategories
+            ? `<p><span>${escapeHtml(project.category)}</span><span>${escapeHtml(project.location)}</span></p>`
+            : `<${Heading}>${escapeHtml(project.title)}</${Heading}>
+          <p>${metadata.map(escapeHtml).join(' <span aria-hidden="true">·</span> ')}</p>`}
         </div>
       </a>
     </article>`;
+}
+
+const workspaceSlugs = new Set(["homeoffice-cg", "oficina-gl"]);
+
+function projectCategories(project) {
+  const taxonomy = new Set([project.category]);
+  const scope = project.scope?.toLocaleLowerCase("es") || "";
+
+  if (scope.includes("visualización")) taxonomy.add("Visualización");
+  if (workspaceSlugs.has(project.slug)) taxonomy.add("Workspaces");
+  if (project.category === "Oficina Técnica Externa" || /desarrollo técnico|documentación|coordinación|oficina técnica/.test(scope)) taxonomy.add("Oficina Técnica");
+
+  return [...taxonomy];
 }
 
 function projectCarouselSlide(project, index, activeIndex, showLocation = false) {
   return `
       <article class="project-carousel__slide" data-carousel-slide data-project-slug="${project.slug}" data-title="${escapeHtml(project.title)}"${showLocation ? ` data-location="${escapeHtml(project.location)}"` : ""}${index === activeIndex ? " data-active" : ""}>
         <a href="/proyectos/${project.slug}/"${index === activeIndex ? ' aria-current="true"' : ""} aria-label="Ver proyecto ${escapeHtml(project.title)}">
-          ${image(project.cover, `${project.title}: ${project.description}`, {
+          ${project.cover ? image(project.cover, `${project.title}: ${project.description}`, {
             sizes: "(max-width: 760px) 84vw, 68vw"
-          })}
+          }) : `<span class="project-carousel__placeholder">${escapeHtml(project.title)}</span>`}
           <span class="sr-only">${escapeHtml(project.title)}</span>
         </a>
       </article>`;
@@ -325,7 +361,7 @@ function featuredCarouselData() {
   const prioritySlugSet = new Set(prioritySlugs);
   const carouselProjects = [
     ...prioritySlugs.map((slug) => projectBySlug.get(slug)).filter(Boolean),
-    ...projects.filter((project) => !prioritySlugSet.has(project.slug))
+    ...projects.filter((project) => project.cover && !prioritySlugSet.has(project.slug))
   ];
   const activeProjectIndex = carouselProjects.findIndex((project) => project.slug === "casa-alicia");
 
@@ -471,7 +507,7 @@ ${projectCarousel({ ...carouselData, showLocation: true })}
   </section>`;
 
   return page({
-    title: "EEAD — Arquitectura e interiorismo en Temuco",
+    title: buildPageTitle("Arquitectura e interiorismo en Temuco"),
     description: "EEAD integra arquitectura, interiorismo, visualización y desarrollo técnico para crear proyectos claros, precisos y construibles desde Temuco, Chile.",
     pathname: "/",
     body,
@@ -510,17 +546,6 @@ function projectsPage() {
     { label: "WORKSPACES", value: "Workspaces" },
     { label: "OFICINA TÉCNICA", value: "Oficina Técnica" }
   ];
-  const workspaceSlugs = new Set(["homeoffice-cg", "oficina-gl"]);
-  const projectCategories = (project) => {
-    const taxonomy = new Set([project.category]);
-    const scope = project.scope?.toLocaleLowerCase("es") || "";
-
-    if (scope.includes("visualización")) taxonomy.add("Visualización");
-    if (workspaceSlugs.has(project.slug)) taxonomy.add("Workspaces");
-    if (/desarrollo técnico|documentación|coordinación/.test(scope)) taxonomy.add("Oficina Técnica");
-
-    return [...taxonomy];
-  };
   const body = `
   <header class="page-intro">
     <h1>Proyectos</h1>
@@ -536,7 +561,7 @@ function projectsPage() {
   </section>`;
 
   return page({
-    title: "Proyectos de arquitectura e interiorismo — EEAD",
+    title: buildPageTitle("Proyectos de arquitectura e interiorismo"),
     description: "Selección de proyectos EEAD en arquitectura, interiorismo, oficina técnica y visualización arquitectónica en Chile.",
     pathname: "/proyectos/",
     current: "proyectos",
@@ -559,20 +584,17 @@ function projectsPage() {
 }
 
 function projectPage(project) {
-  const sharesCategory = (candidate) => candidate.category === project.category
-    || (project.category === "Visualización"
-      && candidate.scope?.toLocaleLowerCase("es").includes("visualización"));
   const relatedCandidates = [
     ...project.related.map((slug) => projectBySlug.get(slug)),
     ...projects
   ].filter(Boolean);
   const related = [...new Map(relatedCandidates.map((candidate) => [candidate.slug, candidate])).values()]
-    .filter((candidate) => candidate.slug !== project.slug && sharesCategory(candidate))
+    .filter((candidate) => candidate.slug !== project.slug)
     .slice(0, 3);
   const projectIndex = projects.indexOf(project);
   const previous = projects[(projectIndex - 1 + projects.length) % projects.length];
   const next = projects[(projectIndex + 1) % projects.length];
-  const typology = project.scope?.split(",")[0]?.trim() || project.category;
+  const typology = project.category;
   const description = limitWords(project.description, 200);
   const facts = [
     ["Ubicación", project.location],
@@ -594,9 +616,8 @@ function projectPage(project) {
     <header class="project-hero">
       <div class="project-container project-hero__grid">
         <div class="project-hero__content">
-          <a class="project-back" href="/proyectos/">
+          <a class="project-back" href="/proyectos/" aria-label="Volver a proyectos">
             <span class="project-back__arrow" aria-hidden="true">←</span>
-            <span>Volver</span>
           </a>
           <p class="project-kicker">${escapeHtml(project.category)}</p>
           <h1 class="project-title">${escapeHtml(project.title)}</h1>
@@ -608,12 +629,12 @@ function projectPage(project) {
       </div>
     </header>
 
-    <figure class="project-cover project-container">
+    ${project.cover ? `<figure class="project-cover project-container">
       ${image(project.cover, coverAlt, {
         eager: true,
         sizes: "(max-width: 760px) calc(100vw - 48px), 1280px"
       })}
-    </figure>
+    </figure>` : ""}
 
     ${gallerySource.length ? `<section class="project-gallery project-container" aria-label="Imágenes del proyecto ${escapeHtml(project.title)}">
       <div class="project-gallery-grid">
@@ -653,7 +674,7 @@ function projectPage(project) {
   </article>`;
 
   return page({
-    title: `${project.title} — ${project.category} | EEAD`,
+    title: buildProjectTitle(project),
     description: `${project.description} ${project.scope}.`,
     pathname: `/proyectos/${project.slug}/`,
     current: "proyectos",
@@ -668,7 +689,7 @@ function projectPage(project) {
       name: project.title,
       url: `${siteUrl}/proyectos/${project.slug}/`,
       description: project.description,
-      image: siteAsset(project.cover),
+      ...(project.cover ? { image: siteAsset(project.cover) } : {}),
       locationCreated: {
         "@type": "Place",
         name: project.location
@@ -689,7 +710,7 @@ function servicesHero(heroImage) {
     label: "SERVICIOS",
     titleId: "services-title",
     title: "<span>Resolver el proyecto</span> <span>antes de construir.</span>",
-    copy: `<p class="hero__lead">Arquitectura, documentación BIM y visualización integradas en un mismo proceso para coordinar decisiones, reducir errores y llegar a obra con mayor claridad.</p>
+    copy: `<p class="hero__lead"><strong><u>Arquitectura</u></strong>, <strong><u>documentación BIM</u></strong> y <strong><u>visualización</u></strong> integradas en un mismo proceso para <strong><u>coordinar decisiones</u></strong>, <strong><u>reducir errores</u></strong> y llegar a obra con <strong><u>mayor claridad</u></strong>.</p>
       <div class="hero__actions"><a class="button button--primary" href="/contacto/">Conversar sobre un proyecto</a></div>`,
     heroImage,
     imageAlt: "Vivienda contemporánea de hormigón y madera integrada al paisaje"
@@ -704,10 +725,6 @@ function servicesIntro() {
         <span>Una misma</span>
         <span>forma de trabajar.</span>
       </h2>
-      <div class="services-intro__copy">
-        <p>Cada servicio puede desarrollarse de manera independiente o integrarse según la etapa, el alcance y la complejidad del proyecto.</p>
-        <p>En todos los casos trabajamos con una misma premisa: claridad antes que improvisación.</p>
-      </div>
     </header>`;
 }
 
@@ -718,7 +735,7 @@ function serviceRow(service) {
         <h3>${escapeHtml(service.title)}</h3>
         <div class="service-row__content">
           <div class="service-row__description">
-            ${service.description.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
+            ${service.description.map((paragraph) => `<p>${paragraph}</p>`).join("")}
           </div>
           <a class="button service-row__link" href="${service.href}">${escapeHtml(service.linkLabel)}</a>
         </div>
@@ -740,7 +757,6 @@ function projectCTA() {
           <span>necesita resolver</span>
           <span>tu proyecto.</span>
         </h2>
-        <p>Revisamos su etapa, alcance, información disponible y entregables antes de preparar una propuesta clara.</p>
       </div>
       <div class="project-cta__actions">
         <a class="button button--primary" href="/contacto/">Solicitar una conversación</a>
@@ -761,8 +777,8 @@ function servicesPage() {
       number: "01",
       title: "Arquitectura + interiores",
       description: [
-        "Diseñamos viviendas, refugios, lofts, remodelaciones, interiores y proyectos de hospitality desde el programa hasta el detalle constructivo.",
-        "Ordenamos uso, distribución, materialidad y experiencia espacial con criterio arquitectónico y constructivo."
+        "Diseñamos <strong><u>viviendas, refugios, lofts, remodelaciones, interiores y proyectos de hospitality</u></strong> desde el <strong><u>programa hasta el detalle constructivo</u></strong>.",
+        "Ordenamos <strong><u>uso, distribución, materialidad y experiencia espacial</u></strong> con <strong><u>criterio arquitectónico y constructivo</u></strong>."
       ],
       href: "/proyectos/",
       linkLabel: "Ver arquitectura e interiores",
@@ -774,8 +790,8 @@ function servicesPage() {
       number: "02",
       title: "Workspaces",
       description: [
-        "Diseñamos oficinas y espacios de trabajo en casa que integran identidad, ergonomía, tecnología y funcionalidad.",
-        "Organizamos cada elemento para mejorar el uso del espacio, la concentración y la experiencia cotidiana de trabajo."
+        "Diseñamos <strong><u>oficinas y espacios de trabajo en casa</u></strong> que integran <strong><u>identidad, ergonomía, tecnología y funcionalidad</u></strong>.",
+        "Organizamos cada elemento para mejorar <strong><u>el uso del espacio, la concentración y la experiencia cotidiana de trabajo</u></strong>."
       ],
       href: "/contacto/",
       linkLabel: "Ver workspaces",
@@ -787,8 +803,8 @@ function servicesPage() {
       number: "03",
       title: "Visualización + render",
       description: [
-        "Producimos imágenes, renders y modelos tridimensionales para evaluar atmósfera, escala, iluminación y materialidad antes de construir.",
-        "La visualización no solo sirve para presentar el proyecto: también permite comprenderlo, revisarlo y tomar mejores decisiones."
+        "Producimos <strong><u>imágenes, renders y modelos tridimensionales</u></strong> para evaluar <strong><u>atmósfera, escala, iluminación y materialidad</u></strong> antes de construir.",
+        "La visualización no solo sirve para presentar el proyecto: también permite <strong><u>comprenderlo, revisarlo y tomar mejores decisiones</u></strong>."
       ],
       href: `/proyectos/${visualizationProject.slug}/`,
       linkLabel: "Ver visualización",
@@ -800,8 +816,8 @@ function servicesPage() {
       number: "04",
       title: "Oficina técnica externa",
       description: [
-        "Apoyamos a arquitectos, constructoras, inmobiliarias y oficinas de diseño en el desarrollo, representación y documentación de sus proyectos.",
-        "Nos integramos como una extensión especializada del equipo, aportando capacidad técnica por alcance definido y sin aumentar innecesariamente su estructura interna."
+        "Apoyamos a <strong><u>arquitectos, constructoras, inmobiliarias y oficinas de diseño</u></strong> en el <strong><u>desarrollo, representación y documentación</u></strong> de sus proyectos.",
+        "Nos integramos como una <strong><u>extensión especializada del equipo</u></strong>, aportando <strong><u>capacidad técnica por alcance definido</u></strong> y sin aumentar innecesariamente su estructura interna."
       ],
       href: "/oficina-tecnica/",
       linkLabel: "Conocer oficina técnica",
@@ -824,7 +840,7 @@ ${services.map(serviceRow).join("")}
 ${projectCTA()}`;
 
   return page({
-    title: "Servicios de arquitectura, workspaces y oficina técnica — EEAD",
+    title: buildPageTitle("Servicios de arquitectura, interiorismo y oficina técnica"),
     description: "Arquitectura e interiores, workspaces, visualización y soporte técnico coordinados para anticipar decisiones y llegar a obra con claridad.",
     pathname: "/servicios/",
     current: "servicios",
@@ -893,35 +909,10 @@ function technicalMethod() {
   </section>`;
 }
 
-function technicalDeliverables() {
-  return `
-  <section class="technical-deliverables" aria-labelledby="technical-deliverables-title">
-    <div class="technical-shell technical-deliverables__grid">
-      <header class="technical-deliverables__intro">
-        <p class="eyebrow">ENTREGABLES</p>
-        <h2 id="technical-deliverables-title">Cada entrega debe conservar la lógica del proyecto.</h2>
-        <p>No producimos modelos, planos o imágenes como piezas independientes. Cada documento debe responder a los antecedentes disponibles, a una decisión arquitectónica y a una etapa concreta del proyecto.</p>
-      </header>
-      <div class="technical-deliverables__table">
-        <table>
-          <thead>
-            <tr><th scope="col">Entregable</th><th scope="col">Base de trabajo</th><th scope="col">Qué se resuelve</th></tr>
-          </thead>
-          <tbody>
-            <tr><th scope="row">Modelo arquitectónico</th><td data-label="Base de trabajo">Antecedentes, levantamientos y especialidades</td><td data-label="Qué se resuelve">Geometría, niveles, espacios y relaciones generales</td></tr>
-            <tr><th scope="row">Planimetría</th><td data-label="Base de trabajo">Modelo y criterios de proyecto</td><td data-label="Qué se resuelve">Plantas, cortes, elevaciones y organización gráfica</td></tr>
-            <tr><th scope="row">Detalles constructivos</th><td data-label="Base de trabajo">Puntos críticos del proyecto</td><td data-label="Qué se resuelve">Encuentros, espesores, tolerancias y materialidad</td></tr>
-            <tr><th scope="row">Especificaciones</th><td data-label="Base de trabajo">Decisiones de diseño y sistemas propuestos</td><td data-label="Qué se resuelve">Materiales, componentes y criterios de ejecución</td></tr>
-            <tr><th scope="row">Visualizaciones</th><td data-label="Base de trabajo">Modelo, materialidad y contexto</td><td data-label="Qué se resuelve">Escala, atmósfera, iluminación y lectura del proyecto</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>`;
-}
-
 function technicalRecentProjects() {
-  const carouselData = featuredCarouselData();
+  const carouselProjects = projects.filter((project) => projectCategories(project).includes("Oficina Técnica"));
+  const activeProjectIndex = 0;
+  const activeProject = carouselProjects[activeProjectIndex];
 
   return `
   <section class="technical-projects" aria-labelledby="technical-projects-title">
@@ -932,7 +923,7 @@ function technicalRecentProjects() {
       </div>
       <a class="button button--primary" href="/contacto/">Solicitar reunión</a>
     </div>
-${projectCarousel({ ...carouselData, label: "Trabajo reciente de EEAD" })}
+${projectCarousel({ carouselProjects, activeProjectIndex, activeProject, label: "Oficina técnica externa", showLocation: true })}
   </section>`;
 }
 
@@ -944,12 +935,10 @@ function technicalOfficePage() {
 
 ${technicalMethod()}
 
-${technicalDeliverables()}
-
 ${technicalRecentProjects()}`;
 
   return page({
-    title: "Oficina técnica externa y desarrollo arquitectónico — EEAD",
+    title: buildPageTitle("Oficina técnica externa para arquitectura y AEC"),
     description: "Desarrollo, representación y documentación arquitectónica integrada a equipos externos, con criterio y continuidad entre diseño y construcción.",
     pathname: "/oficina-tecnica/",
     current: "oficina-tecnica",
@@ -974,32 +963,49 @@ function studioHero(heroImage) {
     label: "ESTUDIO",
     titleId: "studio-title",
     title: "<span>Una oficina pequeña.</span> <span>Una forma integral de</span> <span>resolver arquitectura.</span>",
-    copy: `<p class="hero__lead">EEAD es un estudio de arquitectura con base en Temuco. Diseñamos, visualizamos y desarrollamos proyectos con una mirada integral para transformar ideas en decisiones claras, precisas y construibles.</p>
-      <div class="hero__actions"><a class="button button--primary" href="/contacto/">Agenda una reunión</a></div>`,
+    copy: `<div class="hero__actions"><a class="button button--primary" href="/contacto/">CONVERSAR SOBRE UN PROYECTO</a></div>`,
     heroImage,
     imageAlt: "Mesa de trabajo con planos de arquitectura, lámpara, anteojos y material de proyecto."
   });
 }
 
-function studioDirector(profileImage) {
+function studioIntroduction() {
   return `
-  <section class="studio-director" aria-labelledby="studio-director-title">
-    <div class="studio-shell studio-director__grid">
-      <div class="studio-director__identity">
-        <h2 id="studio-director-title">Emir Esparza</h2>
-        <p class="studio-director__credentials">
-          <span>Arquitecto UM</span>
-          <span>Mg (c) Tec. Aplicadas a la Construcción</span>
-          <span>Director EEAD</span>
-        </p>
+  <section class="studio-intro" aria-label="Estudio">
+    <div class="studio-shell studio-intro__grid">
+      <div class="studio-intro__copy">
+        <div class="studio-intro__lead">
+          <p>EEAD es una oficina de <strong><u>arquitectura e interiorismo</u></strong> que trabaja cada proyecto con <strong><u>cercanía, criterio y precisión técnica</u></strong>.</p>
+        </div>
+        <div class="studio-intro__detail">
+          <p>Creemos que la arquitectura correcta es simple: <strong><u>debe resolverse antes de construir</u></strong>. Por eso integramos <strong><u>diseño, BIM, visualización y documentación desde el inicio</u></strong>, reduciendo errores, improvisación e incertidumbre durante la obra.</p>
+          <p>Cada decisión busca aportar <strong><u>claridad al cliente, coherencia al proyecto y mayor control sobre el proceso</u></strong>.</p>
+        </div>
       </div>
+    </div>
+  </section>`;
+}
+
+function studioDirection(profileImage) {
+  return `
+  <section class="studio-direction" aria-label="Dirección y red colaborativa">
+    <div class="studio-shell studio-direction__grid">
       <figure class="studio-director__portrait">
         ${image(profileImage, "Retrato de Emir Esparza, arquitecto y director de EEAD.", {
           className: "studio-director__image",
-          sizes: "(max-width: 760px) 144px, (max-width: 1100px) 140px, 176px"
+          sizes: "(max-width: 760px) calc(100vw - 48px), (max-width: 1100px) 30vw, 320px"
         })}
       </figure>
-      <p class="studio-director__bio">Arquitecto e interiorista. Dirige EEAD desde Temuco, integrando diseño, visualización y desarrollo técnico en proyectos de distintas escalas. Su enfoque prioriza claridad, criterio y soluciones bien resueltas antes de construir.</p>
+      <div class="studio-direction__copy">
+        <h2>Emir Esparza</h2>
+        <p class="studio-direction__credentials">ARQUITECTO<br>MG (C) TECNOLOGÍAS APLICADAS A LA CONSTRUCCIÓN<br>DIRECTOR EEAD</p>
+        <p>Con <strong><u>más de nueve años de experiencia</u></strong>, dirige proyectos residenciales, comerciales y de interiorismo integrando <strong><u>diseño, visualización, BIM y desarrollo técnico</u></strong>.</p>
+      </div>
+      <div class="studio-network">
+        <h2 class="eyebrow">RED COLABORATIVA</h2>
+        <p>EEAD opera como una oficina compacta y especializada.</p>
+        <p>Según la escala y complejidad de cada encargo, conformamos equipos con <strong><u>profesionales, especialistas y consultores de confianza</u></strong>. Esto permite entregar a cada proyecto la <strong><u>estructura técnica que necesita</u></strong>, sin sumar procesos ni capas innecesarias.</p>
+      </div>
     </div>
   </section>`;
 }
@@ -1009,9 +1015,8 @@ function studioCta() {
   <section class="studio-cta" aria-labelledby="studio-cta-title">
     <div class="studio-shell studio-cta__grid">
       <h2 id="studio-cta-title">
-        <span>Conversemos</span>
-        <span>sobre lo que</span>
-        <span>tu proyecto</span>
+        <span>Conversemos sobre</span>
+        <span>lo que tu proyecto</span>
         <span>necesita resolver.</span>
       </h2>
       <div class="studio-cta__actions">
@@ -1026,12 +1031,13 @@ function studioPage() {
   const heroImage = "/assets/img/estudio/estudio-eead-hero.jpg";
   const profileImage = "/assets/img/estudio/emir-esparza-perfil.png";
   const body = `${studioHero(heroImage)}
-${studioDirector(profileImage)}
+${studioIntroduction()}
+${studioDirection(profileImage)}
 ${studioCta()}`;
 
   return page({
-    title: "Estudio de arquitectura en Temuco — EEAD",
-    description: "EEAD es un estudio de arquitectura en Temuco que integra diseño, visualización y desarrollo técnico para transformar ideas en decisiones claras y construibles.",
+    title: buildPageTitle("Estudio de arquitectura y diseño en Temuco"),
+    description: "EEAD es una oficina de arquitectura e interiorismo que trabaja cada proyecto con cercanía, criterio y precisión técnica.",
     pathname: "/estudio/",
     current: "estudio",
     body,
@@ -1139,7 +1145,7 @@ function contactPage() {
   </section>`;
 
   return page({
-    title: "Contacto — EEAD Arquitectura e interiorismo",
+    title: buildPageTitle("Contacto estudio de arquitectura en Temuco"),
     description: "Contacte a EEAD para conversar sobre un proyecto de arquitectura, interiorismo, oficina técnica BIM o visualización arquitectónica.",
     pathname: "/contacto/",
     current: "contacto",
@@ -1194,7 +1200,7 @@ function privacyPage() {
   </article>`;
 
   return page({
-    title: "Política de privacidad — EEAD",
+    title: buildPageTitle("Política de privacidad"),
     description: "Información sobre el uso, procesamiento y conservación de los datos enviados mediante el formulario de contacto de EEAD.",
     pathname: "/privacidad/",
     body,
@@ -1222,7 +1228,7 @@ function notFoundPage() {
   </section>`;
 
   return page({
-    title: "Página no encontrada — EEAD",
+    title: buildPageTitle("Página no encontrada"),
     description: "La página solicitada no está disponible. Vuelve al inicio de EEAD o explora los proyectos.",
     pathname: "/404.html",
     body,

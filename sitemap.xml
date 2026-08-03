@@ -79,6 +79,30 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://eead.cl/proyectos/oficina-tr/</loc>
+    <lastmod>2026-07-30</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://eead.cl/proyectos/casa-ba/</loc>
+    <lastmod>2026-07-30</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://eead.cl/proyectos/taller-salfa/</loc>
+    <lastmod>2026-07-30</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://eead.cl/proyectos/casa101/</loc>
+    <lastmod>2026-07-30</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://eead.cl/servicios/</loc>
     <lastmod>2026-07-30</lastmod>
     <changefreq>yearly</changefreq>

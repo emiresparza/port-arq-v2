@@ -29,8 +29,8 @@ export const legacyProjectMap = {
   "oficinas-frindt": null,
   "parque-olimpia": null,
   "rendering-bigdreams": "big-dreams",
-  "rendering-lds": null,
-  "taller-salfa": null,
+  "rendering-lds": "render-pocuro",
+  "taller-salfa": "taller-salfa",
   "tw-temuco": null,
   "videoinstalacion-mnfpn": null,
   "zen426": "zenteno"
@@ -49,8 +49,7 @@ export const legacyStaticRedirects = new Map([
   ["/proyectos/bim-panoramica/", "/proyectos/"],
   ["/proyectos/oficinas-cdj-group/", "/proyectos/"],
   ["/proyectos/clinica-o2/", "/proyectos/"],
-  ["/proyectos/taller-salfa/", "/proyectos/"],
-  ["/proyectos/rendering-lds/", "/proyectos/"],
+  ["/proyectos/rendering-lds/", "/proyectos/render-pocuro/"],
   ["/proyectos/rendering-bigdreams/", "/proyectos/big-dreams/"]
 ]);
 

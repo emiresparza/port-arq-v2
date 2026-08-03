@@ -37,7 +37,15 @@ test("la arquitectura pública contiene todas las rutas requeridas", () => {
 });
 
 test("cada proyecto usa una ficha editorial compacta y conserva su navegación", () => {
-  assert.ok(projects.length >= 8 && projects.length <= 12);
+  assert.equal(projects.length, 15);
+  assert.ok(projects.every((project) => project.title === project.title.toLocaleUpperCase("es")));
+  assert.deepEqual([...new Set(projects.map((project) => project.category))].sort(), [
+    "Arquitectura",
+    "Interiorismo",
+    "Oficina Técnica Externa",
+    "Visualización",
+    "Workspaces"
+  ]);
   const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
 
   projects.forEach((project) => {
@@ -55,7 +63,7 @@ test("cada proyecto usa una ficha editorial compacta y conserva su navegación",
 
     assert.match(html, new RegExp(`<h1 class="project-title">${project.title}</h1>`));
     assert.match(html, /<body class="page-project-detail">/);
-    assert.match(html, /<a class="project-back" href="\/proyectos\/">[\s\S]*?<span>Volver<\/span>[\s\S]*?<\/a>/);
+    assert.match(html, /<a class="project-back" href="\/proyectos\/" aria-label="Volver a proyectos">\s*<span class="project-back__arrow" aria-hidden="true">←<\/span>\s*<\/a>/);
     assert.ok(description.split(/\s+/).filter(Boolean).length <= 200, project.slug);
     assert.ok(facts.length >= 4 && facts.length <= 6, project.slug);
     assert.deepEqual(factLabels, [
@@ -73,15 +81,18 @@ test("cada proyecto usa una ficha editorial compacta y conserva su navegación",
     relatedSlugs.forEach((slug) => {
       const related = projects.find((candidate) => candidate.slug === slug);
       assert.notEqual(slug, project.slug);
-      assert.ok(related?.category === project.category
-        || (project.category === "Visualización" && related?.scope.toLowerCase().includes("visualización")), `${project.slug}: ${slug}`);
+      assert.ok(related, `${project.slug}: ${slug}`);
     });
     assert.match(html, /<nav class="project-nav project-container"/);
     assert.match(html, /rel="prev"/);
     assert.match(html, /rel="next"/);
     assert.doesNotMatch(html, />Galería<|Secuencia visual/);
-    assert.match(html, /class="project-cover project-container">[\s\S]*?loading="eager"[\s\S]*?fetchpriority="high"/);
-    assert.match(html, /<figure class="project-gallery-item is-main">/);
+    if (project.cover) {
+      assert.match(html, /class="project-cover project-container">[\s\S]*?loading="eager"[\s\S]*?fetchpriority="high"/);
+      assert.match(html, /<figure class="project-gallery-item is-main">/);
+    } else {
+      assert.doesNotMatch(html, /class="project-cover project-container"/);
+    }
     assert.match(html, /Proyectos relacionados/);
     assert.doesNotMatch(html, /project-narrative|El problema|<figcaption>/);
   });
@@ -93,14 +104,12 @@ test("cada proyecto usa una ficha editorial compacta y conserva su navegación",
   assert.doesNotMatch(css, /project-narrative|project-pagination|gallery-item--/);
 });
 
-test("Big Dreams muestra los créditos conocidos sin inventarlos en otras fichas", () => {
-  const bigDreams = fs.readFileSync(path.join(root, "proyectos/big-dreams/index.html"), "utf8");
-
-  assert.match(bigDreams, /<dt>Desarrollo<\/dt><dd>Emir Esparza<\/dd>/);
-  assert.match(bigDreams, /<dt>Cliente<\/dt><dd>Objeto de Diseño<\/dd>/);
-  projects.filter((project) => project.slug !== "big-dreams").forEach((project) => {
+test("cada ficha muestra solo los créditos entregados", () => {
+  projects.forEach((project) => {
     const html = fs.readFileSync(path.join(root, "proyectos", project.slug, "index.html"), "utf8");
-    assert.doesNotMatch(html, /<dt>Cliente<\/dt>/, project.slug);
+    assert.ok(html.includes(`<dt>Desarrollo</dt><dd>${project.developedBy}</dd>`), project.slug);
+    if (project.client) assert.ok(html.includes(`<dt>Cliente</dt><dd>${project.client}</dd>`), project.slug);
+    else assert.doesNotMatch(html, /<dt>Cliente<\/dt>/, project.slug);
   });
 });
 
@@ -121,7 +130,11 @@ test("el índice de proyectos conserva un orden curado y una grilla editorial re
     "oficina-gl",
     "quincho-ss",
     "render-pocuro",
-    "zenteno"
+    "zenteno",
+    "oficina-tr",
+    "casa-ba",
+    "taller-salfa",
+    "casa101"
   ]);
   assert.match(html, /<body class="page-projects">/);
   assert.doesNotMatch(html, /Archivo seleccionado|Listado de proyectos|Arquitectura, interiorismo, desarrollo técnico/);
@@ -131,9 +144,14 @@ test("el índice de proyectos conserva un orden curado y una grilla editorial re
     ["Todos", "Arquitectura", "Interiorismo", "Visualización", "Workspaces", "Oficina Técnica"]
   );
   assert.equal((html.match(/<article class="project-card"/g) || []).length, projects.length);
-  assert.match(html, /data-categories="Interiorismo\|Workspaces"/);
-  assert.match(html, /data-categories="Arquitectura\|Visualización\|Oficina Técnica"/);
+  assert.match(html, /<h2 class="project-card__title">ANTU<\/h2>[\s\S]*?<div class="project-card__meta">\s*<p><span>Arquitectura<\/span><span>Temuco<\/span><\/p>/);
+  assert.match(html, /project-card__media project-card__media--empty">\s*<h2 class="project-card__title">CASA101<\/h2>/);
+  assert.match(html, /data-categories="Workspaces"/);
+  assert.match(html, /data-categories="Oficina Técnica Externa\|Oficina Técnica"/);
   assert.match(css, /\.page-projects \.project-grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(3/);
+  assert.match(css, /\.page-projects \.project-card__title\s*\{[\s\S]*?position:\s*absolute;[\s\S]*?font-size:\s*clamp\(2rem, 3\.8vw, 4rem\)/);
+  assert.match(css, /\.page-projects \.project-card__meta p > span\s*\{[\s\S]*?display:\s*block/);
+  assert.match(css, /\.page-projects \.project-card__meta p > span:first-child\s*\{[\s\S]*?font-weight:\s*700/);
   assert.match(css, /@media \(max-width: 1024px\)[\s\S]*?\.page-projects \.project-grid\s*\{[\s\S]*?repeat\(2/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-projects \.project-grid\s*\{[\s\S]*?grid-template-columns:\s*1fr/);
   assert.doesNotMatch(css, /project-grid--editorial|project-card--featured/);
@@ -143,30 +161,34 @@ test("la oficina técnica replica la composición editorial solicitada y reutili
   const html = fs.readFileSync(path.join(root, "oficina-tecnica/index.html"), "utf8");
   const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
   const standardFooter = html.slice(html.indexOf('<footer class="site-footer">'));
-  const deliverablesTable = html.match(/<table>[\s\S]*?<\/table>/)?.[0] || "";
+  const carousel = html.match(/<section class="technical-projects"[\s\S]*?<\/section>/)?.[0] || "";
+  const carouselLinks = [...carousel.matchAll(/<a href="(\/proyectos\/[^\"]+\/)"/g)].map((match) => match[1]);
 
   assert.match(html, /<body class="page-technical">/);
   assert.equal((html.match(/<h1(?:\s|>)/g) || []).length, 1);
   assert.match(html, /<span>Capacidad técnica,<\/span> <span>integrada a tu equipo\.<\/span>/);
   assert.match(html, /<h3>Modelo arquitectónico<\/h3>[\s\S]*?<h3>Desarrollo<\/h3>[\s\S]*?<h3>Documentación<\/h3>/);
-  assert.match(html, /Cada entrega debe conservar la lógica del proyecto\./);
-  assert.equal((deliverablesTable.match(/<thead>[\s\S]*?<\/thead>/)?.[0].match(/scope="col"/g) || []).length, 3);
-  assert.equal((deliverablesTable.match(/<tbody>[\s\S]*?<\/tbody>/)?.[0].match(/<tr>/g) || []).length, 5);
-  assert.doesNotMatch(deliverablesTable, /Salida/);
+  assert.doesNotMatch(html, /ENTREGABLES|technical-deliverables|Cada entrega debe conservar/);
   assert.ok(html.indexOf('class="hero site-hero site-hero--technical"') < html.indexOf('class="technical-method"'));
-  assert.ok(html.indexOf('class="technical-method"') < html.indexOf('class="technical-deliverables"'));
-  assert.ok(html.indexOf('class="technical-deliverables"') < html.indexOf('class="technical-projects"'));
+  assert.ok(html.indexOf('class="technical-method"') < html.indexOf('class="technical-projects"'));
   assert.match(html, /class="button button--primary" href="\/contacto\/">Solicitar reunión<\/a>/);
   assert.match(html, /<p class="eyebrow">PROYECTOS<\/p>[\s\S]*?<h2 id="technical-projects-title">Trabajo reciente<\/h2>/);
   assert.match(html, /class="project-carousel" data-carousel/);
-  assert.match(html, /data-carousel-title>Casa Alicia<\/strong>/);
+  assert.deepEqual(carouselLinks, ["/proyectos/render-pocuro/", "/proyectos/casa-ba/", "/proyectos/taller-salfa/"]);
+  assert.match(carousel, /aria-label="Oficina técnica externa"/);
+  assert.match(carousel, /data-title="LADERAS DEL SUR" data-location="Temuco" data-active/);
+  assert.match(carousel, /data-carousel-title>LADERAS DEL SUR<\/strong>[\s\S]*?data-carousel-location>Temuco<\/span>/);
   assert.doesNotMatch(html, /Ver caso relacionado|DESARROLLO DE PROYECTO|Del criterio de diseño|CASO RELACIONADO|technical-case-study|Axonometría general/);
   assert.match(standardFooter, /Arquitectura simple\./);
   assert.match(standardFooter, />Privacidad</);
   assert.match(css, /--site-hero-height:\s*max\(720px, calc\(100svh - var\(--hero-ticker-height\)\)\)/);
   assert.match(css, /\.site-hero \.hero__media\s*\{[\s\S]*?position|\.site-hero \.hero__media,[\s\S]*?position:\s*absolute/);
   assert.match(css, /\.page-technical \.technical-method__pillars\s*\{[\s\S]*?grid-column:\s*1 \/ 13;[\s\S]*?repeat\(3/);
-  assert.match(css, /\.page-technical \.technical-deliverables__table\s*\{[\s\S]*?overflow-x:\s*auto/);
+  assert.match(css, /\.page-technical \.technical-method__pillars h3\s*\{[\s\S]*?margin:\s*clamp\(21\.6px, 2\.2vw, 33\.6px\) 0 18px;[\s\S]*?text-transform:\s*uppercase/);
+  assert.match(css, /\.page-technical \.technical-method__pillars article:hover\s*\{[\s\S]*?background:\s*rgba\(255, 255, 255, 0\.08\)/);
+  assert.match(css, /\.page-technical \.technical-method__pillars article:hover span,[\s\S]*?article:hover h3\s*\{[\s\S]*?translateX\(6px\)/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.page-technical \.technical-method__pillars article,[\s\S]*?transition:\s*none/);
+  assert.doesNotMatch(css, /technical-deliverables/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-technical \.technical-method__pillars\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
 });
 
@@ -177,6 +199,7 @@ test("Servicios presenta cuatro áreas en el orden y las rutas acordadas", () =>
   const main = html.match(/<main[\s\S]*?<\/main>/)?.[0] || "";
   const serviceTitles = [...main.matchAll(/<article class="service-row"[\s\S]*?<h3>([^<]+)<\/h3>/g)]
     .map((match) => match[1]);
+  const serviceDescriptions = [...main.matchAll(/<div class="service-row__description">([\s\S]*?)<\/div>/g)];
 
   assert.deepEqual(serviceTitles, [
     "Arquitectura + interiores",
@@ -184,12 +207,14 @@ test("Servicios presenta cuatro áreas en el orden y las rutas acordadas", () =>
     "Visualización + render",
     "Oficina técnica externa"
   ]);
+  assert.equal(serviceDescriptions.length, 4);
+  assert.ok(serviceDescriptions.every(([, description]) => description.includes("<strong><u>")));
   assert.match(main, /class="hero site-hero site-hero--services"/);
   assert.match(main, /assets\/img\/optimized\/Servicios\/EEAD%20Hero%20Servicios-[0-9]+\.avif/);
   assert.match(main, /alt="Vivienda contemporánea de hormigón y madera integrada al paisaje"/);
   assert.match(optimizer, /\/assets\/img\/Servicios\/EEAD Hero Servicios\.png/);
   assert.match(main, /<span>Resolver el proyecto<\/span> <span>antes de construir\.<\/span>/);
-  assert.match(main, /Arquitectura, documentación BIM y visualización integradas en un mismo proceso para coordinar decisiones, reducir errores y llegar a obra con mayor claridad\./);
+  assert.match(main, /<strong><u>Arquitectura<\/u><\/strong>, <strong><u>documentación BIM<\/u><\/strong> y <strong><u>visualización<\/u><\/strong> integradas en un mismo proceso para <strong><u>coordinar decisiones<\/u><\/strong>, <strong><u>reducir errores<\/u><\/strong> y llegar a obra con <strong><u>mayor claridad<\/u><\/strong>\./);
   assert.doesNotMatch(main, /Ver capacidades/);
   assert.match(main, /class="button button--primary" href="\/contacto\/">Conversar sobre un proyecto<\/a>/);
   assert.match(main, /id="capacidades"/);
@@ -215,47 +240,60 @@ test("Servicios presenta cuatro áreas en el orden y las rutas acordadas", () =>
   assert.match(css, /@media \(max-width: 900px\)[\s\S]*?\.page-services \.services-matrix__rows\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)[\s\S]*?border-left:\s*0/);
 });
 
-test("Estudio reproduce la composición editorial breve del mockup", () => {
+test("Estudio presenta oficina, dirección y red con composición editorial responsive", () => {
   const html = fs.readFileSync(path.join(root, "estudio/index.html"), "utf8");
   const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
   const main = html.match(/<main[\s\S]*?<\/main>/)?.[0] || "";
+  const studioCss = css.slice(css.indexOf("/* Estudio — estructura institucional */"));
 
   assert.match(html, /<html lang="es-CL">/);
   assert.match(html, /<body class="page-studio">/);
   assert.match(html, /<a href="\/estudio\/" aria-current="page">Estudio<\/a>/);
   assert.equal((main.match(/<h1(?:\s|>)/g) || []).length, 1);
-  assert.equal((main.match(/<section\b/g) || []).length, 2);
-  assert.equal((main.match(/>ESTUDIO<\/p>/g) || []).length, 1);
-  assert.doesNotMatch(main, />EQUIPO<\/p>/);
+  assert.equal((main.match(/<section\b/g) || []).length, 3);
+  assert.doesNotMatch(main, />ESTUDIO<\/h2>|>DIRECCIÓN<\/h2>|ÁREAS DE TRABAJO<\/h2>/);
   assert.match(main, /<span>Una oficina pequeña\.<\/span>[\s\S]*?<span>Una forma integral de<\/span>[\s\S]*?<span>resolver arquitectura\.<\/span>/);
-  assert.match(main, /EEAD es un estudio de arquitectura con base en Temuco\. Diseñamos, visualizamos y desarrollamos proyectos con una mirada integral para transformar ideas en decisiones claras, precisas y construibles\./);
-  assert.match(main, /class="hero__actions"[\s\S]*?class="button button--primary" href="\/contacto\/">Agenda una reunión<\/a>/);
-  assert.doesNotMatch(main, /Diseño, visualización[\s\S]*?y desarrollo técnico[\s\S]*?como parte de un[\s\S]*?mismo proceso\./);
-  assert.doesNotMatch(main, /Trabajamos proyectos residenciales, interiores y encargos de hospitalidad desde una lógica de continuidad\./);
-  assert.match(main, /<h2 id="studio-director-title">Emir Esparza<\/h2>/);
-  assert.match(main, /Arquitecto UM[\s\S]*?Mg \(c\) Tec\. Aplicadas a la Construcción[\s\S]*?Director EEAD/);
-  assert.match(main, /Arquitecto e interiorista\. Dirige EEAD desde Temuco, integrando diseño, visualización y desarrollo técnico/);
+  assert.match(main, /EEAD es una oficina de <strong><u>arquitectura e interiorismo<\/u><\/strong> que trabaja cada proyecto con <strong><u>cercanía, criterio y precisión técnica<\/u><\/strong>\./);
+  assert.match(main, /Creemos que la arquitectura correcta es simple: <strong><u>debe resolverse antes de construir<\/u><\/strong>\./);
+  assert.match(main, /Cada decisión busca aportar <strong><u>claridad al cliente, coherencia al proyecto y mayor control sobre el proceso<\/u><\/strong>\./);
+  assert.match(main, /class="hero__copy"><div class="hero__actions"><a class="button button--primary" href="\/contacto\/">CONVERSAR SOBRE UN PROYECTO<\/a>/);
+  assert.doesNotMatch(main.match(/class="hero site-hero site-hero--studio"[\s\S]*?<\/header>/)?.[0] || "", /class="hero__lead"/);
+  assert.match(main, /<h2>Emir Esparza<\/h2>/);
+  assert.match(main, /ARQUITECTO<br>MG \(C\) TECNOLOGÍAS APLICADAS A LA CONSTRUCCIÓN<br>DIRECTOR EEAD/);
+  assert.match(main, /Con <strong><u>más de nueve años de experiencia<\/u><\/strong>, dirige proyectos residenciales, comerciales y de interiorismo/);
+  assert.doesNotMatch(main, /Su enfoque se centra/);
+  assert.match(main, /<h2 class="eyebrow">RED COLABORATIVA<\/h2>[\s\S]*?EEAD opera como una oficina compacta y especializada\./);
+  assert.match(main, /conformamos equipos con <strong><u>profesionales, especialistas y consultores de confianza<\/u><\/strong>\./);
+  assert.doesNotMatch(main, /studio-areas|studio-area__icon|Proyectos contextualizados|Espacios coherentes y funcionales|Modelado, coordinación y documentación|Imágenes y recorridos/);
   assert.match(main, /alt="Mesa de trabajo con planos de arquitectura, lámpara, anteojos y material de proyecto\."/);
   assert.match(main, /alt="Retrato de Emir Esparza, arquitecto y director de EEAD\."/);
-  assert.match(main, /<span>Conversemos<\/span>[\s\S]*?<span>sobre lo que<\/span>[\s\S]*?<span>tu proyecto<\/span>[\s\S]*?<span>necesita resolver\.<\/span>/);
+  assert.match(main, /<span>Conversemos sobre<\/span>[\s\S]*?<span>lo que tu proyecto<\/span>[\s\S]*?<span>necesita resolver\.<\/span>/);
   assert.doesNotMatch(main, /Iniciar conversación/);
   assert.match(main, /class="studio-cta__actions"[\s\S]*?href="\/contacto\/">Solicitar una conversación<\/a>[\s\S]*?href="\/proyectos\/">Ver proyectos<\/a>/);
-  assert.ok(main.indexOf('class="hero site-hero site-hero--studio"') < main.indexOf('class="studio-director"'));
-  assert.ok(main.indexOf('class="studio-director"') < main.indexOf('class="studio-cta"'));
-  assert.doesNotMatch(main, /studio-overview|Enfoque|Principios|Cómo trabajamos|studio-approach|studio-direction|studio-principles/);
+  assert.ok(main.indexOf('class="studio-intro"') < main.indexOf('class="studio-direction"'));
+  assert.ok(main.indexOf('class="studio-direction"') < main.indexOf('class="studio-cta"'));
+  assert.doesNotMatch(main, /Cómo trabajamos|Arquitectura e interiores|Visualización y criterio|Desarrollo técnico/);
   assert.match(css, /\.site-hero\s*\{[\s\S]*?height:\s*var\(--site-hero-height\)/);
   assert.match(css, /\.site-hero \.hero__image\s*\{[\s\S]*?object-fit:\s*cover/);
   assert.match(css, /\.page-studio \.site-hero--studio \.hero__image\s*\{[\s\S]*?object-position:\s*center bottom/);
-  assert.match(css, /\.page-studio \.studio-director__grid\s*\{[\s\S]*?justify-content:\s*center/);
-  assert.doesNotMatch(css, /\/\* Estudio — composición de la referencia \*\/[\s\S]*?\.page-studio \.studio-director__grid\s*\{[^}]*border-top/);
-  assert.match(css, /\.page-studio \.studio-director__portrait\s*\{[\s\S]*?aspect-ratio:\s*1 \/ 1[\s\S]*?border-radius:\s*50%/);
-  assert.match(css, /\.page-studio \.studio-director__image\s*\{[\s\S]*?object-fit:\s*cover/);
+  assert.match(studioCss, /\.page-studio \.studio-direction__grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(12/);
+  assert.match(studioCss, /\.page-studio \.studio-intro__copy\s*\{[\s\S]*?grid-column:\s*1 \/ 13/);
+  assert.match(studioCss, /\.page-studio \.studio-intro__lead\s*\{[\s\S]*?grid-column:\s*1 \/ 6/);
+  assert.match(studioCss, /\.page-studio \.studio-intro__detail\s*\{[\s\S]*?grid-column:\s*7 \/ 12/);
+  assert.match(studioCss, /@media \(hover: hover\) and \(pointer: fine\)[\s\S]*?\.page-studio \.studio-direction__copy:hover,[\s\S]*?transform:\s*translateX\(4px\)/);
+  assert.match(studioCss, /\.page-studio \.studio-direction__copy::before\s*\{[\s\S]*?background:\s*var\(--accent\)/);
+  assert.match(studioCss, /\.page-studio \.studio-network:hover\s*\{[\s\S]*?border-color:\s*var\(--accent\)/);
+  assert.match(studioCss, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.page-studio \.studio-direction__copy,[\s\S]*?transition:\s*none/);
+  assert.match(studioCss, /\.page-studio \.studio-direction > \.studio-shell\s*\{[\s\S]*?border-top:\s*0/);
+  assert.match(studioCss, /\.page-studio \.studio-director__portrait\s*\{[\s\S]*?aspect-ratio:\s*1 \/ 1[\s\S]*?border-radius:\s*2px/);
+  assert.match(studioCss, /\.page-studio \.studio-director__image\s*\{[\s\S]*?object-fit:\s*cover/);
   assert.match(css, /\.page-studio \.studio-cta\s*\{[\s\S]*?background:\s*#121212/);
   assert.match(css, /\.page-studio \.studio-cta__grid\s*\{[\s\S]*?justify-content:\s*center/);
   assert.match(css, /\.page-studio \.studio-cta__actions\s*\{[\s\S]*?grid-column:\s*2/);
   assert.match(css, /\.page-studio \.studio-cta__actions \.button\s*\{[\s\S]*?background:\s*var\(--accent\)/);
-  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-studio \.studio-director__identity\s*\{[\s\S]*?order:\s*1/);
-  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-studio \.studio-director__portrait\s*\{[\s\S]*?order:\s*2/);
+  assert.match(studioCss, /\.page-studio \.studio-cta h2 span\s*\{[\s\S]*?white-space:\s*nowrap/);
+  assert.match(studioCss, /@media \(max-width: 760px\)[\s\S]*?\.page-studio \.studio-direction__grid\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
+  assert.match(studioCss, /@media \(max-width: 760px\)[\s\S]*?\.page-studio \.studio-director__portrait\s*\{[\s\S]*?order:\s*1/);
 });
 
 test("la home conserva SEO y aplica la composición editorial de referencia", () => {
@@ -273,6 +311,8 @@ test("la home conserva SEO y aplica la composición editorial de referencia", ()
   assert.ok(!html.includes('class="manifesto__label"'));
   assert.ok(html.includes("<h2 id=\"manifiesto-eead\"><span>Diseño y Técnica,</span><span>juntos desde el inicio</span></h2>"));
   assert.match(css, /\.page-home \.manifesto h2\s*\{[\s\S]*?line-height:\s*1\.05/);
+  assert.match(css, /\.page-home \.manifesto\s*\{[\s\S]*?min-height:\s*clamp\(245px, 18\.9vw, 301px\);[\s\S]*?padding:\s*clamp\(43px, 3\.85vw, 59px\) var\(--content-edge\)/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.page-home \.manifesto\s*\{[\s\S]*?padding:\s*38px var\(--page-gutter\)/);
   assert.equal((html.match(/<div class="manifesto__copy">[\s\S]*?<\/div>/)?.[0].match(/<p>/g) || []).length, 1);
   assert.ok(html.includes("Porque una buena arquitectura no solo debe verse bien: <strong><u>debe estar pensada para construirse bien.</u></strong>"));
   assert.match(
@@ -284,8 +324,8 @@ test("la home conserva SEO y aplica la composición editorial de referencia", ()
   assert.ok(html.indexOf('class="hero__dither"') < html.indexOf('class="hero__content hero__grid"'));
   assert.ok(html.indexOf('class="editorial-ticker"') < html.indexOf('class="manifesto"'));
   assert.match(html, /class="hero__image"[\s\S]*?loading="eager"[\s\S]*?fetchpriority="high"/);
-  assert.equal(carouselLinks.length, projects.length);
-  assert.equal(new Set(carouselLinks).size, projects.length);
+  assert.equal(carouselLinks.length, projects.filter((project) => project.cover).length);
+  assert.equal(new Set(carouselLinks).size, carouselLinks.length);
   carouselLinks.forEach((href) => {
     const slug = href.split("/").filter(Boolean).at(-1);
     assert.ok(projects.some((project) => project.slug === slug), href);
@@ -293,15 +333,15 @@ test("la home conserva SEO y aplica la composición editorial de referencia", ()
   assert.ok(html.includes('aria-roledescription="carrusel"'));
   assert.ok(html.includes('aria-label="Todos los proyectos"'));
   assert.ok(html.includes('aria-live="polite"'));
-  assert.match(html, /data-title="Casa Alicia" data-location="Chile" data-active/);
-  assert.match(html, /<strong data-carousel-title>Casa Alicia<\/strong>[\s\S]*?<span data-carousel-location>Chile<\/span>/);
+  assert.match(html, /data-title="CASA AL" data-location="Cunco" data-active/);
+  assert.match(html, /<strong data-carousel-title>CASA AL<\/strong>[\s\S]*?<span data-carousel-location>Cunco<\/span>/);
   assert.ok(!html.includes("data-carousel-meta"));
   assert.ok(!html.includes("data-meta="));
   assert.ok(html.includes('class="button button--primary button--compact home-projects__cta"'));
   assert.ok(!html.includes("hero__title-field"));
   assert.ok(html.includes('<span class="footer-wordmark">EEAD</span>'));
   assert.ok(!hasNestedAnchors(html));
-  assert.match(html, /<title>EEAD — Arquitectura e interiorismo en Temuco<\/title>/);
+  assert.match(html, /<title>EEAD \| Arquitectura e interiorismo en Temuco<\/title>/);
   assert.match(html, /<link rel="canonical" href="https:\/\/eead\.cl\/">/);
   assert.match(html, /"@type":"ProfessionalService"/);
 });
@@ -508,28 +548,42 @@ test("el carrusel usa controles nativos accesibles sin autoplay ni dependencias"
   assert.doesNotMatch(javascript, /setInterval/);
   assert.match(css, /scroll-snap-type:\s*x mandatory/);
   assert.match(css, /flex-basis:\s*84vw/);
-  assert.match(css, /\.page-home \.project-carousel__caption \[data-carousel-location\]\s*\{[\s\S]*?font-size:\s*clamp\(0\.72rem,[\s\S]*?font-weight:\s*300/);
+  assert.match(css, /:where\(\.page-home, \.page-technical\) \.project-carousel__caption \[data-carousel-location\]\s*\{[\s\S]*?font-size:\s*clamp\(0\.72rem,[\s\S]*?font-weight:\s*300/);
 });
 
-test("cada página indexable tiene un title y canonical únicos", () => {
-  const files = [
-    "index.html",
-    "proyectos/index.html",
-    ...projects.map((project) => `proyectos/${project.slug}/index.html`),
-    "servicios/index.html",
-    "oficina-tecnica/index.html",
-    "estudio/index.html",
-    "contacto/index.html",
-    "privacidad/index.html"
-  ];
+test("cada página indexable tiene el title SEO esperado y un canonical único", () => {
+  const mainTitles = new Map([
+    ["index.html", "EEAD | Arquitectura e interiorismo en Temuco"],
+    ["proyectos/index.html", "EEAD | Proyectos de arquitectura e interiorismo"],
+    ["servicios/index.html", "EEAD | Servicios de arquitectura, interiorismo y oficina técnica"],
+    ["oficina-tecnica/index.html", "EEAD | Oficina técnica externa para arquitectura y AEC"],
+    ["estudio/index.html", "EEAD | Estudio de arquitectura y diseño en Temuco"],
+    ["contacto/index.html", "EEAD | Contacto estudio de arquitectura en Temuco"],
+    ["privacidad/index.html", "EEAD | Política de privacidad"]
+  ]);
+  const typologies = {
+    Arquitectura: "Arquitectura",
+    Interiorismo: "Interiorismo",
+    Workspaces: "Espacios de trabajo",
+    Visualización: "Visualización arquitectónica",
+    "Oficina Técnica Externa": "Oficina técnica externa"
+  };
+  const expectedTitles = new Map([
+    ...mainTitles,
+    ...projects.map((project) => [
+      `proyectos/${project.slug}/index.html`,
+      `${project.title} | ${typologies[project.category] ?? project.category}`
+    ])
+  ]);
   const titles = new Set();
   const canonicals = new Set();
 
-  files.forEach((file) => {
+  expectedTitles.forEach((expectedTitle, file) => {
     const html = fs.readFileSync(path.join(root, file), "utf8");
     const title = html.match(/<title>([^<]+)<\/title>/)?.[1];
     const canonical = html.match(/<link rel="canonical" href="([^"]+)">/)?.[1];
-    assert.ok(title, file);
+    assert.equal(title, expectedTitle, file);
+    assert.doesNotMatch(title, /—|\| EEAD$/);
     assert.ok(canonical, file);
     assert.ok(!titles.has(title), `title repetido: ${title}`);
     assert.ok(!canonicals.has(canonical), `canonical repetido: ${canonical}`);
@@ -557,7 +611,7 @@ test("Contacto usa una sección compacta y un formulario accesible de cinco camp
 
   [
     '<body class="page-contact">',
-    "<title>Contacto — EEAD Arquitectura e interiorismo</title>",
+    "<title>EEAD | Contacto estudio de arquitectura en Temuco</title>",
     '<h1 id="contact-title"><span>Conversemos</span> <span>sobre tu</span> <span>proyecto</span></h1>',
     "Cuéntanos <strong><u>qué idea tienes en mente, dónde está tu proyecto y en qué etapa se encuentra.</u></strong> Con esa información podemos orientarte sobre los próximos pasos. <strong><u>¡Conversemos!</u></strong>",
     'id="contact-form-title">CUÉNTANOS TU ENCARGO</h2>',

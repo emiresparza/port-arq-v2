@@ -37,7 +37,7 @@ const sources = new Set(
       project.cover,
       ...project.images.map(([src]) => src)
     ])
-  ]
+  ].filter(Boolean)
 );
 
 const targetWidths = (sourceWidth) => {
