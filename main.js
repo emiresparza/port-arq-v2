@@ -241,6 +241,7 @@
     const previousButton = carousel.querySelector("[data-carousel-previous]");
     const nextButton = carousel.querySelector("[data-carousel-next]");
     const title = carousel.querySelector("[data-carousel-title]");
+    const location = carousel.querySelector("[data-carousel-location]");
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const compactCarousel = window.matchMedia("(max-width: 760px)");
     let activeIndex = Number(carousel.dataset.carouselCurrent || 0);
@@ -288,6 +289,7 @@
 
       const activeSlide = slides[activeIndex];
       title.textContent = activeSlide.dataset.title || "";
+      if (location) location.textContent = activeSlide.dataset.location || "";
     };
 
     const centerVisualSlide = (index, behavior = "smooth") => {

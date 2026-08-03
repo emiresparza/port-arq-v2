@@ -1517,7 +1517,7 @@ body:not(.page-home) .menu-toggle {
   font-size: clamp(3rem, 4.6vw, 5.35rem);
   font-weight: 400;
   letter-spacing: -0.05em;
-  line-height: 0.94;
+  line-height: 1.05;
 }
 
 .page-home .manifesto__copy {
@@ -1700,6 +1700,20 @@ body:not(.page-home) .menu-toggle {
   letter-spacing: -0.035em;
 }
 
+.page-home .project-carousel__caption {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+}
+
+.page-home .project-carousel__caption [data-carousel-location] {
+  font-size: clamp(0.72rem, 0.82vw, 0.84rem);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+}
+
 .page-home .home-services {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -1734,15 +1748,36 @@ body:not(.page-home) .menu-toggle {
 }
 
 .page-home .home-services__chapters article {
+  position: relative;
+  isolation: isolate;
   min-height: 0;
   padding: clamp(24px, 2.5vw, 36px) 0;
   border-bottom: 1px solid rgba(67, 67, 67, 0.5);
 }
 
+.page-home .home-services__chapters article::before {
+  position: absolute;
+  z-index: -1;
+  inset: 14px -12px;
+  background: rgba(255, 255, 255, 0.24);
+  content: "";
+  filter: blur(22px);
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.98);
+  transition: opacity 240ms ease, transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.page-home .home-services__chapters article:is(:hover, :focus-within)::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
 .page-home .home-services__chapters span {
   margin-bottom: 14px;
   color: var(--ink);
-  font-size: 0.64rem;
+  font-size: clamp(1.2rem, 1.7vw, 1.65rem);
+  transition: color 220ms ease, transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .page-home .home-services__chapters h3 {
@@ -1751,6 +1786,20 @@ body:not(.page-home) .menu-toggle {
   font-size: clamp(2.25rem, 3.7vw, 4.6rem);
   font-weight: 400;
   line-height: 0.96;
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.page-home .home-services__chapters article:is(:hover, :focus-within) span {
+  color: var(--accent);
+  transform: translateX(6px);
+}
+
+.page-home .home-services__chapters article:is(:hover, :focus-within) h3 {
+  transform: translateX(6px);
+}
+
+.page-home .home-services__chapters article:is(:hover, :focus-within) .button::after {
+  transform: translateX(3px);
 }
 
 .page-home .home-services__chapters p {
@@ -1849,7 +1898,7 @@ body:not(.page-home) .menu-toggle {
 }
 
 .page-home .home-closure__action p {
-  max-width: 34ch;
+  max-width: none;
   margin: 16px 0 0;
   color: #fff;
   font-size: 0.66rem;
@@ -1857,6 +1906,7 @@ body:not(.page-home) .menu-toggle {
   letter-spacing: 0.09em;
   line-height: 1.45;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .site-footer {
@@ -5819,7 +5869,7 @@ h2 {
 .contact-page__form-area > h2 {
   margin: 0;
   color: rgba(255, 255, 255, 0.7);
-  font-size: 0.72rem;
+  font-size: 0.9rem;
   font-weight: 700;
   letter-spacing: 0.11em;
   line-height: 1.4;
@@ -6005,18 +6055,7 @@ h2 {
   justify-content: space-between;
   gap: 24px;
   padding-inline: 20px;
-  color: #101010;
-}
-
-.page-contact .form-submit .button__arrow {
-  font-size: 1rem;
-  line-height: 1;
-  transition: transform 180ms ease;
-}
-
-.page-contact .form-submit .button:hover .button__arrow,
-.page-contact .form-submit .button:focus-visible .button__arrow {
-  transform: translateX(3px);
+  color: #fff;
 }
 
 .page-contact .form-submit .button:disabled {
@@ -6124,7 +6163,6 @@ h2 {
 
 @media (prefers-reduced-motion: reduce) {
   .page-contact .button,
-  .page-contact .button__arrow,
   .page-contact .contact-channel__value,
   .page-contact .contact-channel__arrow,
   .page-contact .field input,
@@ -6694,6 +6732,12 @@ h2 {
   .floating-control {
     transition: none;
   }
+
+  .page-home .home-services__chapters span,
+  .page-home .home-services__chapters h3,
+  .page-home .home-services__chapters article::before {
+    transition: none;
+  }
 }
 
 /* Oficina técnica — composición editorial de ruta */
@@ -7173,5 +7217,108 @@ h2 {
 
   .page-projects .filters button {
     min-height: 38px;
+  }
+}
+
+/* Acciones — tratamiento único */
+
+body .button.button,
+.page-projects .filters button {
+  justify-content: space-between;
+  gap: 16px;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
+body .button.button::after,
+.page-projects .filters button::after {
+  flex: 0 0 auto;
+  margin-left: auto;
+  content: "→";
+  font-size: 1rem;
+  line-height: 1;
+  transition: transform 180ms ease;
+}
+
+body .button.button:hover,
+body .button.button:focus-visible,
+.page-projects .filters button:hover,
+.page-projects .filters button:focus-visible,
+.page-projects .filters button[aria-pressed="true"],
+.page-projects .filters button[aria-pressed="true"]:hover {
+  border-color: #d92714;
+  background: #d92714;
+  color: #fff;
+}
+
+body .button.button:hover::after,
+body .button.button:focus-visible::after,
+.page-projects .filters button:hover::after,
+.page-projects .filters button:focus-visible::after {
+  transform: translateX(3px);
+}
+
+@media (max-width: 960px) {
+  .menu-toggle {
+    display: inline-flex;
+    min-width: 110px;
+    min-height: var(--button-height);
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 16px;
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: #fff !important;
+  }
+
+  .menu-toggle::after {
+    margin-left: auto;
+    content: "→";
+    font-size: 1rem;
+    line-height: 1;
+    transition: transform 180ms ease;
+  }
+
+  .menu-toggle:hover::after,
+  .menu-toggle:focus-visible::after {
+    transform: translateX(3px);
+  }
+
+  .menu-toggle__line {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body .button.button::after,
+  .page-projects .filters button::after,
+  .menu-toggle::after {
+    transition: none;
+  }
+}
+
+/* Heroes — separación vertical simétrica */
+
+.site-hero {
+  --hero-content-gap: clamp(18px, 1.7vw, 28px);
+}
+
+body .site-hero .hero__copy {
+  margin-top: var(--hero-content-gap);
+}
+
+body .site-hero .hero__lead {
+  margin-bottom: var(--hero-content-gap);
+}
+
+.page-studio .site-hero--studio {
+  --hero-content-gap: clamp(26px, 2.8vw, 40px);
+}
+
+@media (max-width: 760px) {
+  .page-studio .site-hero--studio {
+    --hero-content-gap: 24px;
   }
 }

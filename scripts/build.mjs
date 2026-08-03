@@ -165,9 +165,9 @@ function footer() {
       </div>
       <div class="footer-contact" aria-label="Contacto EEAD">
         <p>Arquitectura simple.</p>
-        <a href="mailto:${contactEmail}">${contactEmail}</a>
+        <a href="mailto:${contactEmail}">${contactEmail.toUpperCase()}</a>
         <a href="${whatsappUrl}" target="_blank" rel="noopener noreferrer">(+569) 87 28 31 54</a>
-        <a href="${instagramUrl}" target="_blank" rel="noopener noreferrer">@eead.cl</a>
+        <a href="${instagramUrl}" target="_blank" rel="noopener noreferrer">@EEAD.CL</a>
       </div>
       <nav aria-label="Navegación secundaria">
         <a href="/proyectos/">Proyectos</a>
@@ -308,9 +308,9 @@ function projectCard(project, { headingLevel = "h2", filterCategories = null } =
     </article>`;
 }
 
-function projectCarouselSlide(project, index, activeIndex) {
+function projectCarouselSlide(project, index, activeIndex, showLocation = false) {
   return `
-      <article class="project-carousel__slide" data-carousel-slide data-project-slug="${project.slug}" data-title="${escapeHtml(project.title)}"${index === activeIndex ? " data-active" : ""}>
+      <article class="project-carousel__slide" data-carousel-slide data-project-slug="${project.slug}" data-title="${escapeHtml(project.title)}"${showLocation ? ` data-location="${escapeHtml(project.location)}"` : ""}${index === activeIndex ? " data-active" : ""}>
         <a href="/proyectos/${project.slug}/"${index === activeIndex ? ' aria-current="true"' : ""} aria-label="Ver proyecto ${escapeHtml(project.title)}">
           ${image(project.cover, `${project.title}: ${project.description}`, {
             sizes: "(max-width: 760px) 84vw, 68vw"
@@ -332,26 +332,29 @@ function featuredCarouselData() {
   return { carouselProjects, activeProjectIndex, activeProject: carouselProjects[activeProjectIndex] };
 }
 
-function projectCarousel({ carouselProjects, activeProjectIndex, activeProject, label = "Todos los proyectos" }) {
+function projectCarousel({ carouselProjects, activeProjectIndex, activeProject, label = "Todos los proyectos", showLocation = false }) {
   return `
     <div class="project-carousel" data-carousel data-carousel-current="${activeProjectIndex}" tabindex="0" role="region" aria-roledescription="carrusel" aria-label="${escapeHtml(label)}">
       <button class="project-carousel__button project-carousel__button--previous" type="button" data-carousel-previous aria-label="Proyecto anterior">
         <span aria-hidden="true">←</span>
       </button>
-      <div class="project-carousel__viewport" data-carousel-viewport>${carouselProjects.map((project, index) => projectCarouselSlide(project, index, activeProjectIndex)).join("")}</div>
+      <div class="project-carousel__viewport" data-carousel-viewport>${carouselProjects.map((project, index) => projectCarouselSlide(project, index, activeProjectIndex, showLocation)).join("")}</div>
       <button class="project-carousel__button project-carousel__button--next" type="button" data-carousel-next aria-label="Proyecto siguiente">
         <span aria-hidden="true">→</span>
       </button>
       <div class="project-carousel__caption" aria-live="polite" aria-atomic="true">
-        <strong data-carousel-title>${escapeHtml(activeProject.title)}</strong>
+        <strong data-carousel-title>${escapeHtml(activeProject.title)}</strong>${showLocation ? `
+        <span data-carousel-location>${escapeHtml(activeProject.location)}</span>` : ""}
       </div>
     </div>`;
 }
 
 const homeTickerPhrases = [
   "Arquitectura e interiorismo",
+  "Arquitectura Simple",
   "Proyectos que se entienden antes de construir",
   "Diseño, visualización y oficina técnica externa",
+  "Araucanía",
   "Chile"
 ];
 
@@ -375,7 +378,7 @@ ${sharedHero({
       variant: "home",
       titleId: "home-title",
       title: "<span>Arquitectura</span> <span>diseñada para</span> <span>construirse</span> <span>mejor.</span>",
-      copy: `<p class="hero__lead">Somos un estudio de <span class="hero__emphasis">Arquitectura</span>, <span class="hero__emphasis">Diseño</span> e <span class="hero__emphasis">Interiorismo</span> fundado en el sur de <span class="hero__emphasis">Chile</span>. Trabajamos con <span class="hero__emphasis">Personas</span> y <span class="hero__emphasis">Empresas</span> para transformar ideas en proyectos <span class="hero__emphasis">Claros</span>, <span class="hero__emphasis">Precisos</span> y bien <span class="hero__emphasis">Resueltos</span>, integrando <span class="hero__emphasis">Diseño</span>, <span class="hero__emphasis">Visualización</span> y <span class="hero__emphasis">Desarrollo</span> técnico antes de la obra.</p>
+      copy: `<p class="hero__lead">Somos un estudio de <strong class="hero__emphasis">Arquitectura, Diseño e Interiorismo</strong> fundado en el sur de <strong class="hero__emphasis">Chile.</strong> Trabajamos con <strong class="hero__emphasis">Personas y Empresas</strong> para transformar ideas en proyectos <strong class="hero__emphasis">Claros</strong>, <strong class="hero__emphasis">Precisos</strong> y bien <strong class="hero__emphasis">Resueltos</strong>, integrando <strong class="hero__emphasis">Diseño, Visualización y Desarrollo Técnico</strong> antes de la obra.</p>
         <div class="hero__actions">
           <a class="button button--primary" href="/proyectos/">Proyectos</a>
           <a class="button button--primary" href="/contacto/">Agenda una reunión</a>
@@ -386,7 +389,7 @@ ${sharedHero({
     })}
 
     <section class="editorial-ticker" aria-label="Servicios y enfoque de EEAD">
-      <p class="sr-only">Arquitectura e interiorismo. Proyectos que se entienden antes de construir. Diseño, visualización y oficina técnica externa. Chile.</p>
+      <p class="sr-only">Arquitectura e interiorismo. Arquitectura Simple. Proyectos que se entienden antes de construir. Diseño, visualización y oficina técnica externa. Araucanía. Chile.</p>
       <div class="editorial-ticker__viewport" aria-hidden="true">
         <div class="editorial-ticker__track">
           ${homeTickerTrack()}
@@ -401,9 +404,7 @@ ${sharedHero({
         <h2 id="manifiesto-eead"><span>Diseño y Técnica,</span><span>juntos desde el inicio</span></h2>
       </div>
       <div class="manifesto__copy">
-        <p>Abordamos cada proyecto con una mirada integral, sin importar su escala. Desde una vivienda hasta una oficina, trabajamos con una misma metodología: diseñar, visualizar y coordinar antes de construir.</p>
-        <p>La visualización permite anticipar y tomar mejores decisiones. El desarrollo técnico transforma esas decisiones en un proyecto claro, preciso y coordinado para su ejecución.</p>
-        <p>Porque una buena arquitectura no solo debe verse bien. También debe estar bien resuelta.</p>
+        <p>En EEAD, el diseño, la coordinación BIM, la visualización y la documentación se desarrollan como <strong><u>un solo proceso.</u></strong> Esto permite <strong><u>anticipar</u></strong> conflictos, <strong><u>evaluar</u></strong> decisiones con claridad y <strong><u>reducir</u></strong> la improvisación durante la obra. Porque una buena arquitectura no solo debe verse bien: <strong><u>debe estar pensada para construirse bien.</u></strong></p>
       </div>
     </div>
   </section>
@@ -414,46 +415,46 @@ ${sharedHero({
       <h2 id="proyectos-destacados">Trabajo reciente</h2>
       <a class="button button--primary button--compact home-projects__cta" href="/proyectos/">Ver todos los proyectos</a>
     </div>
-${projectCarousel(carouselData)}
+${projectCarousel({ ...carouselData, showLocation: true })}
   </section>
 
   <section class="home-services" aria-labelledby="servicios-inicio">
     <div class="home-services__intro">
       <p class="eyebrow">Servicios</p>
       <h2 id="servicios-inicio">Cuatro áreas, Una misma forma de trabajar.</h2>
-      <p>En EEAD abordamos la arquitectura desde una premisa simple: resolver antes de construir. Integramos diseño, visualización, coordinación y documentación para reducir errores, anticipar decisiones y llevar cada proyecto a obra con mayor claridad.</p>
+      <p>Abordamos la arquitectura desde una <strong><u>premisa simple: resolver antes de construir.</u></strong> Integramos <strong><u>Diseño, Visualización y Documentación</u></strong> en un solo proceso para <strong><u>anticipar</u></strong> decisiones, <strong><u>reducir</u></strong> errores y llevar cada proyecto a obra con <strong><u>mayor claridad y menos incertidumbre.</u></strong></p>
     </div>
     <div class="home-services__chapters">
       <article>
         <span aria-hidden="true">01</span>
         <h3>Arquitectura + Interiores</h3>
-        <p>Diseñamos <strong>viviendas, refugios, lofts, remodelaciones, interiores y proyectos de hospitality</strong> con una mirada integral.</p>
-        <p>Cada propuesta responde al lugar, al uso, a la materialidad y a la forma real en que será construida. Desde las primeras decisiones hasta la documentación final, buscamos una arquitectura contemporánea, precisa y coherente.</p>
-        <p class="home-service__scope"><strong>Diseño arquitectónico · Interiorismo · Remodelaciones · Hospitality</strong></p>
+        <p>Diseñamos <strong>Viviendas, Refugios, Lofts, Remodelaciones, Interiorismo y Proyectos de Hospitality</strong> desde una mirada integral.</p>
+        <p>Nuestras propuestas responden <strong>al uso, a la materialidad y a la forma</strong> en que será construida. Desde las primeras decisiones hasta la documentación final, desarrollamos una <strong>arquitectura contemporánea, coherente con su contexto y pensada para ejecutarse con claridad.</strong></p>
+        <p class="home-service__scope"><strong><u>ARQUITECTURA  |  INTERIORISMO  |  REMODELACIONES  |  HOSPITALITY</u></strong></p>
         <a class="button button--primary button--compact" href="/servicios/#arquitectura">Explorar arquitectura</a>
       </article>
       <article>
         <span aria-hidden="true">02</span>
         <h3>Workspaces</h3>
-        <p>Diseñamos <strong>oficinas y espacios de trabajo en casa</strong> que integran identidad, ergonomía, tecnología y funcionalidad.</p>
-        <p>Organizamos cada elemento para mejorar la concentración, el bienestar y el aprovechamiento del espacio, creando entornos que se adaptan a la forma actual de trabajar.</p>
-        <p class="home-service__scope"><strong>Oficinas · Home office · Estudios creativos · Espacios de productividad</strong></p>
+        <p>Nuestra especialidad, <strong>Oficinas y Espacios de trabajo en casa</strong> que integran <strong>Identidad, Ergonomia, Tecnología y Funcionalidad.</strong></p>
+        <p>Organizamos cada elemento para mejorar tu <strong>concentración, bienestar y aprovechar cada espacio,</strong> creando entornos  que se adaptan a tu forma de trabajar.</p>
+        <p class="home-service__scope"><strong><u>OFICINAS | HOME OFFICE | TALLERES | ESPACIOS DE PRODUCTIVIDAD</u></strong></p>
         <a class="button button--primary button--compact" href="/contacto/">Explorar workspaces</a>
       </article>
       <article>
         <span aria-hidden="true">03</span>
         <h3>Visualización + Render</h3>
-        <p>Creamos <strong>imágenes, renders y modelos tridimensionales</strong> para comprender, evaluar y comunicar un proyecto antes de construirlo.</p>
-        <p>La visualización no es solo una herramienta estética: permite revisar proporciones, materiales, iluminación y decisiones de diseño cuando todavía es posible corregirlas de forma simple y eficiente.</p>
-        <p class="home-service__scope"><strong>Modelado 3D · Renders arquitectónicos · Imágenes comerciales · Estudios visuales</strong></p>
+        <p>Creamos <strong>Imágenes, Renders y Modelos 3D</strong> para comprender, evaluar y comunicar tu proyecto antes de construirlo.</p>
+        <p>La visualización no es solo una herramienta visual, permite <strong>conocer tu proyecto</strong> antes de su ejecución y tener una herramienta poderosa para <strong>presentar a tus clientes y puntos de venta.</strong></p>
+        <p class="home-service__scope"><strong><u>MODELADO 3D  |  RENDERS  | VIDEOS  |  IMÁGENES COMERCIALES  |  BRANDING INMOBILIARIO</u></strong></p>
         <a class="button button--primary button--compact" href="/servicios/#visualizacion">Explorar visualización</a>
       </article>
       <article>
         <span aria-hidden="true">04</span>
         <h3>Oficina Técnica Externa</h3>
-        <p>Apoyamos a <strong>arquitectos, constructoras, inmobiliarias y oficinas de diseño</strong> en el desarrollo, representación y documentación de sus proyectos.</p>
-        <p>Nos incorporamos como una extensión especializada del equipo, aportando capacidad técnica en dibujo, BIM, modelado y coordinación, sin aumentar innecesariamente la estructura interna de la oficina.</p>
-        <p class="home-service__scope"><strong>Documentación · Dibujo técnico · Modelado BIM · Apoyo especializado</strong></p>
+        <p>Apoyamos a <strong>Arquitectos, Constructoras, Inmobiliarias e Ingenieros</strong> en el Desarrollo, Representación y Documentación de sus proyectos.</p>
+        <p>Nos incorporamos como una <strong>extensión especializada de tu equipo,</strong> aportando capacidad técnica en <strong>Dibujo, BIM, Modelado y Documentación</strong> sin aumentar la estructura interna de tu oficina.</p>
+        <p class="home-service__scope"><strong><u>APOYO ESPECIALIZADO  |  DOCUMENTACIÓN  |  DIBUJO TÉCNICO  |  MODELADO  |  BIM</u></strong></p>
         <a class="button button--primary button--compact" href="/oficina-tecnica/">Explorar oficina técnica</a>
       </article>
     </div>
@@ -1062,7 +1063,7 @@ function contactPage() {
       <div class="contact-page__intro">
         <header class="contact-page__heading">
           <h1 id="contact-title"><span>Conversemos</span> <span>sobre tu</span> <span>proyecto</span></h1>
-          <p>Cuéntanos qué necesitas resolver, dónde se ubica el proyecto y en qué etapa se encuentra. Con esa información podremos orientarte sobre los próximos pasos.</p>
+          <p>Cuéntanos <strong><u>qué idea tienes en mente, dónde está tu proyecto y en qué etapa se encuentra.</u></strong> Con esa información podemos orientarte sobre los próximos pasos. <strong><u>¡Conversemos!</u></strong></p>
         </header>
         <section class="contact-channels" aria-label="Canales directos">
           <a href="mailto:hola@eead.cl">
@@ -1077,7 +1078,7 @@ function contactPage() {
           </a>
           <a href="https://www.instagram.com/eead.cl/" target="_blank" rel="noopener noreferrer" aria-label="Abrir Instagram de EEAD en una nueva pestaña">
             <span class="contact-channel__label">INSTAGRAM</span>
-            <strong class="contact-channel__value">@eead.cl</strong>
+            <strong class="contact-channel__value">@EEAD.CL</strong>
             <span class="contact-channel__arrow" aria-hidden="true">↗</span>
           </a>
         </section>
@@ -1128,7 +1129,6 @@ function contactPage() {
           <div class="form-submit">
             <button class="button button--primary" type="submit" data-submit>
               <span data-submit-label>ENVIAR CONSULTA</span>
-              <span class="button__arrow" aria-hidden="true">→</span>
             </button>
             <p>Al enviar esta consulta, acepta el uso de sus datos exclusivamente para responder su mensaje. Consulte la <a href="/privacidad/">política de privacidad</a>.</p>
           </div>
