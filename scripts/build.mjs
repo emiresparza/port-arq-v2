@@ -9,10 +9,15 @@ const SITE_NAME = "EEAD";
 const siteUrl = "https://eead.cl";
 const contactEmail = "hola@eead.cl";
 const whatsappNumber = "56987283154";
-const whatsappUrl = `https://wa.me/${whatsappNumber}`;
+const defaultWhatsappMessage = "Hola, quisiera conversar sobre un proyecto con EEAD.";
+const whatsappUrl = (message = defaultWhatsappMessage) =>
+  `https://wa.me/${whatsappNumber}?${new URLSearchParams({ text: message })}`;
+const contactUrl = (params) =>
+  `/contacto/?${String(new URLSearchParams(params)).replaceAll("&", "&amp;")}`;
 const instagramUrl = "https://www.instagram.com/eead.cl/";
 const defaultImage = "/assets/img/project-details/antu/img-0.webp";
-const buildDate = "2026-07-30";
+const buildDate = "2026-08-03";
+const organizationId = `${siteUrl}/#organization`;
 const syneSource = path.join(root, "node_modules", "@fontsource", "syne", "files", "syne-latin-800-normal.woff2");
 const syneTarget = path.join(root, "assets", "fonts", "syne-latin-800-normal.woff2");
 
@@ -41,13 +46,13 @@ const formatProjectTypology = (typology) => {
   return {
     arquitectura: "Arquitectura",
     interiorismo: "Interiorismo",
-    workspace: "Espacios de trabajo",
-    workspaces: "Espacios de trabajo",
-    "espacios de trabajo": "Espacios de trabajo",
-    visualizacion: "Visualización arquitectónica",
-    "visualizacion arquitectonica": "Visualización arquitectónica",
-    "oficina tecnica": "Oficina técnica externa",
-    "oficina tecnica externa": "Oficina técnica externa"
+    workspace: "Workspaces",
+    workspaces: "Workspaces",
+    "espacios de trabajo": "Workspaces",
+    visualizacion: "Visualización",
+    "visualizacion arquitectonica": "Visualización",
+    "oficina tecnica": "Oficina Técnica",
+    "oficina tecnica externa": "Oficina Técnica"
   }[normalized] ?? typology.trim();
 };
 
@@ -171,7 +176,7 @@ function header(current = "") {
   </header>`;
 }
 
-function footer() {
+function footer({ whatsappMessage = defaultWhatsappMessage, service = "", projectSlug = "" } = {}) {
   return `
   <footer class="site-footer">
     <div class="site-footer__top">
@@ -186,8 +191,8 @@ function footer() {
       </div>
       <div class="footer-contact" aria-label="Contacto EEAD">
         <p>Arquitectura simple.</p>
-        <a href="mailto:${contactEmail}">${contactEmail.toUpperCase()}</a>
-        <a href="${whatsappUrl}" target="_blank" rel="noopener noreferrer">(+569) 87 28 31 54</a>
+        <a href="mailto:${contactEmail}" data-email data-cta-location="footer">${contactEmail.toUpperCase()}</a>
+        <a href="${whatsappUrl(whatsappMessage)}" target="_blank" rel="noopener noreferrer" data-whatsapp data-cta-location="footer"${service ? ` data-service="${service}"` : ""}${projectSlug ? ` data-project-slug="${projectSlug}"` : ""}>(+569) 87 28 31 54</a>
         <a href="${instagramUrl}" target="_blank" rel="noopener noreferrer">@EEAD.CL</a>
       </div>
       <nav aria-label="Navegación secundaria">
@@ -206,13 +211,13 @@ function footer() {
   </footer>`;
 }
 
-function floatingControls() {
+function floatingControls({ whatsappMessage = defaultWhatsappMessage, service = "", projectSlug = "" } = {}) {
   return `
   <aside class="floating-controls" aria-label="Accesos rápidos">
     <button class="floating-control floating-control--top" type="button" data-scroll-top aria-label="Volver al inicio de la página" hidden>
       <span aria-hidden="true">↑</span>
     </button>
-    <a class="floating-control floating-control--whatsapp" href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp">
+    <a class="floating-control floating-control--whatsapp" href="${whatsappUrl(whatsappMessage)}" target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp" title="Contactar por WhatsApp" data-whatsapp data-cta-location="floating"${service ? ` data-service="${service}"` : ""}${projectSlug ? ` data-project-slug="${projectSlug}"` : ""}>
       <svg class="floating-control__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.273.297-1.04 1.016-1.04 2.479s1.065 2.875 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.262.489 1.693.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.29.173-1.414-.074-.123-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.981.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.9 6.989c-.002 5.45-4.437 9.884-9.892 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
       </svg>
@@ -256,11 +261,42 @@ function page({
   robots = "index, follow",
   preloadImage = "",
   jsonLd,
-  bodyClass = ""
+  bodyClass = "",
+  service = "",
+  projectSlug = "",
+  whatsappMessage = defaultWhatsappMessage
 }) {
   const canonical = `${siteUrl}${pathname}`;
   const absoluteImage = siteAsset(ogImage);
   const preload = preloadImage ? responsiveVariants(preloadImage) : null;
+  const pageLabels = new Map([
+    ["/proyectos/", "Proyectos"],
+    ["/servicios/", "Servicios"],
+    ["/oficina-tecnica/", "Oficina Técnica"],
+    ["/estudio/", "Estudio"],
+    ["/contacto/", "Contacto"],
+    ["/privacidad/", "Privacidad"]
+  ]);
+  const projectBreadcrumb = pathname.match(/^\/proyectos\/[^/]+\/$/);
+  const breadcrumbItems = pathname === "/" || pathname === "/404.html"
+    ? []
+    : [
+        ["Inicio", `${siteUrl}/`],
+        ...(projectBreadcrumb ? [["Proyectos", `${siteUrl}/proyectos/`]] : []),
+        [projectBreadcrumb ? title.split(" | ")[0] : pageLabels.get(pathname), canonical]
+      ];
+  const structuredData = breadcrumbItems.length
+    ? [jsonLd, {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: breadcrumbItems.map(([name, item], index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name,
+          item
+        }))
+      }]
+    : jsonLd;
   return `<!doctype html>
 <html lang="es-CL">
 <head>
@@ -288,7 +324,7 @@ function page({
   <link rel="preload" href="/assets/fonts/manrope-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
   ${preload ? `<link rel="preload" as="image" href="${preload.fallback}" imagesrcset="${preload.webp}" imagesizes="100vw" fetchpriority="high">` : ""}
   <link rel="stylesheet" href="/styles.css">
-  <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
+  <script type="application/ld+json">${JSON.stringify(structuredData)}</script>
   <script src="/main.js" defer></script>
 </head>
 <body${bodyClass ? ` class="${bodyClass}"` : ""}>
@@ -296,8 +332,8 @@ ${header(current)}
 <main id="contenido" tabindex="-1">
 ${body}
 </main>
-${footer()}
-${floatingControls()}
+${footer({ whatsappMessage, service, projectSlug })}
+${floatingControls({ whatsappMessage, service, projectSlug })}
 </body>
 </html>
 `;
@@ -305,6 +341,10 @@ ${floatingControls()}
 
 function projectCard(project, { headingLevel = "h2", filterCategories = null } = {}) {
   const Heading = headingLevel === "h3" ? "h3" : "h2";
+  const titleWords = project.title.trim().split(/\s+/);
+  const matrixTitle = titleWords.length > 2
+    ? `${escapeHtml(titleWords.slice(0, Math.floor(titleWords.length / 2)).join(" "))}<br>${escapeHtml(titleWords.slice(Math.floor(titleWords.length / 2)).join(" "))}`
+    : escapeHtml(project.title);
   const metadata = [
     project.category,
     project.year,
@@ -319,7 +359,7 @@ function projectCard(project, { headingLevel = "h2", filterCategories = null } =
         <div class="project-card__media${project.cover ? "" : " project-card__media--empty"}">
           ${project.cover ? image(project.cover, `${project.title}: ${project.description}`, {
             sizes: "(max-width: 760px) calc(100vw - 48px), (max-width: 1024px) calc(50vw - 56px), (max-width: 1440px) calc((100vw - 208px) / 3), 400px"
-          }) : ""}${filterCategories ? `<${Heading} class="project-card__title">${escapeHtml(project.title)}</${Heading}>` : (!project.cover ? `<span>${escapeHtml(project.title)}</span>` : "")}
+          }) : ""}${filterCategories ? `<${Heading} class="project-card__title">${matrixTitle}</${Heading}>` : (!project.cover ? `<span>${escapeHtml(project.title)}</span>` : "")}
         </div>
         <div class="project-card__meta">
           ${filterCategories
@@ -331,7 +371,7 @@ function projectCard(project, { headingLevel = "h2", filterCategories = null } =
     </article>`;
 }
 
-const workspaceSlugs = new Set(["homeoffice-cg", "oficina-gl"]);
+const workspaceSlugs = new Set(["homeoffice-cg", "oficina-le"]);
 
 function projectCategories(project) {
   const taxonomy = new Set([project.category]);
@@ -357,13 +397,13 @@ function projectCarouselSlide(project, index, activeIndex, showLocation = false)
 }
 
 function featuredCarouselData() {
-  const prioritySlugs = ["zenteno", "casa-alicia", "antu", "quincho-ss"];
+  const prioritySlugs = ["zen416", "casa-al", "antu", "quincho-ss"];
   const prioritySlugSet = new Set(prioritySlugs);
   const carouselProjects = [
     ...prioritySlugs.map((slug) => projectBySlug.get(slug)).filter(Boolean),
     ...projects.filter((project) => project.cover && !prioritySlugSet.has(project.slug))
   ];
-  const activeProjectIndex = carouselProjects.findIndex((project) => project.slug === "casa-alicia");
+  const activeProjectIndex = carouselProjects.findIndex((project) => project.slug === "casa-al");
 
   return { carouselProjects, activeProjectIndex, activeProject: carouselProjects[activeProjectIndex] };
 }
@@ -417,7 +457,7 @@ ${sharedHero({
       copy: `<p class="hero__lead">Somos un estudio de <strong class="hero__emphasis">Arquitectura, Diseño e Interiorismo</strong> fundado en el sur de <strong class="hero__emphasis">Chile.</strong> Trabajamos con <strong class="hero__emphasis">Personas y Empresas</strong> para transformar ideas en proyectos <strong class="hero__emphasis">Claros</strong>, <strong class="hero__emphasis">Precisos</strong> y bien <strong class="hero__emphasis">Resueltos</strong>, integrando <strong class="hero__emphasis">Diseño, Visualización y Desarrollo Técnico</strong> antes de la obra.</p>
         <div class="hero__actions">
           <a class="button button--primary" href="/proyectos/">Proyectos</a>
-          <a class="button button--primary" href="/contacto/">Agenda una reunión</a>
+          <a class="button button--primary" href="${contactUrl({ motivo: "proyecto" })}" data-cta data-cta-location="hero">Conversemos sobre tu proyecto</a>
         </div>`,
       heroImage: defaultImage,
       imageAlt: "Vista interior del proyecto Antü, arquitectura de EEAD",
@@ -467,7 +507,7 @@ ${projectCarousel({ ...carouselData, showLocation: true })}
         <p>Diseñamos <strong>Viviendas, Refugios, Lofts, Remodelaciones, Interiorismo y Proyectos de Hospitality</strong> desde una mirada integral.</p>
         <p>Nuestras propuestas responden <strong>al uso, a la materialidad y a la forma</strong> en que será construida. Desde las primeras decisiones hasta la documentación final, desarrollamos una <strong>arquitectura contemporánea, coherente con su contexto y pensada para ejecutarse con claridad.</strong></p>
         <p class="home-service__scope"><strong><u>ARQUITECTURA  |  INTERIORISMO  |  REMODELACIONES  |  HOSPITALITY</u></strong></p>
-        <a class="button button--primary button--compact" href="/servicios/#arquitectura">Explorar arquitectura</a>
+        <a class="button button--primary button--compact" href="${contactUrl({ servicio: "arquitectura-interiorismo" })}" data-cta data-cta-location="services" data-service="arquitectura-interiorismo">Conversemos sobre tu proyecto</a>
       </article>
       <article>
         <span aria-hidden="true">02</span>
@@ -475,7 +515,7 @@ ${projectCarousel({ ...carouselData, showLocation: true })}
         <p>Nuestra especialidad, <strong>Oficinas y Espacios de trabajo en casa</strong> que integran <strong>Identidad, Ergonomia, Tecnología y Funcionalidad.</strong></p>
         <p>Organizamos cada elemento para mejorar tu <strong>concentración, bienestar y aprovechar cada espacio,</strong> creando entornos  que se adaptan a tu forma de trabajar.</p>
         <p class="home-service__scope"><strong><u>OFICINAS | HOME OFFICE | TALLERES | ESPACIOS DE PRODUCTIVIDAD</u></strong></p>
-        <a class="button button--primary button--compact" href="/contacto/">Explorar workspaces</a>
+        <a class="button button--primary button--compact" href="${contactUrl({ servicio: "workspaces" })}" data-cta data-cta-location="services" data-service="workspaces">Conversemos sobre tu espacio de trabajo</a>
       </article>
       <article>
         <span aria-hidden="true">03</span>
@@ -483,7 +523,7 @@ ${projectCarousel({ ...carouselData, showLocation: true })}
         <p>Creamos <strong>Imágenes, Renders y Modelos 3D</strong> para comprender, evaluar y comunicar tu proyecto antes de construirlo.</p>
         <p>La visualización no es solo una herramienta visual, permite <strong>conocer tu proyecto</strong> antes de su ejecución y tener una herramienta poderosa para <strong>presentar a tus clientes y puntos de venta.</strong></p>
         <p class="home-service__scope"><strong><u>MODELADO 3D  |  RENDERS  | VIDEOS  |  IMÁGENES COMERCIALES  |  BRANDING INMOBILIARIO</u></strong></p>
-        <a class="button button--primary button--compact" href="/servicios/#visualizacion">Explorar visualización</a>
+        <a class="button button--primary button--compact" href="${contactUrl({ servicio: "visualizacion" })}" data-cta data-cta-location="services" data-service="visualizacion">Cotizar visualización</a>
       </article>
       <article>
         <span aria-hidden="true">04</span>
@@ -491,7 +531,7 @@ ${projectCarousel({ ...carouselData, showLocation: true })}
         <p>Apoyamos a <strong>Arquitectos, Constructoras, Inmobiliarias e Ingenieros</strong> en el Desarrollo, Representación y Documentación de sus proyectos.</p>
         <p>Nos incorporamos como una <strong>extensión especializada de tu equipo,</strong> aportando capacidad técnica en <strong>Dibujo, BIM, Modelado y Documentación</strong> sin aumentar la estructura interna de tu oficina.</p>
         <p class="home-service__scope"><strong><u>APOYO ESPECIALIZADO  |  DOCUMENTACIÓN  |  DIBUJO TÉCNICO  |  MODELADO  |  BIM</u></strong></p>
-        <a class="button button--primary button--compact" href="/oficina-tecnica/">Explorar oficina técnica</a>
+        <a class="button button--primary button--compact" href="${contactUrl({ servicio: "oficina-tecnica" })}" data-cta data-cta-location="services" data-service="oficina-tecnica">Solicitar apoyo técnico</a>
       </article>
     </div>
   </section>
@@ -500,7 +540,7 @@ ${projectCarousel({ ...carouselData, showLocation: true })}
     <div class="home-closure__inner">
       <h2 id="contacto-home"><span>Conversemos</span><span>sobre su encargo.</span></h2>
       <div class="home-closure__action">
-        <a class="button button--primary" href="/contacto/">Contactar a EEAD</a>
+        <a class="button button--primary" href="${contactUrl({ motivo: "proyecto" })}" data-cta data-cta-location="contact">Conversemos sobre tu proyecto</a>
         <p>Un proyecto comienza con una conversación clara.</p>
       </div>
     </div>
@@ -516,17 +556,18 @@ ${projectCarousel({ ...carouselData, showLocation: true })}
     jsonLd: {
       "@context": "https://schema.org",
       "@type": "ProfessionalService",
+      "@id": organizationId,
       name: "EEAD",
       url: `${siteUrl}/`,
       logo: `${siteUrl}/assets/brand/eead-symbol.svg`,
       image: siteAsset(defaultImage),
       description: "Oficina de arquitectura e interiorismo con servicios de desarrollo técnico y visualización arquitectónica.",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: "Temuco",
-        addressCountry: "CL"
-      },
-      areaServed: "Chile",
+      email: contactEmail,
+      telephone: `+${whatsappNumber}`,
+      areaServed: [
+        { "@type": "City", name: "Temuco" },
+        { "@type": "Country", name: "Chile" }
+      ],
       serviceType: [
         "Arquitectura e interiores",
         "Workspaces",
@@ -584,6 +625,13 @@ function projectsPage() {
 }
 
 function projectPage(project) {
+  const cta = {
+    Arquitectura: ["arquitectura-interiorismo", "Conversemos sobre tu proyecto"],
+    Interiorismo: ["arquitectura-interiorismo", "Conversemos sobre tu proyecto"],
+    Workspaces: ["workspaces", "Conversemos sobre tu espacio de trabajo"],
+    "Oficina Técnica Externa": ["oficina-tecnica", "Solicitar apoyo técnico"],
+    Visualización: ["visualizacion", "Cotizar visualización"]
+  }[project.category];
   const relatedCandidates = [
     ...project.related.map((slug) => projectBySlug.get(slug)),
     ...projects
@@ -622,6 +670,7 @@ function projectPage(project) {
           <p class="project-kicker">${escapeHtml(project.category)}</p>
           <h1 class="project-title">${escapeHtml(project.title)}</h1>
           <p class="project-description">${escapeHtml(description)}</p>
+          <a class="button button--primary" href="${contactUrl({ servicio: cta[0], proyecto: project.slug })}" data-cta data-cta-location="project_detail" data-service="${cta[0]}" data-project-slug="${project.slug}">${cta[1]}</a>
         </div>
         ${facts.length ? `<dl class="project-meta">
           ${facts.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}
@@ -650,6 +699,10 @@ function projectPage(project) {
         }).join("")}
       </div>
     </section>` : ""}
+
+    <div class="project-end-cta project-container">
+      <a class="button button--primary" href="${contactUrl({ servicio: cta[0], proyecto: project.slug })}" data-cta data-cta-location="project_detail" data-service="${cta[0]}" data-project-slug="${project.slug}">${cta[1]}</a>
+    </div>
 
     <nav class="project-nav project-container" aria-label="Proyecto anterior y siguiente">
       <a href="/proyectos/${previous.slug}/" rel="prev">
@@ -683,6 +736,9 @@ function projectPage(project) {
     ogImage: project.cover,
     ogType: "article",
     preloadImage: project.cover,
+    service: cta[0],
+    projectSlug: project.slug,
+    whatsappMessage: `Hola, quisiera consultar por un proyecto similar a ${project.title}.`,
     jsonLd: {
       "@context": "https://schema.org",
       "@type": "CreativeWork",
@@ -696,8 +752,10 @@ function projectPage(project) {
       },
       creator: {
         "@type": "Organization",
+        "@id": organizationId,
         name: "EEAD",
-        url: `${siteUrl}/`
+        url: `${siteUrl}/`,
+        logo: `${siteUrl}/assets/brand/eead-symbol.svg`
       },
       genre: project.category
     }
@@ -711,7 +769,7 @@ function servicesHero(heroImage) {
     titleId: "services-title",
     title: "<span>Resolver el proyecto</span> <span>antes de construir.</span>",
     copy: `<p class="hero__lead"><strong><u>Arquitectura</u></strong>, <strong><u>documentación BIM</u></strong> y <strong><u>visualización</u></strong> integradas en un mismo proceso para <strong><u>coordinar decisiones</u></strong>, <strong><u>reducir errores</u></strong> y llegar a obra con <strong><u>mayor claridad</u></strong>.</p>
-      <div class="hero__actions"><a class="button button--primary" href="/contacto/">Conversar sobre un proyecto</a></div>`,
+      <div class="hero__actions"><a class="button button--primary" href="${contactUrl({ motivo: "proyecto" })}" data-cta data-cta-location="hero">Conversemos sobre tu proyecto</a></div>`,
     heroImage,
     imageAlt: "Vivienda contemporánea de hormigón y madera integrada al paisaje"
   });
@@ -737,7 +795,7 @@ function serviceRow(service) {
           <div class="service-row__description">
             ${service.description.map((paragraph) => `<p>${paragraph}</p>`).join("")}
           </div>
-          <a class="button service-row__link" href="${service.href}">${escapeHtml(service.linkLabel)}</a>
+          <a class="button service-row__link" href="${service.href}" data-cta data-cta-location="services" data-service="${service.service}">${escapeHtml(service.linkLabel)}</a>
         </div>
         <figure class="service-row__media">
           ${image(service.image, service.imageAlt, {
@@ -759,7 +817,7 @@ function projectCTA() {
         </h2>
       </div>
       <div class="project-cta__actions">
-        <a class="button button--primary" href="/contacto/">Solicitar una conversación</a>
+        <a class="button button--primary" href="${contactUrl({ motivo: "proyecto" })}" data-cta data-cta-location="services">Conversemos sobre tu proyecto</a>
         <a class="button button--primary" href="/proyectos/">Ver proyectos</a>
       </div>
     </div>
@@ -769,8 +827,8 @@ function projectCTA() {
 function servicesPage() {
   const architectureProject = projectBySlug.get("antu");
   const workspaceProject = projectBySlug.get("homeoffice-cg");
-  const technicalProject = projectBySlug.get("zenteno");
-  const visualizationProject = projectBySlug.get("render-pocuro");
+  const technicalProject = projectBySlug.get("zen416");
+  const visualizationProject = projectBySlug.get("laderas-del-sur");
   const services = [
     {
       id: "arquitectura",
@@ -780,8 +838,9 @@ function servicesPage() {
         "Diseñamos <strong><u>viviendas, refugios, lofts, remodelaciones, interiores y proyectos de hospitality</u></strong> desde el <strong><u>programa hasta el detalle constructivo</u></strong>.",
         "Ordenamos <strong><u>uso, distribución, materialidad y experiencia espacial</u></strong> con <strong><u>criterio arquitectónico y constructivo</u></strong>."
       ],
-      href: "/proyectos/",
-      linkLabel: "Ver arquitectura e interiores",
+      href: contactUrl({ servicio: "arquitectura-interiorismo" }),
+      linkLabel: "Conversemos sobre tu proyecto",
+      service: "arquitectura-interiorismo",
       image: architectureProject.cover,
       imageAlt: "Vista exterior del proyecto Antü, un volumen horizontal revestido en madera"
     },
@@ -793,8 +852,9 @@ function servicesPage() {
         "Diseñamos <strong><u>oficinas y espacios de trabajo en casa</u></strong> que integran <strong><u>identidad, ergonomía, tecnología y funcionalidad</u></strong>.",
         "Organizamos cada elemento para mejorar <strong><u>el uso del espacio, la concentración y la experiencia cotidiana de trabajo</u></strong>."
       ],
-      href: "/contacto/",
-      linkLabel: "Ver workspaces",
+      href: contactUrl({ servicio: "workspaces" }),
+      linkLabel: "Conversemos sobre tu espacio de trabajo",
+      service: "workspaces",
       image: workspaceProject.cover,
       imageAlt: "Homeoffice compacto con mobiliario a medida, iluminación integrada y dos puestos de trabajo"
     },
@@ -806,8 +866,9 @@ function servicesPage() {
         "Producimos <strong><u>imágenes, renders y modelos tridimensionales</u></strong> para evaluar <strong><u>atmósfera, escala, iluminación y materialidad</u></strong> antes de construir.",
         "La visualización no solo sirve para presentar el proyecto: también permite <strong><u>comprenderlo, revisarlo y tomar mejores decisiones</u></strong>."
       ],
-      href: `/proyectos/${visualizationProject.slug}/`,
-      linkLabel: "Ver visualización",
+      href: contactUrl({ servicio: "visualizacion" }),
+      linkLabel: "Cotizar visualización",
+      service: "visualizacion",
       image: visualizationProject.images[17][0],
       imageAlt: "Visualización interior de una sala multiuso con comedor, cocina y luz natural"
     },
@@ -819,8 +880,9 @@ function servicesPage() {
         "Apoyamos a <strong><u>arquitectos, constructoras, inmobiliarias y oficinas de diseño</u></strong> en el <strong><u>desarrollo, representación y documentación</u></strong> de sus proyectos.",
         "Nos integramos como una <strong><u>extensión especializada del equipo</u></strong>, aportando <strong><u>capacidad técnica por alcance definido</u></strong> y sin aumentar innecesariamente su estructura interna."
       ],
-      href: "/oficina-tecnica/",
-      linkLabel: "Conocer oficina técnica",
+      href: contactUrl({ servicio: "oficina-tecnica" }),
+      linkLabel: "Solicitar apoyo técnico",
+      service: "oficina-tecnica",
       image: technicalProject.images.at(-1)[0],
       imageAlt: "Vista axonométrica del modelo arquitectónico coordinado del proyecto Zenteno"
     }
@@ -852,7 +914,7 @@ ${projectCTA()}`;
       "@context": "https://schema.org",
       "@type": "Service",
       name: "Servicios EEAD",
-      provider: { "@type": "ProfessionalService", name: "EEAD" },
+      provider: { "@type": "ProfessionalService", "@id": organizationId, name: "EEAD", url: `${siteUrl}/` },
       areaServed: "Chile",
       hasOfferCatalog: {
         "@type": "OfferCatalog",
@@ -875,7 +937,7 @@ function technicalHero(proofImage) {
     titleId: "technical-title",
     title: "<span>Capacidad técnica,</span> <span>integrada a tu equipo.</span>",
     copy: `<div class="hero__lead"><p>Colaboramos con arquitectos, constructoras, ingenierías e inmobiliarias para desarrollar, representar y documentar proyectos sin perder su intención arquitectónica.</p><p>Nos integramos al proceso para ordenar la información, profundizar decisiones y transformar antecedentes existentes en un proyecto claro, coherente y preparado para avanzar.</p></div>
-      <div class="hero__actions"><a class="button button--primary" href="/contacto/">Solicitar reunión</a></div>`,
+      <div class="hero__actions"><a class="button button--primary" href="${contactUrl({ servicio: "oficina-tecnica" })}" data-cta data-cta-location="hero" data-service="oficina-tecnica">Solicitar apoyo técnico</a></div>`,
     heroImage: proofImage,
     imageAlt: "Escritorio de arquitectura con un monitor que muestra láminas de proyecto en Revit"
   });
@@ -921,14 +983,14 @@ function technicalRecentProjects() {
         <p class="eyebrow">PROYECTOS</p>
         <h2 id="technical-projects-title">Trabajo reciente</h2>
       </div>
-      <a class="button button--primary" href="/contacto/">Solicitar reunión</a>
+      <a class="button button--primary" href="${contactUrl({ servicio: "oficina-tecnica" })}" data-cta data-cta-location="services" data-service="oficina-tecnica">Solicitar apoyo técnico</a>
     </div>
 ${projectCarousel({ carouselProjects, activeProjectIndex, activeProject, label: "Oficina técnica externa", showLocation: true })}
   </section>`;
 }
 
 function technicalOfficePage() {
-  const caseStudy = projectBySlug.get("zenteno");
+  const caseStudy = projectBySlug.get("zen416");
   const proofImage = caseStudy.images.at(-1)[0];
   const heroImage = "/assets/img/oficina-tecnica/hero-oficina-tecnica.png";
   const body = `${technicalHero(heroImage)}
@@ -946,11 +1008,13 @@ ${technicalRecentProjects()}`;
     bodyClass: "page-technical",
     preloadImage: heroImage,
     ogImage: proofImage,
+    service: "oficina-tecnica",
+    whatsappMessage: "Hola, quisiera consultar por el servicio de Oficina técnica externa de EEAD.",
     jsonLd: {
       "@context": "https://schema.org",
       "@type": "Service",
       name: "Oficina técnica externa",
-      provider: { "@type": "ProfessionalService", name: "EEAD", url: `${siteUrl}/` },
+      provider: { "@type": "ProfessionalService", "@id": organizationId, name: "EEAD", url: `${siteUrl}/` },
       areaServed: "Chile",
       serviceType: ["Desarrollo arquitectónico", "Documentación", "Modelado BIM", "Detalles constructivos", "Visualización"]
     }
@@ -963,7 +1027,7 @@ function studioHero(heroImage) {
     label: "ESTUDIO",
     titleId: "studio-title",
     title: "<span>Una oficina pequeña.</span> <span>Una forma integral de</span> <span>resolver arquitectura.</span>",
-    copy: `<div class="hero__actions"><a class="button button--primary" href="/contacto/">CONVERSAR SOBRE UN PROYECTO</a></div>`,
+    copy: `<div class="hero__actions"><a class="button button--primary" href="${contactUrl({ motivo: "proyecto" })}" data-cta data-cta-location="hero">CONVERSEMOS SOBRE TU PROYECTO</a></div>`,
     heroImage,
     imageAlt: "Mesa de trabajo con planos de arquitectura, lámpara, anteojos y material de proyecto."
   });
@@ -1020,7 +1084,7 @@ function studioCta() {
         <span>necesita resolver.</span>
       </h2>
       <div class="studio-cta__actions">
-        <a class="button button--primary" href="/contacto/">Solicitar una conversación</a>
+        <a class="button button--primary" href="${contactUrl({ motivo: "proyecto" })}" data-cta data-cta-location="contact">Conversemos sobre tu proyecto</a>
         <a class="button button--primary" href="/proyectos/">Ver proyectos</a>
       </div>
     </div>
@@ -1051,7 +1115,10 @@ ${studioCta()}`;
       url: `${siteUrl}/estudio/`,
       about: {
         "@type": "ProfessionalService",
+        "@id": organizationId,
         name: "EEAD",
+        url: `${siteUrl}/`,
+        logo: `${siteUrl}/assets/brand/eead-symbol.svg`,
         founder: {
           "@type": "Person",
           name: "Emir Esparza",
@@ -1072,12 +1139,12 @@ function contactPage() {
           <p>Cuéntanos <strong><u>qué idea tienes en mente, dónde está tu proyecto y en qué etapa se encuentra.</u></strong> Con esa información podemos orientarte sobre los próximos pasos. <strong><u>¡Conversemos!</u></strong></p>
         </header>
         <section class="contact-channels" aria-label="Canales directos">
-          <a href="mailto:hola@eead.cl">
+          <a href="mailto:${contactEmail}" data-email data-cta-location="contact">
             <span class="contact-channel__label">CORREO</span>
             <strong class="contact-channel__value">HOLA@EEAD.CL</strong>
             <span class="contact-channel__arrow" aria-hidden="true">↗</span>
           </a>
-          <a href="https://wa.me/56987283154" target="_blank" rel="noopener noreferrer" aria-label="Abrir WhatsApp de EEAD en una nueva pestaña">
+          <a href="${whatsappUrl()}" target="_blank" rel="noopener noreferrer" aria-label="Abrir WhatsApp de EEAD en una nueva pestaña" data-whatsapp data-cta-location="contact">
             <span class="contact-channel__label">WHATSAPP</span>
             <strong class="contact-channel__value">(+569) 87 28 31 54</strong>
             <span class="contact-channel__arrow" aria-hidden="true">↗</span>
@@ -1092,7 +1159,7 @@ function contactPage() {
 
       <div class="contact-page__form-area">
         <h2 id="contact-form-title">CUÉNTANOS TU ENCARGO</h2>
-        <form class="contact-form" id="contact-form" action="https://formsubmit.co/ajax/emiresparza@gmail.com" method="post" aria-labelledby="contact-form-title" novalidate>
+        <form class="contact-form" id="contact-form" action="https://formsubmit.co/ajax/emiresparza@gmail.com" method="post" aria-labelledby="contact-form-title" data-projects="${escapeHtml(JSON.stringify(Object.fromEntries(projects.map(({ slug, title }) => [slug, title]))))}" novalidate>
           <div class="form-grid">
           <div class="field">
             <label for="nombre">Nombre</label>
@@ -1108,10 +1175,12 @@ function contactPage() {
             <label for="tipo-encargo">Tipo de encargo</label>
             <select id="tipo-encargo" name="tipo_encargo" required aria-describedby="error-tipo-encargo">
               <option value="">Seleccione una opción</option>
-              <option>Arquitectura e interiorismo</option>
-              <option>Oficina técnica / BIM</option>
-              <option>Visualización arquitectónica</option>
-              <option>Otro</option>
+              <option value="arquitectura-interiorismo">Arquitectura e interiorismo</option>
+              <option value="workspaces">Workspaces</option>
+              <option value="oficina-tecnica">Oficina técnica externa</option>
+              <option value="visualizacion">Visualización arquitectónica</option>
+              <option value="proyecto-similar">Proyecto similar</option>
+              <option value="otro">Otro</option>
             </select>
             <p class="field-error" id="error-tipo-encargo" aria-live="polite"></p>
           </div>
@@ -1159,7 +1228,9 @@ function contactPage() {
       url: `${siteUrl}/contacto/`,
       about: {
         "@type": "ProfessionalService",
+        "@id": organizationId,
         name: "EEAD",
+        url: `${siteUrl}/`,
         email: "hola@eead.cl",
         telephone: "+56987283154"
       }
@@ -1210,7 +1281,7 @@ function privacyPage() {
       "@type": "WebPage",
       name: "Política de privacidad — EEAD",
       url: `${siteUrl}/privacidad/`,
-      about: { "@type": "ProfessionalService", name: "EEAD" }
+      about: { "@type": "ProfessionalService", "@id": organizationId, name: "EEAD", url: `${siteUrl}/` }
     }
   });
 }

@@ -36,8 +36,9 @@ const server = http.createServer((request, response) => {
     : "");
 
   if (redirectTarget) {
+    const location = staticRedirect ? `${redirectTarget}${requestUrl.search}` : redirectTarget;
     response.writeHead(301, {
-      location: redirectTarget,
+      location,
       "cache-control": "public, max-age=3600"
     });
     response.end();

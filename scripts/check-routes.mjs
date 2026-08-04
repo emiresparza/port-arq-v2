@@ -31,7 +31,7 @@ const server = http.createServer((request, response) => {
     : "");
 
   if (redirectTarget) {
-    response.writeHead(301, { location: redirectTarget });
+    response.writeHead(301, { location: staticRedirect ? `${redirectTarget}${requestUrl.search}` : redirectTarget });
     response.end();
     return;
   }
@@ -69,6 +69,11 @@ for (const [from, target] of legacyStaticRedirects) {
   const response = await fetch(`http://127.0.0.1:${port}${from}`, { redirect: "manual" });
   if (response.status !== 301 || response.headers.get("location") !== target) {
     failures.push(`${from} (${response.status} -> ${response.headers.get("location")})`);
+  }
+
+  const tracked = await fetch(`http://127.0.0.1:${port}${from}?utm_source=legacy`, { redirect: "manual" });
+  if (tracked.status !== 301 || tracked.headers.get("location") !== `${target}?utm_source=legacy`) {
+    failures.push(`${from}?utm_source=legacy (${tracked.status} -> ${tracked.headers.get("location")})`);
   }
 }
 

@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { projects } from "../content/projects.mjs";
-import { legacyProjectMap, legacyProjectTarget } from "../content/legacy-routes.mjs";
+import { legacyProjectMap, legacyProjectTarget, legacyStaticRedirects } from "../content/legacy-routes.mjs";
 import { onRequest as legacyProjectRedirect } from "../functions/proyecto.js";
 import { onRequest as legacyProjectHtmlRedirect } from "../functions/proyecto.html.js";
 
@@ -47,6 +47,13 @@ test("cada proyecto usa una ficha editorial compacta y conserva su navegación",
     "Workspaces"
   ]);
   const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+  const ctaByCategory = {
+    Arquitectura: ["arquitectura-interiorismo", "Conversemos sobre tu proyecto"],
+    Interiorismo: ["arquitectura-interiorismo", "Conversemos sobre tu proyecto"],
+    Workspaces: ["workspaces", "Conversemos sobre tu espacio de trabajo"],
+    "Oficina Técnica Externa": ["oficina-tecnica", "Solicitar apoyo técnico"],
+    Visualización: ["visualizacion", "Cotizar visualización"]
+  };
 
   projects.forEach((project) => {
     const file = path.join(root, "proyectos", project.slug, "index.html");
@@ -84,6 +91,18 @@ test("cada proyecto usa una ficha editorial compacta y conserva su navegación",
       assert.ok(related, `${project.slug}: ${slug}`);
     });
     assert.match(html, /<nav class="project-nav project-container"/);
+    const [service, ctaLabel] = ctaByCategory[project.category];
+    assert.match(
+      html,
+      new RegExp(`class="project-end-cta project-container"[\\s\\S]*?href="/contacto/\\?servicio=${service}&amp;proyecto=${project.slug}"[^>]*>${ctaLabel}</a>`)
+    );
+    assert.equal(
+      (html.match(new RegExp(`href="/contacto/\\?servicio=${service}&amp;proyecto=${project.slug}"[^>]*>${ctaLabel}</a>`, "g")) || []).length,
+      2,
+      project.slug
+    );
+    assert.ok(html.indexOf('class="project-end-cta') < html.indexOf('class="project-nav'), project.slug);
+    assert.equal((html.match(/class="project-end-cta/g) || []).length, 1, project.slug);
     assert.match(html, /rel="prev"/);
     assert.match(html, /rel="next"/);
     assert.doesNotMatch(html, />Galería<|Secuencia visual/);
@@ -100,6 +119,7 @@ test("cada proyecto usa una ficha editorial compacta y conserva su navegación",
   assert.match(css, /\.project-hero__grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2/);
   assert.doesNotMatch(css, /\.project-cover\s*\{[^}]*?(?:height|max-height|aspect-ratio)\s*:/);
   assert.match(css, /\.related-grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(3/);
+  assert.match(css, /\.project-end-cta\s*\{[\s\S]*?justify-content:\s*flex-end/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.project-gallery-grid\s*\{[\s\S]*?grid-template-columns:\s*1fr/);
   assert.doesNotMatch(css, /project-narrative|project-pagination|gallery-item--/);
 });
@@ -121,16 +141,16 @@ test("el índice de proyectos conserva un orden curado y una grilla editorial re
 
   assert.deepEqual(projectLinks, [
     "antu",
-    "big-dreams",
-    "casa-alicia",
+    "render-bd",
+    "casa-al",
     "casa-bv",
-    "casa-cg",
+    "casa-ca",
     "cdl",
     "homeoffice-cg",
-    "oficina-gl",
+    "oficina-le",
     "quincho-ss",
-    "render-pocuro",
-    "zenteno",
+    "laderas-del-sur",
+    "zen416",
     "oficina-tr",
     "casa-ba",
     "taller-salfa",
@@ -146,10 +166,15 @@ test("el índice de proyectos conserva un orden curado y una grilla editorial re
   assert.equal((html.match(/<article class="project-card"/g) || []).length, projects.length);
   assert.match(html, /<h2 class="project-card__title">ANTU<\/h2>[\s\S]*?<div class="project-card__meta">\s*<p><span>Arquitectura<\/span><span>Temuco<\/span><\/p>/);
   assert.match(html, /project-card__media project-card__media--empty">\s*<h2 class="project-card__title">CASA101<\/h2>/);
+  projects.forEach((project) => {
+    const titleMarkup = html.match(new RegExp(`href="\\/proyectos\\/${project.slug}\\/"[\\s\\S]*?<h2 class="project-card__title">([\\s\\S]*?)<\\/h2>`))?.[1] || "";
+    const breakCount = (titleMarkup.match(/<br>/g) || []).length;
+    assert.equal(breakCount, project.title.trim().split(/\s+/).length > 2 ? 1 : 0, project.slug);
+  });
   assert.match(html, /data-categories="Workspaces"/);
   assert.match(html, /data-categories="Oficina Técnica Externa\|Oficina Técnica"/);
   assert.match(css, /\.page-projects \.project-grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(3/);
-  assert.match(css, /\.page-projects \.project-card__title\s*\{[\s\S]*?position:\s*absolute;[\s\S]*?font-size:\s*clamp\(2rem, 3\.8vw, 4rem\)/);
+  assert.match(css, /\.page-projects \.project-card__title\s*\{[\s\S]*?position:\s*absolute;[\s\S]*?font-size:\s*clamp\(1\.8rem, 3\.4vw, 3\.6rem\)/);
   assert.match(css, /\.page-projects \.project-card__meta p > span\s*\{[\s\S]*?display:\s*block/);
   assert.match(css, /\.page-projects \.project-card__meta p > span:first-child\s*\{[\s\S]*?font-weight:\s*700/);
   assert.match(css, /@media \(max-width: 1024px\)[\s\S]*?\.page-projects \.project-grid\s*\{[\s\S]*?repeat\(2/);
@@ -171,10 +196,10 @@ test("la oficina técnica replica la composición editorial solicitada y reutili
   assert.doesNotMatch(html, /ENTREGABLES|technical-deliverables|Cada entrega debe conservar/);
   assert.ok(html.indexOf('class="hero site-hero site-hero--technical"') < html.indexOf('class="technical-method"'));
   assert.ok(html.indexOf('class="technical-method"') < html.indexOf('class="technical-projects"'));
-  assert.match(html, /class="button button--primary" href="\/contacto\/">Solicitar reunión<\/a>/);
+  assert.equal((html.match(/href="\/contacto\/\?servicio=oficina-tecnica"[^>]*>Solicitar apoyo técnico<\/a>/g) || []).length, 2);
   assert.match(html, /<p class="eyebrow">PROYECTOS<\/p>[\s\S]*?<h2 id="technical-projects-title">Trabajo reciente<\/h2>/);
   assert.match(html, /class="project-carousel" data-carousel/);
-  assert.deepEqual(carouselLinks, ["/proyectos/render-pocuro/", "/proyectos/casa-ba/", "/proyectos/taller-salfa/"]);
+  assert.deepEqual(carouselLinks, ["/proyectos/laderas-del-sur/", "/proyectos/casa-ba/", "/proyectos/taller-salfa/"]);
   assert.match(carousel, /aria-label="Oficina técnica externa"/);
   assert.match(carousel, /data-title="LADERAS DEL SUR" data-location="Temuco" data-active/);
   assert.match(carousel, /data-carousel-title>LADERAS DEL SUR<\/strong>[\s\S]*?data-carousel-location>Temuco<\/span>/);
@@ -216,16 +241,17 @@ test("Servicios presenta cuatro áreas en el orden y las rutas acordadas", () =>
   assert.match(main, /<span>Resolver el proyecto<\/span> <span>antes de construir\.<\/span>/);
   assert.match(main, /<strong><u>Arquitectura<\/u><\/strong>, <strong><u>documentación BIM<\/u><\/strong> y <strong><u>visualización<\/u><\/strong> integradas en un mismo proceso para <strong><u>coordinar decisiones<\/u><\/strong>, <strong><u>reducir errores<\/u><\/strong> y llegar a obra con <strong><u>mayor claridad<\/u><\/strong>\./);
   assert.doesNotMatch(main, /Ver capacidades/);
-  assert.match(main, /class="button button--primary" href="\/contacto\/">Conversar sobre un proyecto<\/a>/);
+  assert.match(main, /href="\/contacto\/\?motivo=proyecto"[^>]*>Conversemos sobre tu proyecto<\/a>/);
   assert.match(main, /id="capacidades"/);
   assert.doesNotMatch(main, /Tres capacidades/);
   assert.doesNotMatch(main, /ÁREAS DE TRABAJO|ALCANCE HABITUAL|technical-support|Capacidad técnica sin ampliar/);
   assert.match(main, /<span>Cuatro áreas\.<\/span>[\s\S]*?<span>Una misma<\/span>[\s\S]*?<span>forma de trabajar\.<\/span>/);
-  assert.match(main, /class="button service-row__link" href="\/proyectos\/">Ver arquitectura e interiores<\/a>/);
-  assert.match(main, /class="button service-row__link" href="\/contacto\/">Ver workspaces<\/a>/);
-  assert.match(main, /class="button service-row__link" href="\/proyectos\/render-pocuro\/">Ver visualización<\/a>/);
-  assert.match(main, /class="button service-row__link" href="\/oficina-tecnica\/">Conocer oficina técnica<\/a>/);
-  assert.match(main, /class="project-cta"[\s\S]*?class="button button--primary" href="\/contacto\/">Solicitar una conversación<\/a>[\s\S]*?class="button button--primary" href="\/proyectos\/">Ver proyectos<\/a>/);
+  assert.match(main, /href="\/contacto\/\?servicio=arquitectura-interiorismo"[^>]*>Conversemos sobre tu proyecto<\/a>/);
+  assert.match(main, /href="\/contacto\/\?servicio=workspaces"[^>]*>Conversemos sobre tu espacio de trabajo<\/a>/);
+  assert.match(main, /href="\/contacto\/\?servicio=visualizacion"[^>]*>Cotizar visualización<\/a>/);
+  assert.match(main, /href="\/contacto\/\?servicio=oficina-tecnica"[^>]*>Solicitar apoyo técnico<\/a>/);
+  assert.doesNotMatch(main, /Ver visualización|Laderas del Sur<\/a>/i);
+  assert.match(main, /class="project-cta"[\s\S]*?href="\/contacto\/\?motivo=proyecto"[^>]*>Conversemos sobre tu proyecto<\/a>[\s\S]*?href="\/proyectos\/">Ver proyectos<\/a>/);
   assert.match(main, /<span>Definamos qué<\/span>[\s\S]*?<span>necesita resolver<\/span>[\s\S]*?<span>tu proyecto\.<\/span>/);
   assert.equal((main.match(/<figure class="service-row__media">/g) || []).length, 4);
   assert.match(main, /project-details\/antu\/img-0-[0-9]+\.avif/);
@@ -256,7 +282,7 @@ test("Estudio presenta oficina, dirección y red con composición editorial resp
   assert.match(main, /EEAD es una oficina de <strong><u>arquitectura e interiorismo<\/u><\/strong> que trabaja cada proyecto con <strong><u>cercanía, criterio y precisión técnica<\/u><\/strong>\./);
   assert.match(main, /Creemos que la arquitectura correcta es simple: <strong><u>debe resolverse antes de construir<\/u><\/strong>\./);
   assert.match(main, /Cada decisión busca aportar <strong><u>claridad al cliente, coherencia al proyecto y mayor control sobre el proceso<\/u><\/strong>\./);
-  assert.match(main, /class="hero__copy"><div class="hero__actions"><a class="button button--primary" href="\/contacto\/">CONVERSAR SOBRE UN PROYECTO<\/a>/);
+  assert.match(main, /class="hero__copy"><div class="hero__actions"><a class="button button--primary" href="\/contacto\/\?motivo=proyecto"[^>]*>CONVERSEMOS SOBRE TU PROYECTO<\/a>/);
   assert.doesNotMatch(main.match(/class="hero site-hero site-hero--studio"[\s\S]*?<\/header>/)?.[0] || "", /class="hero__lead"/);
   assert.match(main, /<h2>Emir Esparza<\/h2>/);
   assert.match(main, /ARQUITECTO<br>MG \(C\) TECNOLOGÍAS APLICADAS A LA CONSTRUCCIÓN<br>DIRECTOR EEAD/);
@@ -269,7 +295,7 @@ test("Estudio presenta oficina, dirección y red con composición editorial resp
   assert.match(main, /alt="Retrato de Emir Esparza, arquitecto y director de EEAD\."/);
   assert.match(main, /<span>Conversemos sobre<\/span>[\s\S]*?<span>lo que tu proyecto<\/span>[\s\S]*?<span>necesita resolver\.<\/span>/);
   assert.doesNotMatch(main, /Iniciar conversación/);
-  assert.match(main, /class="studio-cta__actions"[\s\S]*?href="\/contacto\/">Solicitar una conversación<\/a>[\s\S]*?href="\/proyectos\/">Ver proyectos<\/a>/);
+  assert.match(main, /class="studio-cta__actions"[\s\S]*?href="\/contacto\/\?motivo=proyecto"[^>]*>Conversemos sobre tu proyecto<\/a>[\s\S]*?href="\/proyectos\/">Ver proyectos<\/a>/);
   assert.ok(main.indexOf('class="studio-intro"') < main.indexOf('class="studio-direction"'));
   assert.ok(main.indexOf('class="studio-direction"') < main.indexOf('class="studio-cta"'));
   assert.doesNotMatch(main, /Cómo trabajamos|Arquitectura e interiores|Visualización y criterio|Desarrollo técnico/);
@@ -379,7 +405,7 @@ test("la home presenta cuatro áreas de servicio y conecta directamente con el c
     "<strong><u>MODELADO 3D  |  RENDERS  | VIDEOS  |  IMÁGENES COMERCIALES  |  BRANDING INMOBILIARIO</u></strong>",
     "<strong><u>APOYO ESPECIALIZADO  |  DOCUMENTACIÓN  |  DIBUJO TÉCNICO  |  MODELADO  |  BIM</u></strong>"
   ].forEach((copy) => assert.ok(services.includes(copy), copy));
-  assert.match(services, /href="\/contacto\/">Explorar workspaces<\/a>/);
+  assert.match(services, /href="\/contacto\/\?servicio=workspaces"[^>]*>Conversemos sobre tu espacio de trabajo<\/a>/);
   assert.doesNotMatch(html, /class="technical-strip"/);
   assert.doesNotMatch(html, /03 \/ Documentación/);
   assert.ok(html.indexOf('class="home-services"') < html.indexOf('class="home-closure"'));
@@ -402,7 +428,7 @@ test("el hero incorpora movimiento limitado, dither fijo y ticker accesible", ()
   assert.match(tickerGroups[0], />Araucanía<\/span>/);
   assert.match(html, /editorial-ticker__viewport" aria-hidden="true"/);
   assert.match(html, /<p class="sr-only">Arquitectura e interiorismo\. Arquitectura Simple\.[\s\S]*?Araucanía\. Chile\.<\/p>/);
-  assert.match(html, /class="button button--primary" href="\/proyectos\/">Proyectos<\/a>[\s\S]*?class="button button--primary" href="\/contacto\/">Agenda una reunión<\/a>/);
+  assert.match(html, /class="button button--primary" href="\/proyectos\/">Proyectos<\/a>[\s\S]*?href="\/contacto\/\?motivo=proyecto"[^>]*>Conversemos sobre tu proyecto<\/a>/);
 
   assert.match(css, /\/\* hero-contrast:start \*\//);
   assert.match(css, /\/\* hero-dither:start \*\//);
@@ -456,7 +482,7 @@ test("todas las páginas comparten el footer editorial actualizado", () => {
     return footer;
   });
 
-  assert.equal(new Set(footers).size, 1);
+  assert.equal(footers.length, files.length);
   assert.match(css, /\.footer-wordmark\s*\{[\s\S]*?font-family:\s*"Syne"/);
   assert.match(css, /\.site-footer\s*\{[\s\S]*?text-transform:\s*uppercase/);
 });
@@ -564,9 +590,9 @@ test("cada página indexable tiene el title SEO esperado y un canonical único",
   const typologies = {
     Arquitectura: "Arquitectura",
     Interiorismo: "Interiorismo",
-    Workspaces: "Espacios de trabajo",
-    Visualización: "Visualización arquitectónica",
-    "Oficina Técnica Externa": "Oficina técnica externa"
+    Workspaces: "Workspaces",
+    Visualización: "Visualización",
+    "Oficina Técnica Externa": "Oficina Técnica"
   };
   const expectedTitles = new Map([
     ...mainTitles,
@@ -590,6 +616,88 @@ test("cada página indexable tiene el title SEO esperado y un canonical único",
     titles.add(title);
     canonicals.add(canonical);
   });
+});
+
+test("los seis proyectos usan slugs canónicos persistidos y redirecciones directas", () => {
+  const expected = new Map([
+    ["RENDER BD", ["big-dreams", "render-bd"]],
+    ["CASA AL", ["casa-alicia", "casa-al"]],
+    ["CASA CA", ["casa-cg", "casa-ca"]],
+    ["OFICINA LE", ["oficina-gl", "oficina-le"]],
+    ["LADERAS DEL SUR", ["render-pocuro", "laderas-del-sur"]],
+    ["ZEN416", ["zenteno", "zen416"]]
+  ]);
+
+  expected.forEach(([oldSlug, newSlug], title) => {
+    assert.equal(projects.find((project) => project.title === title)?.slug, newSlug);
+    assert.equal(legacyStaticRedirects.get(`/proyectos/${oldSlug}/`), `/proyectos/${newSlug}/`);
+    assert.ok(fs.existsSync(path.join(root, "proyectos", newSlug, "index.html")));
+    assert.ok(!fs.existsSync(path.join(root, "proyectos", oldSlug)));
+  });
+
+  const activeSlugs = new Set(projects.map((project) => project.slug));
+  legacyStaticRedirects.forEach((target) => {
+    const targetSlug = target.match(/^\/proyectos\/([^/]+)\/$/)?.[1];
+    if (targetSlug) assert.ok(activeSlugs.has(targetSlug), target);
+  });
+});
+
+test("canonical, Open Graph, Twitter y JSON-LD coinciden con cada URL pública", () => {
+  const files = [
+    "index.html",
+    "proyectos/index.html",
+    ...projects.map((project) => `proyectos/${project.slug}/index.html`),
+    "servicios/index.html",
+    "oficina-tecnica/index.html",
+    "estudio/index.html",
+    "contacto/index.html",
+    "privacidad/index.html"
+  ];
+
+  files.forEach((file) => {
+    const html = fs.readFileSync(path.join(root, file), "utf8");
+    const pathname = file === "index.html" ? "/" : `/${file.replace(/index\.html$/, "")}`;
+    const canonical = `https://eead.cl${pathname}`;
+    assert.equal((html.match(/<link rel="canonical"/g) || []).length, 1, file);
+    assert.match(html, new RegExp(`<link rel="canonical" href="${canonical}">`));
+    assert.ok(html.includes(`<meta property="og:url" content="${canonical}">`), file);
+    assert.match(html, /<meta property="og:image" content="https:\/\/eead\.cl\/[^" ]+">/);
+    assert.match(html, /<meta name="twitter:card" content="summary_large_image">/);
+
+    const data = JSON.parse(html.match(/<script type="application\/ld\+json">(.+)<\/script>/)?.[1]);
+    const graph = Array.isArray(data) ? data : [data];
+    assert.ok(JSON.stringify(data).includes(canonical), file);
+    if (pathname !== "/") {
+      const breadcrumbs = graph.find((item) => item["@type"] === "BreadcrumbList");
+      assert.ok(breadcrumbs, file);
+      assert.equal(breadcrumbs.itemListElement.at(-1).item, canonical, file);
+    }
+  });
+
+  const contact = fs.readFileSync(path.join(root, "contacto/index.html"), "utf8");
+  assert.match(contact, /<link rel="canonical" href="https:\/\/eead\.cl\/contacto\/">/);
+  assert.doesNotMatch(contact, /canonical" href="[^"]+\?/);
+});
+
+test("sitemap y robots publican solo rutas canónicas indexables", () => {
+  const sitemap = fs.readFileSync(path.join(root, "sitemap.xml"), "utf8");
+  const urls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
+  const expected = [
+    "https://eead.cl/",
+    "https://eead.cl/proyectos/",
+    ...projects.map((project) => `https://eead.cl/proyectos/${project.slug}/`),
+    "https://eead.cl/servicios/",
+    "https://eead.cl/oficina-tecnica/",
+    "https://eead.cl/estudio/",
+    "https://eead.cl/contacto/",
+    "https://eead.cl/privacidad/"
+  ];
+  assert.deepEqual(urls, expected);
+  assert.equal(new Set(urls).size, urls.length);
+
+  const robots = fs.readFileSync(path.join(root, "robots.txt"), "utf8");
+  assert.match(robots, /Sitemap: https:\/\/eead\.cl\/sitemap\.xml/);
+  assert.doesNotMatch(robots, /Disallow:\s*\/(?:assets|proyectos|servicios)/);
 });
 
 test("Contacto usa una sección compacta y un formulario accesible de cinco campos", () => {
@@ -617,13 +725,15 @@ test("Contacto usa una sección compacta y un formulario accesible de cinco camp
     'id="contact-form-title">CUÉNTANOS TU ENCARGO</h2>',
     'action="https://formsubmit.co/ajax/emiresparza@gmail.com"',
     "Arquitectura e interiorismo",
-    "Oficina técnica / BIM",
+    "Workspaces",
+    "Oficina técnica externa",
     "Visualización arquitectónica",
-    "<option>Otro</option>",
+    "Proyecto similar",
+    '<option value="otro">Otro</option>',
     'placeholder="Comuna, ciudad o región"',
     'placeholder="Describa brevemente el proyecto, su etapa actual y cualquier plazo o condición relevante."',
     'href="mailto:hola@eead.cl"',
-    'href="https://wa.me/56987283154"',
+    'href="https://wa.me/56987283154?text=',
     'href="https://www.instagram.com/eead.cl/"',
     "HOLA@EEAD.CL",
     "(+569) 87 28 31 54",
@@ -674,6 +784,45 @@ test("Contacto usa una sección compacta y un formulario accesible de cinco camp
   assert.match(javascript, /let isSubmitting = false/);
   assert.match(javascript, /if \(isSubmitting\) return/);
   assert.match(javascript, /new AbortController\(\)/);
+});
+
+test("los CTA conservan contexto, accesibilidad y medición sin instalar analítica", () => {
+  const javascript = fs.readFileSync(path.join(root, "main.js"), "utf8");
+  const files = [
+    "index.html",
+    "proyectos/index.html",
+    ...projects.map((project) => `proyectos/${project.slug}/index.html`),
+    "servicios/index.html",
+    "oficina-tecnica/index.html",
+    "estudio/index.html",
+    "contacto/index.html"
+  ];
+
+  files.forEach((file) => {
+    const html = fs.readFileSync(path.join(root, file), "utf8");
+    assert.doesNotMatch(html, /Agendar reunión|Agenda una reunión|Solicitar reunión/);
+    for (const match of html.matchAll(/<a\b([^>]*target="_blank"[^>]*)>/g)) {
+      assert.match(match[1], /href="https:\/\//, file);
+      assert.match(match[1], /rel="noopener noreferrer"/, file);
+    }
+    for (const match of html.matchAll(/href="#([^"]+)"/g)) {
+      assert.match(html, new RegExp(`id="${match[1]}"`), `${file}: #${match[1]}`);
+    }
+  });
+
+  const antu = fs.readFileSync(path.join(root, "proyectos/antu/index.html"), "utf8");
+  assert.match(antu, /servicio=arquitectura-interiorismo&amp;proyecto=antu/);
+  assert.match(antu, /text=Hola%2C\+quisiera\+consultar\+por\+un\+proyecto\+similar\+a\+ANTU\./);
+  assert.match(antu, /aria-label="Contactar por WhatsApp" title="Contactar por WhatsApp"/);
+
+  assert.match(javascript, /typeof window\.gtag === "function"/);
+  assert.match(javascript, /Array\.isArray\(window\.dataLayer\)/);
+  ["cta_click", "whatsapp_click", "email_click", "form_start", "form_submit"].forEach((eventName) => {
+    assert.ok(javascript.includes(`"${eventName}"`), eventName);
+  });
+  assert.match(javascript, /Object\.hasOwn\(serviceLabels, service\)/);
+  assert.match(javascript, /Object\.hasOwn\(projectNames, projectSlug\)/);
+  assert.match(javascript, /!message\.value\.trim\(\)/);
 });
 
 test("las páginas HTML legacy ya no se publican", () => {

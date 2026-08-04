@@ -22,6 +22,14 @@ const allHtmlFiles = [
   "404.html"
 ];
 const legacyHtmlFiles = ["projects.html", "proyecto.html", "nosotros.html", "blog.html", "post.html"];
+const oldProjectPaths = [
+  "/proyectos/big-dreams/",
+  "/proyectos/casa-alicia/",
+  "/proyectos/casa-cg/",
+  "/proyectos/oficina-gl/",
+  "/proyectos/render-pocuro/",
+  "/proyectos/zenteno/"
+];
 
 function report(condition, message) {
   if (!condition) errors.push(message);
@@ -51,6 +59,27 @@ for (const relativePath of allHtmlFiles) {
     report(/<meta property="og:description" content="[^"]+">/.test(html), `${relativePath}: falta og:description`);
     report(/<meta property="og:image" content="https:\/\/eead\.cl\/[^"]+">/.test(html), `${relativePath}: falta og:image`);
     report(/<script type="application\/ld\+json">.+<\/script>/.test(html), `${relativePath}: falta JSON-LD`);
+  }
+
+  if (isIndexable) {
+    const pathname = relativePath === "index.html" ? "/" : `/${relativePath.replace(/index\.html$/, "")}`;
+    const canonical = `https://eead.cl${pathname}`;
+    report((html.match(/<link rel="canonical"/g) || []).length === 1, `${relativePath}: debe tener un canonical`);
+    report(html.includes(`<link rel="canonical" href="${canonical}">`), `${relativePath}: canonical no coincide con su ruta`);
+    report(html.includes(`<meta property="og:url" content="${canonical}">`), `${relativePath}: og:url no coincide con canonical`);
+    report(!oldProjectPaths.some((oldPath) => html.includes(`href="${oldPath}`)), `${relativePath}: contiene enlace interno a un slug antiguo`);
+
+    const jsonText = html.match(/<script type="application\/ld\+json">(.+)<\/script>/)?.[1];
+    try {
+      const data = JSON.parse(jsonText);
+      report(JSON.stringify(data).includes(canonical), `${relativePath}: JSON-LD no contiene su URL canónica`);
+      if (pathname !== "/") {
+        const graph = Array.isArray(data) ? data : [data];
+        report(graph.some((item) => item?.["@type"] === "BreadcrumbList"), `${relativePath}: falta BreadcrumbList`);
+      }
+    } catch {
+      report(false, `${relativePath}: JSON-LD inválido`);
+    }
   }
 
   for (const match of html.matchAll(/<(?:input|textarea)\b([^>]*\bplaceholder="[^"]*"[^>]*)>/g)) {
@@ -119,6 +148,18 @@ const publicHtml = indexableFiles.map((file) => fs.readFileSync(path.join(root, 
 report(!publicHtml.includes(`${directorName} Arquitectura y Diseño`), "La denominación pública anterior todavía aparece");
 report(!publicHtml.includes(">EEF.<"), "La marca EEF todavía aparece");
 report(!publicHtml.includes(">Blog<"), "Blog todavía aparece en la navegación pública");
+report(!oldProjectPaths.some((oldPath) => publicHtml.includes(oldPath)), "Una URL antigua todavía aparece en HTML indexable");
+
+const sitemap = fs.readFileSync(path.join(root, "sitemap.xml"), "utf8");
+const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
+const expectedUrls = indexableFiles.map((file) => `https://eead.cl${file === "index.html" ? "/" : `/${file.replace(/index\.html$/, "")}`}`);
+report(new Set(sitemapUrls).size === sitemapUrls.length, "sitemap.xml contiene URLs duplicadas");
+report(sitemapUrls.length === expectedUrls.length && expectedUrls.every((url) => sitemapUrls.includes(url)), "sitemap.xml no coincide con las rutas indexables");
+report(!oldProjectPaths.some((oldPath) => sitemap.includes(oldPath)), "sitemap.xml contiene una URL antigua");
+
+const robots = fs.readFileSync(path.join(root, "robots.txt"), "utf8");
+report(robots.includes("Sitemap: https://eead.cl/sitemap.xml"), "robots.txt no declara el sitemap canónico");
+report(!/Disallow:\s*\/(?:assets|proyectos|servicios)/.test(robots), "robots.txt bloquea recursos o rutas públicas");
 
 const studio = fs.readFileSync(path.join(root, "estudio/index.html"), "utf8");
 const pagesOutsideStudio = indexableFiles

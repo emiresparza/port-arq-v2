@@ -1,6 +1,40 @@
 (function () {
   "use strict";
 
+  const trackEvent = (eventName, parameters = {}) => {
+    const cleanParameters = Object.fromEntries(
+      Object.entries(parameters).filter(([, value]) => value !== "")
+    );
+
+    if (typeof window.gtag === "function") {
+      window.gtag("event", eventName, cleanParameters);
+    } else if (Array.isArray(window.dataLayer)) {
+      window.dataLayer.push({ event: eventName, ...cleanParameters });
+    }
+  };
+
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest("a[href]");
+    if (!link) return;
+
+    const eventName = link.hasAttribute("data-whatsapp")
+      ? "whatsapp_click"
+      : link.hasAttribute("data-email")
+        ? "email_click"
+        : link.hasAttribute("data-cta")
+          ? "cta_click"
+          : "";
+    if (!eventName) return;
+
+    trackEvent(eventName, {
+      cta_label: link.textContent.trim() || link.getAttribute("aria-label") || "",
+      cta_location: link.dataset.ctaLocation || "",
+      service: link.dataset.service || "",
+      project_slug: link.dataset.projectSlug || "",
+      destination: link.getAttribute("href") || ""
+    });
+  });
+
   const header = document.querySelector("[data-header]");
   const menuButton = document.querySelector(".menu-toggle");
   const menu = document.querySelector(".site-nav");
@@ -370,7 +404,55 @@
       ubicacion: "Indique la ubicación del proyecto.",
       mensaje: "Describa brevemente el proyecto y su etapa actual."
     };
+    const serviceLabels = {
+      "arquitectura-interiorismo": "Arquitectura e interiorismo",
+      workspaces: "Workspaces",
+      "oficina-tecnica": "Oficina técnica externa",
+      visualizacion: "Visualización arquitectónica",
+      "proyecto-similar": "Proyecto similar"
+    };
+    const searchParams = new URLSearchParams(window.location.search);
+    const motivo = searchParams.get("motivo");
+    const service = searchParams.get("servicio");
+    const projectSlug = searchParams.get("proyecto");
+    const serviceSelect = form.elements.tipo_encargo;
+    const message = form.elements.mensaje;
+    let projectNames = {};
+    let formStarted = false;
     let isSubmitting = false;
+
+    try {
+      projectNames = JSON.parse(form.dataset.projects || "{}");
+    } catch {
+      projectNames = {};
+    }
+
+    if (motivo === "proyecto") form.dataset.motivo = motivo;
+    if (Object.hasOwn(serviceLabels, service) && !serviceSelect.value) {
+      serviceSelect.value = service;
+      form.dataset.service = service;
+    }
+    if (Object.hasOwn(serviceLabels, service) && Object.hasOwn(projectNames, projectSlug)) {
+      form.dataset.projectSlug = projectSlug;
+      if (!message.value.trim()) {
+        message.value = `Quisiera conversar sobre un proyecto similar a ${projectNames[projectSlug]}.`;
+      }
+    }
+
+    const trackFormStart = () => {
+      if (formStarted) return;
+      formStarted = true;
+      trackEvent("form_start", {
+        cta_label: "Formulario de contacto",
+        cta_location: "contact",
+        service: Object.hasOwn(serviceLabels, serviceSelect.value) ? serviceSelect.value : "",
+        project_slug: form.dataset.projectSlug || "",
+        destination: form.action
+      });
+    };
+
+    form.addEventListener("input", trackFormStart);
+    form.addEventListener("change", trackFormStart);
 
     const errorElement = (control) => {
       const describedBy = (control.getAttribute("aria-describedby") || "").split(" ");
@@ -438,6 +520,13 @@
 
         if (!response.ok || !delivered) throw new Error(`Respuesta ${response.status}`);
 
+        trackEvent("form_submit", {
+          cta_label: "Formulario de contacto",
+          cta_location: "contact",
+          service: Object.hasOwn(serviceLabels, serviceSelect.value) ? serviceSelect.value : "",
+          project_slug: form.dataset.projectSlug || "",
+          destination: form.action
+        });
         form.reset();
         status.classList.add("is-success");
         status.textContent = "Gracias. Su consulta fue enviada correctamente.";
