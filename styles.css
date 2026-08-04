@@ -2942,7 +2942,7 @@ h2 {
 }
 
 .project-hero {
-  padding: clamp(48px, 5vw, 72px) 0 clamp(28px, 3vw, 42px);
+  padding: clamp(48px, 5vw, 72px) 0 clamp(28px, 2.5vw, 36px);
 }
 
 .project-hero__grid {
@@ -3010,7 +3010,7 @@ h2 {
 }
 
 .project-description + .button {
-  margin-top: 28px;
+  margin-top: clamp(20px, 2vw, 24px);
 }
 
 .project-meta {
@@ -3053,7 +3053,7 @@ h2 {
 }
 
 .page-project-detail .project-gallery {
-  padding: 12px 0 clamp(52px, 5vw, 72px);
+  padding: 12px 0 0;
 }
 
 .project-section-heading {
@@ -3098,13 +3098,17 @@ h2 {
 }
 
 .project-end-cta {
-  display: flex;
-  justify-content: flex-end;
-  padding-bottom: clamp(36px, 4vw, 52px);
+  margin-top: clamp(40px, 5vw, 64px);
+  margin-bottom: clamp(32px, 4vw, 48px);
 }
 
-.project-cover + .project-end-cta {
-  padding-top: clamp(52px, 5vw, 72px);
+.page-project-detail .project-end-cta .button {
+  width: 100%;
+  justify-content: center;
+}
+
+.page-project-detail .project-end-cta .button::after {
+  margin-left: 0;
 }
 
 .project-nav {
@@ -3112,10 +3116,6 @@ h2 {
   grid-template-columns: 1fr 1fr;
   border-top: 1px solid var(--project-line);
   border-bottom: 1px solid var(--project-line);
-}
-
-.project-cover + .project-nav {
-  margin-top: clamp(52px, 5vw, 72px);
 }
 
 .project-nav a {
@@ -3277,7 +3277,7 @@ h2 {
   }
 
   .page-project-detail .project-gallery {
-    padding: 8px 0 48px;
+    padding: 8px 0 0;
   }
 
   .project-section-heading {

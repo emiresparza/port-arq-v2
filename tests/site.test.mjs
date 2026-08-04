@@ -119,7 +119,10 @@ test("cada proyecto usa una ficha editorial compacta y conserva su navegación",
   assert.match(css, /\.project-hero__grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2/);
   assert.doesNotMatch(css, /\.project-cover\s*\{[^}]*?(?:height|max-height|aspect-ratio)\s*:/);
   assert.match(css, /\.related-grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(3/);
-  assert.match(css, /\.project-end-cta\s*\{[\s\S]*?justify-content:\s*flex-end/);
+  assert.match(css, /\.project-description \+ \.button\s*\{[\s\S]*?margin-top:\s*clamp\(20px, 2vw, 24px\)/);
+  assert.match(css, /\.project-end-cta\s*\{[\s\S]*?margin-top:\s*clamp\(40px, 5vw, 64px\);[\s\S]*?margin-bottom:\s*clamp\(32px, 4vw, 48px\)/);
+  assert.match(css, /\.page-project-detail \.project-end-cta \.button\s*\{[\s\S]*?width:\s*100%;[\s\S]*?justify-content:\s*center/);
+  assert.match(css, /\.page-project-detail \.project-end-cta \.button::after\s*\{[\s\S]*?margin-left:\s*0/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*?\.project-gallery-grid\s*\{[\s\S]*?grid-template-columns:\s*1fr/);
   assert.doesNotMatch(css, /project-narrative|project-pagination|gallery-item--/);
 });
